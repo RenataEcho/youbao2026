@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>右豹管理后台 · 奖励明细</title>
+  <script>(function(){var s=localStorage.getItem('theme'),p=window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',s||p);})();</script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --primary: #2563eb; --primary-hover: #1d4ed8; --primary-active: #1e40af;
+      --primary-light: #eff6ff; --primary-border: #bfdbfe;
+      --success: #16a34a; --success-bg: #f0fdf4; --success-border: #bbf7d0;
+      --warning: #d97706; --warning-bg: #fffbeb; --warning-border: #fde68a;
+      --danger: #dc2626; --danger-bg: #fef2f2; --danger-border: #fca5a5;
+      --info: #0891b2; --info-bg: #ecfeff; --info-border: #a5f3fc;
+      --bg: #f0f4f8; --surface: #ffffff; --surface-hover: #f8fafc;
+      --border: #e8edf3; --border-hover: #c8d5e2;
+      --text-primary: #18222f; --text-secondary: #4a5568;
+      --text-muted: #9aa5b4; --text-disabled: #c8d5e2;
+      --shadow-sm: 0 1px 4px rgba(30,40,60,0.06);
+      --shadow: 0 2px 10px rgba(30,40,60,0.08);
+      --shadow-lg: 0 8px 28px rgba(30,40,60,0.11);
+      --shadow-xl: 0 20px 60px rgba(30,40,60,0.18);
+      --radius-xs: 4px; --radius-sm: 7px; --radius: 10px;
+      --radius-lg: 14px; --radius-xl: 20px;
+      --transition: all 0.16s ease; --transition-slow: all 0.28s ease;
+      --topnav-h: 54px; --sidebar-w: 196px;
+      --topnav-bg: linear-gradient(135deg, #dbeafe 0%, #ede9fe 40%, #e0f2fe 100%);
+      --topnav-text: #3b4d6b; --topnav-text-active: #1e3a8a;
+      --topnav-hover-bg: rgba(99,102,241,0.09); --topnav-active-bg: rgba(99,102,241,0.13);
+      --topnav-border: rgba(148,163,196,0.25);
+      --sidebar-bg: rgba(240,244,255,0.92); --sidebar-border: rgba(148,163,196,0.22);
+    }
+    [data-theme="dark"] {
+      --bg: #0f172a; --surface: #1e293b; --surface-hover: #273348;
+      --border: #334155; --border-hover: #475569;
+      --text-primary: #f1f5f9; --text-secondary: #94a3b8;
+      --text-muted: #475569; --text-disabled: #334155;
+      --shadow-sm: 0 1px 4px rgba(0,0,0,0.3); --shadow: 0 2px 10px rgba(0,0,0,0.35);
+      --shadow-lg: 0 8px 28px rgba(0,0,0,0.45); --shadow-xl: 0 20px 60px rgba(0,0,0,0.6);
+      --topnav-bg: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0c1a2e 100%);
+      --topnav-text: rgba(203,213,225,0.85); --topnav-text-active: #f1f5f9;
+      --topnav-hover-bg: rgba(255,255,255,0.08); --topnav-active-bg: rgba(255,255,255,0.13);
+      --topnav-border: rgba(255,255,255,0.10);
+      --sidebar-bg: rgba(15,23,42,0.97); --sidebar-border: rgba(255,255,255,0.07);
+    }
+    html, body { height:100%; }
+    body { font-family:'PingFang SC','Microsoft YaHei','Segoe UI',-apple-system,sans-serif;font-size:13px;color:var(--text-primary);background:#f0f4f8;transition:background 0.2s,color 0.2s; }
+    [data-theme="dark"] body { background:#0f172a; }
+
+    /* TopNav */
+    .topnav { position:fixed;top:0;left:0;right:0;height:var(--topnav-h);z-index:300;display:flex;align-items:center;background:var(--topnav-bg);backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);border-bottom:1px solid var(--topnav-border);box-shadow:0 2px 16px rgba(99,102,241,0.10); }
+    .topnav-logo { display:flex;align-items:center;gap:9px;padding:0 18px;height:100%;flex-shrink:0;text-decoration:none;border-right:1px solid var(--topnav-border); }
+    .logo-icon { width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#6366f1,#2563eb);border:1px solid rgba(255,255,255,0.5);display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0;box-shadow:0 2px 8px rgba(99,102,241,0.30); }
+    .logo-name { font-size:15px;font-weight:700;color:var(--topnav-text-active);white-space:nowrap; }
+    .primary-nav { display:flex;align-items:stretch;flex:1;height:100%;overflow-x:auto;overflow-y:hidden;padding:0 6px;scrollbar-width:none; }
+    .primary-nav::-webkit-scrollbar { display:none; }
+    .pnav-item { display:flex;align-items:center;gap:6px;padding:0 14px;height:100%;font-size:13px;font-weight:500;color:var(--topnav-text);cursor:pointer;white-space:nowrap;border:none;background:none;font-family:inherit;position:relative;transition:color .15s,background .15s;flex-shrink:0;text-decoration:none; }
+    .pnav-item:hover { color:var(--topnav-text-active);background:var(--topnav-hover-bg); }
+    .pnav-item.active { color:var(--topnav-text-active);background:var(--topnav-active-bg);font-weight:600; }
+    .pnav-item.active::after { content:'';position:absolute;bottom:0;left:10px;right:10px;height:2px;border-radius:2px 2px 0 0;background:#4f46e5; }
+    [data-theme="dark"] .pnav-item.active::after { background:rgba(255,255,255,0.85); }
+    .topnav-actions { display:flex;align-items:center;gap:4px;flex-shrink:0;padding:0 12px;border-left:1px solid var(--topnav-border); }
+    .nav-icon-btn { width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:none;border:none;cursor:pointer;color:var(--topnav-text);transition:var(--transition); }
+    .nav-icon-btn:hover { background:var(--topnav-hover-bg);color:var(--topnav-text-active); }
+    .nav-user { display:flex;align-items:center;gap:7px;padding:4px 10px;border-radius:8px;cursor:pointer;transition:var(--transition); }
+    .nav-user:hover { background:var(--topnav-hover-bg); }
+    .user-avatar { width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#2563eb);display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700;flex-shrink:0; }
+    .user-name { font-size:13px;font-weight:600;color:var(--topnav-text-active); }
+    .icon-sun { display:none; }
+    [data-theme="dark"] .icon-moon { display:none; }
+    [data-theme="dark"] .icon-sun { display:block; }
+
+    /* Layout */
+    .layout { display:flex;margin-top:var(--topnav-h);min-height:calc(100vh - var(--topnav-h)); }
+    .sidebar { width:var(--sidebar-w);flex-shrink:0;position:fixed;top:var(--topnav-h);bottom:0;left:0;z-index:200;display:flex;flex-direction:column;background:var(--sidebar-bg);backdrop-filter:blur(20px) saturate(160%);-webkit-backdrop-filter:blur(20px) saturate(160%);border-right:1px solid var(--sidebar-border);box-shadow:2px 0 12px rgba(99,102,241,0.07);transition:width 0.22s ease;overflow:hidden; }
+    .sidebar-header { display:flex;align-items:center;gap:8px;padding:14px 14px 10px;border-bottom:1px solid var(--sidebar-border);flex-shrink:0;min-height:48px; }
+    .sidebar-module-icon { width:22px;height:22px;border-radius:5px;background:rgba(99,102,241,0.12);display:flex;align-items:center;justify-content:center;color:#4f46e5;flex-shrink:0; }
+    .sidebar-module-name { font-size:13px;font-weight:700;color:#1e3a8a;white-space:nowrap; }
+    [data-theme="dark"] .sidebar-module-name { color:#e2e8f0; }
+    .sidebar-scroll { flex:1;overflow-y:auto;overflow-x:hidden;padding:8px 0; }
+    .sidebar-scroll::-webkit-scrollbar { width:3px; }
+    .sidebar-scroll::-webkit-scrollbar-thumb { background:var(--border);border-radius:2px; }
+    .nav-group-label { padding:14px 22px 4px;font-size:10.5px;font-weight:700;color:#8a9abf;text-transform:uppercase;letter-spacing:0.8px;white-space:nowrap; }
+    [data-theme="dark"] .nav-group-label { color:#475569; }
+    .nav-subitem { display:flex;align-items:center;padding:0 14px 0 22px;height:36px;font-size:12.5px;color:#5a6a8a;cursor:pointer;transition:var(--transition);border:none;background:none;width:calc(100% - 16px);margin:1px 8px;font-family:inherit;position:relative;white-space:nowrap;overflow:hidden;text-align:left;border-radius:7px;text-decoration:none; }
+    [data-theme="dark"] .nav-subitem { color:rgba(148,163,184,0.80); }
+    .nav-subitem:hover { color:#2563eb;background:rgba(37,99,235,0.07); }
+    [data-theme="dark"] .nav-subitem:hover { color:#93c5fd;background:rgba(37,99,235,0.12); }
+    .nav-subitem.active { color:#2563eb;font-weight:600;background:rgba(37,99,235,0.10); }
+    [data-theme="dark"] .nav-subitem.active { color:#93c5fd;background:rgba(37,99,235,0.18); }
+    .nav-subitem::before { content:'';position:absolute;left:10px;top:50%;transform:translateY(-50%);width:5px;height:5px;border-radius:50%;background:currentColor;opacity:0.35; }
+    .nav-subitem.active::before { opacity:1; }
+    .sidebar-footer { padding:8px 10px;border-top:1px solid var(--sidebar-border);display:flex;align-items:center;flex-shrink:0; }
+    .sidebar-version { font-size:10px;color:var(--text-muted); }
+
+    /* Main */
+    .main { flex:1;margin-left:var(--sidebar-w);min-height:calc(100vh - var(--topnav-h)); }
+    .breadcrumb-bar { display:flex;align-items:center;gap:6px;padding:10px 20px 0;font-size:12px;color:var(--text-muted); }
+    .breadcrumb-bar a { color:var(--text-secondary);text-decoration:none;transition:var(--transition); }
+    .breadcrumb-bar a:hover { color:var(--primary); }
+    .bc-sep { opacity:0.5; }
+    .bc-cur { color:var(--text-primary);font-weight:500; }
+    .page-content { padding:10px 20px 24px; }
+
+    /* 玻璃卡片 */
+    .glass-card { background:rgba(255,255,255,0.72);backdrop-filter:blur(16px) saturate(180%);-webkit-backdrop-filter:blur(16px) saturate(180%);border:1px solid rgba(255,255,255,0.55);box-shadow:0 8px 32px rgba(30,40,80,0.10),inset 0 1px 0 rgba(255,255,255,0.8);border-radius:var(--radius-lg); }
+    [data-theme="dark"] .glass-card { background:rgba(30,41,59,0.65);backdrop-filter:blur(16px) saturate(160%);border:1px solid rgba(255,255,255,0.08);box-shadow:0 8px 32px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.05); }
+
+    /* 筛选区 */
+    .filter-card { padding:16px 18px;margin-bottom:14px; }
+    .filter-grid { display:grid;grid-template-columns:repeat(4,minmax(0,200px));gap:10px; }
+    .filter-extra { display:none;grid-template-columns:repeat(4,minmax(0,200px));gap:10px;margin-top:10px; }
+    .filter-extra.show { display:grid; }
+    .filter-footer { display:flex;align-items:center;justify-content:space-between;margin-top:14px;padding-top:14px;border-top:1px solid var(--border); }
+    .filter-expand-btn { font-size:12px;color:var(--primary);background:none;border:none;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:4px;padding:0; }
+    .filter-expand-btn svg { transition:transform 0.2s ease; }
+    .filter-expand-btn.expanded svg { transform:rotate(180deg); }
+    .filter-actions { display:flex;gap:8px; }
+    .form-group-filter { display:flex;flex-direction:column;gap:5px; }
+    .form-label-sm { font-size:12px;color:var(--text-secondary);font-weight:500; }
+    .form-input-sm { width:100%;height:30px;padding:0 9px;font-size:12px;font-family:inherit;color:var(--text-primary);background:var(--surface);border:1px solid var(--border);border-radius:6px;outline:none;transition:var(--transition); }
+    .form-input-sm:focus { border-color:var(--primary);box-shadow:0 0 0 3px rgba(37,99,235,0.10); }
+    .form-input-sm::placeholder { color:var(--text-muted); }
+    .form-select-sm { appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%239aa5b4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;padding-right:26px;cursor:pointer; }
+
+    /* 表格区 */
+    .table-card { overflow:hidden; }
+    .table-header { display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:8px; }
+    .table-title { font-size:14px;font-weight:600;color:var(--text-primary);display:flex;align-items:center;gap:8px; }
+    .table-count { font-size:12px;font-weight:400;color:var(--text-muted); }
+    .table-header-right { display:flex;align-items:center;gap:8px;flex-wrap:wrap; }
+    .bulk-bar { display:none;align-items:center;gap:8px; }
+    .bulk-bar.show { display:flex; }
+    .bulk-count { font-size:13px;color:var(--text-primary); }
+    .bulk-count span { color:var(--primary);font-weight:700; }
+    .table-wrap { overflow-x:auto; }
+    table { width:100%;border-collapse:collapse;min-width:1200px; }
+    thead th { background:var(--surface-hover);font-size:12px;font-weight:600;color:var(--text-secondary);letter-spacing:0.5px;padding:10px 12px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap;position:sticky;top:0; }
+    [data-theme="dark"] thead th { background:rgba(39,51,72,0.8); }
+    tbody tr { border-bottom:1px solid var(--border);transition:var(--transition); }
+    tbody tr:last-child { border-bottom:none; }
+    tbody tr:hover { background:rgba(37,99,235,0.04);box-shadow:inset 3px 0 0 var(--primary); }
+    tbody tr.selected { background:rgba(37,99,235,0.06);box-shadow:inset 3px 0 0 var(--primary); }
+    tbody td { padding:10px 12px;font-size:13px;color:var(--text-primary);vertical-align:middle; }
+    .td-mono { font-family:'SFMono-Regular','Consolas','Monaco',monospace;font-size:12px; }
+    .td-right { text-align:right; }
+    .td-muted { color:var(--text-muted);font-size:12px; }
+
+    /* 按钮 */
+    .btn { display:inline-flex;align-items:center;gap:5px;height:34px;padding:0 16px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;font-family:inherit;cursor:pointer;transition:var(--transition);border:1px solid transparent;white-space:nowrap; }
+    .btn:active { transform:translateY(1px); }
+    .btn:disabled { opacity:0.45;cursor:not-allowed;transform:none; }
+    .btn-primary { background:var(--primary);color:#fff;border-color:var(--primary); }
+    .btn-primary:hover { background:var(--primary-hover);border-color:var(--primary-hover); }
+    .btn-default { background:var(--surface);color:var(--text-primary);border-color:var(--border); }
+    .btn-default:hover { border-color:var(--border-hover);background:var(--surface-hover); }
+    .btn-danger { background:var(--danger);color:#fff;border-color:var(--danger); }
+    .btn-danger:hover { background:#b91c1c; }
+    .btn-sm { height:30px;padding:0 12px;font-size:12px; }
+    .btn-xs { height:26px;padding:0 9px;font-size:11.5px;border-radius:5px; }
+    .action-btns { display:flex;align-items:center;gap:2px; }
+    .action-btn { width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;background:transparent;border:none;cursor:pointer;transition:background .15s,color .15s;flex-shrink:0; }
+    .action-btn.edit { color:var(--primary); }
+    .action-btn.edit:hover { background:var(--primary-light); }
+    .action-btn.view { color:var(--success); }
+    .action-btn.view:hover { background:var(--success-bg); }
+    .action-btn.delete { color:var(--danger); }
+    .action-btn.delete:hover { background:var(--danger-bg); }
+
+    /* Tag/Badge */
+    .tag { display:inline-flex;align-items:center;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;white-space:nowrap; }
+    .tag-blue { background:#eff6ff;color:#2563eb; }
+    .tag-green { background:#f0fdf4;color:#16a34a; }
+    .tag-amber { background:#fffbeb;color:#92400e; }
+    .tag-purple { background:#faf5ff;color:#7c3aed; }
+    .tag-gray { background:#f1f5f9;color:#64748b; }
+    .tag-red { background:#fef2f2;color:#dc2626; }
+    .tag-gold { background:#fefce8;color:#b45309; }
+    [data-theme="dark"] .tag-blue { background:rgba(37,99,235,0.18);color:#93c5fd; }
+    [data-theme="dark"] .tag-green { background:rgba(22,163,74,0.18);color:#86efac; }
+    [data-theme="dark"] .tag-amber { background:rgba(217,119,6,0.18);color:#fcd34d; }
+    [data-theme="dark"] .tag-gray { background:rgba(100,116,139,0.18);color:#94a3b8; }
+    [data-theme="dark"] .tag-purple { background:rgba(124,58,237,0.18);color:#c4b5fd; }
+    [data-theme="dark"] .tag-red { background:rgba(220,38,38,0.18);color:#fca5a5; }
+    .badge { display:inline-flex;align-items:center;gap:5px;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:600; }
+    .badge::before { content:'';width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0; }
+    .badge-green { background:#f0fdf4;color:#16a34a; }
+    .badge-amber { background:#fffbeb;color:#d97706; }
+    .badge-gray { background:#f1f5f9;color:#64748b; }
+    .badge-red { background:#fef2f2;color:#dc2626; }
+    .badge-blue { background:#eff6ff;color:#2563eb; }
+    [data-theme="dark"] .badge-green { background:rgba(22,163,74,0.15); }
+    [data-theme="dark"] .badge-amber { background:rgba(217,119,6,0.15); }
+    [data-theme="dark"] .badge-gray { background:rgba(100,116,139,0.15); }
+    [data-theme="dark"] .badge-red { background:rgba(220,38,38,0.15); }
+    [data-theme="dark"] .badge-blue { background:rgba(37,99,235,0.15); }
+
+    /* 分页 */
+    .pagination { display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-top:1px solid var(--border); }
+    .page-info { font-size:12px;color:var(--text-muted); }
+    .page-info span { color:var(--text-primary);font-weight:600; }
+    .page-btns { display:flex;align-items:center;gap:4px; }
+    .page-btn { width:30px;height:30px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:13px;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--text-secondary);transition:var(--transition);font-family:inherit; }
+    .page-btn:hover:not(:disabled) { border-color:var(--primary);color:var(--primary); }
+    .page-btn.active { background:var(--primary);border-color:var(--primary);color:#fff;font-weight:600; }
+    .page-btn:disabled { opacity:0.4;cursor:not-allowed; }
+    .page-size { display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-muted); }
+    .page-size select { height:30px;padding:0 24px 0 8px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text-primary);font-size:12px;font-family:inherit;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%239aa5b4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 6px center; }
+
+    /* 页面 Header */
+    .page-header { display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px; }
+    .page-title { font-size:19px;font-weight:700;color:var(--text-primary); }
+    .page-desc { font-size:12px;color:var(--text-muted);margin-top:3px; }
+    .page-actions { display:flex;gap:8px;flex-wrap:wrap; }
+
+    /* Overlay/Modal/Drawer */
+    .overlay { position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:699;opacity:0;pointer-events:none;transition:opacity 0.22s ease; }
+    .overlay.show { opacity:1;pointer-events:all; }
+    .drawer { position:fixed;top:0;right:0;height:100vh;z-index:700;width:520px;background:var(--surface);box-shadow:var(--shadow-xl);display:flex;flex-direction:column;transform:translateX(100%);transition:transform 0.28s cubic-bezier(0.4,0,0.2,1); }
+    .drawer.show { transform:translateX(0); }
+    .drawer-header { display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);flex-shrink:0; }
+    .drawer-title-main { font-size:15px;font-weight:700;color:var(--text-primary); }
+    .drawer-close { width:30px;height:30px;border-radius:6px;display:flex;align-items:center;justify-content:center;background:none;border:none;cursor:pointer;color:var(--text-muted);transition:var(--transition); }
+    .drawer-close:hover { background:var(--surface-hover); }
+    .drawer-body { flex:1;overflow-y:auto;padding:20px; }
+    .drawer-footer { display:flex;align-items:center;justify-content:flex-end;gap:10px;padding:14px 20px;border-top:1px solid var(--border);flex-shrink:0; }
+    .modal { position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0.95);background:var(--surface);border-radius:var(--radius-lg);z-index:700;box-shadow:var(--shadow-xl);opacity:0;pointer-events:none;transition:all 0.22s ease-out; }
+    .modal.show { opacity:1;pointer-events:all;transform:translate(-50%,-50%) scale(1); }
+    .modal-sm { width:420px;max-width:calc(100vw - 32px); }
+    .modal-md { width:520px;max-width:calc(100vw - 32px); }
+    .modal-header { display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border); }
+    .modal-title { font-size:15px;font-weight:700;color:var(--text-primary); }
+    .modal-close { width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;background:none;border:none;cursor:pointer;color:var(--text-muted);transition:var(--transition); }
+    .modal-close:hover { background:var(--surface-hover); }
+    .modal-body { padding:20px; }
+    .modal-desc { font-size:13px;color:var(--text-secondary);line-height:1.6; }
+    .modal-desc strong { color:var(--text-primary); }
+    .modal-footer { display:flex;align-items:center;justify-content:flex-end;gap:10px;padding:14px 20px;border-top:1px solid var(--border); }
+
+    /* Form */
+    .form-group { display:flex;flex-direction:column;gap:6px;margin-bottom:16px; }
+    .form-label { font-size:13px;color:var(--text-secondary);font-weight:500; }
+    .form-label .req { color:var(--danger); }
+    .form-input { width:100%;height:36px;padding:0 10px;font-size:13px;font-family:inherit;color:var(--text-primary);background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);outline:none;transition:var(--transition); }
+    .form-input:focus { border-color:var(--primary);box-shadow:0 0 0 3px rgba(37,99,235,0.10); }
+    .form-textarea { width:100%;padding:8px 10px;font-size:13px;font-family:inherit;color:var(--text-primary);background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);outline:none;transition:var(--transition);resize:vertical;min-height:80px; }
+    .form-textarea:focus { border-color:var(--primary);box-shadow:0 0 0 3px rgba(37,99,235,0.10); }
+    .form-select { appearance:none;-webkit-appearance:none;height:36px;padding:0 28px 0 10px;font-size:13px;font-family:inherit;color:var(--text-primary);background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);outline:none;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%239aa5b4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;width:100%;transition:var(--transition); }
+    .form-select:focus { border-color:var(--primary);box-shadow:0 0 0 3px rgba(37,99,235,0.10); }
+    .form-hint { font-size:12px;color:var(--text-muted); }
+
+    /* File Upload */
+    .file-upload-area { border:2px dashed var(--border);border-radius:var(--radius);padding:24px;text-align:center;cursor:pointer;transition:var(--transition); }
+    .file-upload-area:hover { border-color:var(--primary);background:var(--primary-light); }
+    .file-upload-icon { font-size:24px;margin-bottom:8px;opacity:0.5; }
+    .file-upload-text { font-size:13px;color:var(--text-secondary); }
+    .file-upload-hint { font-size:12px;color:var(--text-muted);margin-top:4px; }
+
+    /* Toast */
+    .toast-container { position:fixed;top:66px;right:22px;z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none; }
+    .toast { min-width:200px;max-width:360px;padding:12px 14px 12px 16px;background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow-lg);border-left:3px solid;display:flex;align-items:flex-start;gap:8px;font-size:13px;pointer-events:all;animation:toastIn 0.28s ease; }
+    @keyframes toastIn { from{opacity:0;transform:translateX(80px)} to{opacity:1;transform:translateX(0)} }
+    .toast.success { border-left-color:var(--success); }
+    .toast.error { border-left-color:var(--danger); }
+    .toast.info { border-left-color:var(--info); }
+    .toast.warning { border-left-color:var(--warning); }
+    .toast-msg { flex:1;color:var(--text-primary);line-height:1.5; }
+    .toast-close { flex-shrink:0;background:none;border:none;cursor:pointer;color:var(--text-muted);padding:0;font-size:14px; }
+
+    /* 统计Badge区 */
+    .stat-badges { display:flex;align-items:center;gap:10px; }
+    .stat-badge { display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:6px;font-size:12px;font-weight:600; }
+    .stat-badge-orange { background:#fff7ed;color:#c2410c;border:1px solid #fed7aa; }
+    .stat-badge-green { background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0; }
+    [data-theme="dark"] .stat-badge-orange { background:rgba(194,65,12,0.15);border-color:rgba(194,65,12,0.3); }
+    [data-theme="dark"] .stat-badge-green { background:rgba(22,163,74,0.15);border-color:rgba(22,163,74,0.3); }
+
+    /* checkbox */
+    input[type=checkbox] { width:15px;height:15px;cursor:pointer;accent-color:var(--primary); }
+    .text-right { text-align:right; }
+    .text-bold { font-weight:700; }
+    .amount { font-family:monospace;color:#b45309;font-weight:600; }
+  </style>
+</head>
+<body>
+<!-- Toast -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- TopNav -->
+<nav class="topnav">
+  <a class="topnav-logo" href="index.html">
+    <div class="logo-icon">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+    </div>
+    <span class="logo-name">右豹后台</span>
+  </a>
+  <div class="primary-nav">
+    <a class="pnav-item" href="index.html">
+      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      首页
+    </a>
+    <a class="pnav-item" href="#">内容域</a>
+    <a class="pnav-item" href="#">订单域</a>
+    <a class="pnav-item" href="#">项目域</a>
+    <a class="pnav-item active" href="user.html">用户域</a>
+    <a class="pnav-item" href="#">系统域</a>
+    <a class="pnav-item" href="#">数据域</a>
+  </div>
+  <div class="topnav-actions">
+    <button class="nav-icon-btn" onclick="toggleTheme()" title="切换主题">
+      <svg class="icon-moon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+      <svg class="icon-sun" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+    </button>
+    <div class="nav-user">
+      <div class="user-avatar">管</div>
+      <span class="user-name">管理员</span>
+    </div>
+  </div>
+</nav>
+
+<!-- Layout -->
+<div class="layout">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-module-icon">
+        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+      </div>
+      <span class="sidebar-module-name">用户域</span>
+    </div>
+    <div class="sidebar-scroll">
+      <div class="nav-group-label">用户管理</div>
+      <a class="nav-subitem" href="user.html">用户列表</a>
+      <a class="nav-subitem" href="realname-company.html">实名信息</a>
+      <a class="nav-subitem" href="media-account.html">媒体账号</a>
+      <a class="nav-subitem" href="withdrawal-account.html">提现账户</a>
+      <a class="nav-subitem" href="blacklist.html">黑名单</a>
+      <a class="nav-subitem" href="user-gift-word.html">赠词记录</a>
+      <a class="nav-subitem" href="user-redeem.html">兑换记录</a>
+      <div class="nav-group-label">用户资金</div>
+      <a class="nav-subitem" href="user-wallet.html">用户钱包</a>
+      <a class="nav-subitem" href="dividend-detail.html">分红明细</a>
+      <a class="nav-subitem active" href="reward-detail.html">奖励明细</a>
+      <a class="nav-subitem" href="withdrawal-record.html">提现记录</a>
+      <div class="nav-group-label">用户通知</div>
+      <a class="nav-subitem" href="wechat-notify.html">微信通知</a>
+      <a class="nav-subitem" href="inbox-notify.html">站内信通知</a>
+      <div class="nav-group-label">用户体系</div>
+      <a class="nav-subitem" href="user-level.html">用户等级</a>
+      <a class="nav-subitem" href="user-rank.html">用户段位</a>
+      <a class="nav-subitem" href="commission-config.html">权益配置</a>
+      <a class="nav-subitem" href="medal-config.html">勋章配置</a>
+      <a class="nav-subitem" href="level-log.html">用户等级日志</a>
+      <div class="nav-group-label">团长体系</div>
+      <a class="nav-subitem" href="captain-level.html">团长等级配置</a>
+      <a class="nav-subitem" href="commission-ratio.html">分销比例配置</a>
+      <a class="nav-subitem" href="captain-log.html">团长身份日志</a>
+    </div>
+    <div class="sidebar-footer">
+      <span class="sidebar-version">v2.4.0</span>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+    <div class="breadcrumb-bar">
+      <a href="index.html">首页</a><span class="bc-sep">/</span>
+      <span>用户资金</span><span class="bc-sep">/</span>
+      <span class="bc-cur">奖励明细</span>
+    </div>
+    <div class="page-content">
+      <div class="page-header">
+        <div>
+          <div class="page-title">奖励明细</div>
+          <div class="page-desc">管理员对用户奖励进行批量导入、审核、打款、微信通知及导出</div>
+        </div>
+        <div class="page-actions">
+          <button class="btn btn-primary" onclick="openModal('importModal')">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            批量导入
+          </button>
+          <button class="btn btn-default" id="btnBatchApprove" disabled onclick="openModal('approveModal')">批量审核通过</button>
+          <button class="btn btn-default" id="btnBatchReject" disabled onclick="openModal('rejectModal')">批量审核驳回</button>
+          <button class="btn btn-default" id="btnBatchNotify" disabled>批量发送微信通知</button>
+          <button class="btn btn-default">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            导出数据
+          </button>
+        </div>
+      </div>
+
+      <!-- 筛选区 -->
+      <div class="glass-card filter-card">
+        <div class="filter-grid">
+          <div class="form-group-filter">
+            <label class="form-label-sm">业务类型</label>
+            <select class="form-input-sm form-select-sm">
+              <option>全部</option><option>品牌</option><option>海外</option>
+            </select>
+          </div>
+          <div class="form-group-filter">
+            <label class="form-label-sm">项目名称</label>
+            <input class="form-input-sm" type="text" placeholder="请输入项目名称">
+          </div>
+          <div class="form-group-filter">
+            <label class="form-label-sm">用户ID</label>
+            <input class="form-input-sm" type="text" placeholder="请输入用户ID">
+          </div>
+          <div class="form-group-filter">
+            <label class="form-label-sm">审核状态</label>
+            <select class="form-input-sm form-select-sm">
+              <option>全部</option><option>待审核</option><option>已审核</option><option>已驳回</option>
+            </select>
+          </div>
+        </div>
+        <div class="filter-extra" id="filterExtra">
+          <div class="form-group-filter">
+            <label class="form-label-sm">打款状态</label>
+            <select class="form-input-sm form-select-sm">
+              <option>全部</option><option>待打款</option><option>已打款</option>
+            </select>
+          </div>
+          <div class="form-group-filter">
+            <label class="form-label-sm">关键词/口令</label>
+            <input class="form-input-sm" type="text" placeholder="请输入关键词">
+          </div>
+          <div class="form-group-filter">
+            <label class="form-label-sm">导入开始时间</label>
+            <input class="form-input-sm" type="date">
+          </div>
+          <div class="form-group-filter">
+            <label class="form-label-sm">导入结束时间</label>
+            <input class="form-input-sm" type="date">
+          </div>
+        </div>
+        <div class="filter-footer">
+          <button class="filter-expand-btn" id="expandBtn" onclick="toggleFilter()">
+            展开更多
+            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="filter-actions">
+            <button class="btn btn-default btn-sm" onclick="resetFilter()">重置</button>
+            <button class="btn btn-primary btn-sm">查询</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 数据表 -->
+      <div class="glass-card table-card">
+        <div class="table-header">
+          <div class="table-title">
+            奖励明细列表
+            <span class="table-count">共 20 条</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div class="stat-badges">
+              <span class="stat-badge stat-badge-orange">已审核待打款：¥ 23,600 元</span>
+              <span class="stat-badge stat-badge-green">已审核已打款：¥ 158,400 元</span>
+            </div>
+            <div class="table-header-right" id="tableHeaderRight">
+              <!-- 批量操作栏（选中后显示） -->
+              <div class="bulk-bar" id="bulkBar">
+                <span class="bulk-count">已选 <span id="selectedCount">0</span> 项</span>
+                <button class="btn btn-default btn-sm" onclick="openModal('approveModal')">审核通过</button>
+                <button class="btn btn-default btn-sm" onclick="openModal('rejectModal')">审核驳回</button>
+                <button class="btn btn-default btn-sm">发送通知</button>
+                <button class="btn btn-ghost btn-sm" onclick="clearSelection()">取消</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:40px"><input type="checkbox" id="checkAll" onchange="toggleAll(this)"></th>
+                <th>订单ID</th>
+                <th>导入时间</th>
+                <th>业务类型</th>
+                <th>项目名称</th>
+                <th>用户ID</th>
+                <th style="text-align:right">奖励金额</th>
+                <th>奖励标题</th>
+                <th>奖励事由</th>
+                <th>审核状态</th>
+                <th>打款状态</th>
+                <th>微信通知</th>
+                <th>导入操作人</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+          </table>
+        </div>
+        <div class="pagination">
+          <div class="page-info">共 <span>20</span> 条，第 <span>1</span>/2 页</div>
+          <div class="page-btns">
+            <button class="page-btn" disabled>«</button>
+            <button class="page-btn active">1</button>
+            <button class="page-btn">2</button>
+            <button class="page-btn">»</button>
+          </div>
+          <div class="page-size">每页 <select><option>10</option><option>20</option><option>50</option></select> 条</div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Overlay -->
+<div class="overlay" id="overlay" onclick="closeAll()"></div>
+
+<!-- 弹窗-批量审核通过 -->
+<div class="modal modal-sm" id="approveModal">
+  <div class="modal-header">
+    <span class="modal-title">批量审核通过</span>
+    <button class="modal-close" onclick="closeModal('approveModal')">✕</button>
+  </div>
+  <div class="modal-body">
+    <p class="modal-desc">确认审核通过选中的奖励记录？</p>
+    <div style="margin-top:16px;padding:12px;background:var(--surface-hover);border-radius:8px;">
+      <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+        <span style="font-size:13px;color:var(--text-secondary);">审核笔数</span>
+        <strong id="approveCount">3 笔</strong>
+      </div>
+      <div style="display:flex;justify-content:space-between;">
+        <span style="font-size:13px;color:var(--text-secondary);">奖励总额</span>
+        <strong style="color:#16a34a;" id="approveAmount">¥ 8,600.00</strong>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-default" onclick="closeModal('approveModal')">取消</button>
+    <button class="btn btn-primary" onclick="closeModal('approveModal');showToast('审核通过操作已提交','success')">确认通过</button>
+  </div>
+</div>
+
+<!-- 弹窗-批量审核驳回 -->
+<div class="modal modal-md" id="rejectModal">
+  <div class="modal-header">
+    <span class="modal-title">批量审核驳回</span>
+    <button class="modal-close" onclick="closeModal('rejectModal')">✕</button>
+  </div>
+  <div class="modal-body">
+    <div class="form-group">
+      <label class="form-label">驳回原因 <span class="req">*</span></label>
+      <textarea class="form-textarea" placeholder="请输入驳回原因（必填）" rows="4"></textarea>
+    </div>
+    <p style="font-size:12px;color:var(--text-muted);">将驳回已选中的 <strong style="color:var(--text-primary)">3</strong> 条奖励记录</p>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-default" onclick="closeModal('rejectModal')">取消</button>
+    <button class="btn btn-danger" onclick="closeModal('rejectModal');showToast('驳回操作已提交','success')">确认驳回</button>
+  </div>
+</div>
+
+<!-- 弹窗-批量导入 -->
+<div class="modal modal-md" id="importModal">
+  <div class="modal-header">
+    <span class="modal-title">批量导入奖励</span>
+    <button class="modal-close" onclick="closeModal('importModal')">✕</button>
+  </div>
+  <div class="modal-body">
+    <div class="form-group">
+      <label class="form-label">上传文件 <span class="req">*</span></label>
+      <div class="file-upload-area" onclick="document.getElementById('fileInput').click()">
+        <div class="file-upload-icon">📁</div>
+        <div class="file-upload-text">点击选择文件或拖拽到此处</div>
+        <div class="file-upload-hint">支持 .xlsx / .xls 格式，最大 10MB</div>
+        <input id="fileInput" type="file" accept=".xlsx,.xls" style="display:none">
+      </div>
+    </div>
+    <div style="padding:12px;background:var(--primary-light);border-radius:8px;border:1px solid var(--primary-border);">
+      <p style="font-size:12px;color:var(--primary);font-weight:600;margin-bottom:6px;">必填字段说明</p>
+      <p style="font-size:12px;color:var(--text-secondary);line-height:1.8;">用户ID、奖励金额、奖励标题、奖励事由、业务类型、项目名称</p>
+    </div>
+    <p style="margin-top:10px;font-size:12px;color:var(--text-muted);">
+      <a href="#" style="color:var(--primary)">下载导入模板</a>
+    </p>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-default" onclick="closeModal('importModal')">取消</button>
+    <button class="btn btn-primary" onclick="closeModal('importModal');showToast('文件已上传，正在处理中...','info')">确认导入</button>
+  </div>
+</div>
+
+<script>
+// Mock数据
+const mockData = [
+  {id:'RWD202404280001',time:'2024-04-28 09:12',bizType:'品牌',project:'春季美妆推广',userId:'U10001',amount:'¥ 2,400.00',title:'爆单奖励',reason:'项目销量前3名',auditStatus:'已审核',payStatus:'已打款',notify:'已通知',operator:'张管理'},
+  {id:'RWD202404280002',time:'2024-04-28 09:45',bizType:'海外',project:'跨境电商Q2',userId:'U10002',amount:'¥ 1,200.00',title:'新人奖励',reason:'首次完成任务',auditStatus:'待审核',payStatus:'待打款',notify:'未通知',operator:'李运营'},
+  {id:'RWD202404280003',time:'2024-04-28 10:00',bizType:'品牌',project:'家居好物节',userId:'U10003',amount:'¥ 3,600.00',title:'连续爆单',reason:'连续7天爆单',auditStatus:'已审核',payStatus:'待打款',notify:'未通知',operator:'张管理'},
+  {id:'RWD202404280004',time:'2024-04-28 10:30',bizType:'品牌',project:'春季美妆推广',userId:'U10004',amount:'¥ 800.00',title:'参与奖励',reason:'完成指定任务',auditStatus:'已驳回',payStatus:'待打款',notify:'未通知',operator:'王审核'},
+  {id:'RWD202404280005',time:'2024-04-28 11:05',bizType:'海外',project:'东南亚拓展',userId:'U10005',amount:'¥ 5,000.00',title:'区域冠军',reason:'月度销量第一',auditStatus:'已审核',payStatus:'已打款',notify:'已通知',operator:'李运营'},
+  {id:'RWD202404280006',time:'2024-04-28 11:20',bizType:'品牌',project:'母婴精选',userId:'U10006',amount:'¥ 1,600.00',title:'爆单奖励',reason:'单日销量突破',auditStatus:'待审核',payStatus:'待打款',notify:'未通知',operator:'张管理'},
+  {id:'RWD202404280007',time:'2024-04-28 12:00',bizType:'品牌',project:'数码科技节',userId:'U10007',amount:'¥ 2,200.00',title:'优质内容',reason:'内容评分优秀',auditStatus:'已审核',payStatus:'已打款',notify:'已通知',operator:'陈审核'},
+  {id:'RWD202404280008',time:'2024-04-28 13:30',bizType:'海外',project:'跨境电商Q2',userId:'U10008',amount:'¥ 900.00',title:'新人奖励',reason:'注册完成任务',auditStatus:'待审核',payStatus:'待打款',notify:'未通知',operator:'李运营'},
+  {id:'RWD202404280009',time:'2024-04-28 14:00',bizType:'品牌',project:'家居好物节',userId:'U10009',amount:'¥ 4,200.00',title:'销量冠军',reason:'月度销量冠军',auditStatus:'已审核',payStatus:'已打款',notify:'已通知',operator:'张管理'},
+  {id:'RWD202404280010',time:'2024-04-28 14:30',bizType:'品牌',project:'春季美妆推广',userId:'U10010',amount:'¥ 1,100.00',title:'邀请奖励',reason:'成功邀请3人',auditStatus:'已驳回',payStatus:'待打款',notify:'未通知',operator:'王审核'},
+  {id:'RWD202404280011',time:'2024-04-27 09:00',bizType:'品牌',project:'母婴精选',userId:'U10011',amount:'¥ 3,300.00',title:'爆单奖励',reason:'连续5天爆单',auditStatus:'已审核',payStatus:'已打款',notify:'已通知',operator:'张管理'},
+  {id:'RWD202404280012',time:'2024-04-27 10:15',bizType:'海外',project:'东南亚拓展',userId:'U10012',amount:'¥ 2,800.00',title:'区域奖励',reason:'开拓新市场',auditStatus:'已审核',payStatus:'待打款',notify:'未通知',operator:'李运营'},
+  {id:'RWD202404280013',time:'2024-04-27 11:00',bizType:'品牌',project:'数码科技节',userId:'U10013',amount:'¥ 1,500.00',title:'内容奖励',reason:'视频播放破万',auditStatus:'待审核',payStatus:'待打款',notify:'未通知',operator:'陈审核'},
+  {id:'RWD202404280014',time:'2024-04-27 14:00',bizType:'品牌',project:'家居好物节',userId:'U10014',amount:'¥ 6,000.00',title:'超级奖励',reason:'季度销量榜首',auditStatus:'已审核',payStatus:'已打款',notify:'已通知',operator:'张管理'},
+  {id:'RWD202404280015',time:'2024-04-27 15:30',bizType:'海外',project:'跨境电商Q2',userId:'U10015',amount:'¥ 2,100.00',title:'新人奖励',reason:'首月完成目标',auditStatus:'已审核',payStatus:'已打款',notify:'已通知',operator:'李运营'},
+  {id:'RWD202404280016',time:'2024-04-26 09:00',bizType:'品牌',project:'春季美妆推广',userId:'U10016',amount:'¥ 700.00',title:'参与奖励',reason:'活动全勤',auditStatus:'已驳回',payStatus:'待打款',notify:'未通知',operator:'王审核'},
+  {id:'RWD202404280017',time:'2024-04-26 10:30',bizType:'品牌',project:'母婴精选',userId:'U10017',amount:'¥ 4,500.00',title:'爆单奖励',reason:'单周销量最高',auditStatus:'已审核',payStatus:'已打款',notify:'已通知',operator:'张管理'},
+  {id:'RWD202404280018',time:'2024-04-26 13:00',bizType:'海外',project:'东南亚拓展',userId:'U10018',amount:'¥ 1,800.00',title:'推广奖励',reason:'拉新达标',auditStatus:'待审核',payStatus:'待打款',notify:'未通知',operator:'李运营'},
+  {id:'RWD202404280019',time:'2024-04-25 09:00',bizType:'品牌',project:'数码科技节',userId:'U10019',amount:'¥ 3,200.00',title:'销量奖励',reason:'品类销量第二',auditStatus:'已审核',payStatus:'已打款',notify:'已通知',operator:'陈审核'},
+  {id:'RWD202404280020',time:'2024-04-25 11:00',bizType:'海外',project:'跨境电商Q2',userId:'U10020',amount:'¥ 2,600.00',title:'综合奖励',reason:'综合表现优秀',auditStatus:'已审核',payStatus:'待打款',notify:'未通知',operator:'张管理'},
+];
+
+const auditBadge = {
+  '待审核':'<span class="badge badge-amber">待审核</span>',
+  '已审核':'<span class="badge badge-green">已审核</span>',
+  '已驳回':'<span class="badge badge-red">已驳回</span>',
+};
+const payBadge = {
+  '待打款':'<span class="badge badge-gray">待打款</span>',
+  '已打款':'<span class="badge badge-green">已打款</span>',
+};
+const notifyBadge = {
+  '已通知':'<span class="badge badge-green">已通知</span>',
+  '未通知':'<span class="badge badge-gray">未通知</span>',
+};
+const bizTag = {
+  '品牌':'<span class="tag tag-blue">品牌</span>',
+  '海外':'<span class="tag tag-purple">海外</span>',
+};
+
+function renderTable() {
+  const tbody = document.getElementById('tableBody');
+  tbody.innerHTML = mockData.slice(0,10).map((r,i)=>`
+    <tr onclick="rowClick(event,${i})" id="row${i}">
+      <td><input type="checkbox" class="row-check" data-idx="${i}" onclick="rowCheck(event,${i})"></td>
+      <td class="td-mono">${r.id}</td>
+      <td style="font-size:12px;color:var(--text-muted)">${r.time}</td>
+      <td>${bizTag[r.bizType]||r.bizType}</td>
+      <td style="max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.project}</td>
+      <td class="td-mono">${r.userId}</td>
+      <td class="td-right"><span class="amount">${r.amount}</span></td>
+      <td>${r.title}</td>
+      <td style="max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text-secondary)">${r.reason}</td>
+      <td>${auditBadge[r.auditStatus]||r.auditStatus}</td>
+      <td>${payBadge[r.payStatus]||r.payStatus}</td>
+      <td>${notifyBadge[r.notify]||r.notify}</td>
+      <td style="color:var(--text-secondary)">${r.operator}</td>
+    </tr>
+  `).join('');
+}
+
+let selectedRows = new Set();
+function rowClick(e,idx){ if(e.target.tagName==='INPUT') return; }
+function rowCheck(e,idx){
+  e.stopPropagation();
+  if(e.target.checked) selectedRows.add(idx); else selectedRows.delete(idx);
+  updateBulk();
+}
+function toggleAll(cb){
+  document.querySelectorAll('.row-check').forEach((c,i)=>{ c.checked=cb.checked; if(cb.checked) selectedRows.add(i); else selectedRows.delete(i); document.getElementById('row'+i).classList.toggle('selected',cb.checked); });
+  updateBulk();
+}
+function clearSelection(){
+  selectedRows.clear();
+  document.querySelectorAll('.row-check').forEach(c=>c.checked=false);
+  document.getElementById('checkAll').checked=false;
+  document.querySelectorAll('tbody tr').forEach(r=>r.classList.remove('selected'));
+  updateBulk();
+}
+function updateBulk(){
+  const n=selectedRows.size;
+  document.getElementById('selectedCount').textContent=n;
+  const show=n>0;
+  document.getElementById('bulkBar').classList.toggle('show',show);
+  document.getElementById('btnBatchApprove').disabled=!show;
+  document.getElementById('btnBatchReject').disabled=!show;
+  document.getElementById('btnBatchNotify').disabled=!show;
+  selectedRows.forEach(i=>document.getElementById('row'+i).classList.add('selected'));
+}
+
+function toggleFilter(){
+  const extra=document.getElementById('filterExtra');
+  const btn=document.getElementById('expandBtn');
+  const show=extra.classList.toggle('show');
+  btn.classList.toggle('expanded',show);
+  btn.childNodes[0].textContent=show?'收起':'展开更多';
+}
+function resetFilter(){
+  document.querySelectorAll('.filter-card input,.filter-card select').forEach(el=>{
+    if(el.tagName==='SELECT') el.selectedIndex=0; else el.value='';
+  });
+  showToast('筛选条件已重置','info');
+}
+
+function openModal(id){ document.getElementById(id).classList.add('show'); document.getElementById('overlay').classList.add('show'); }
+function closeModal(id){ document.getElementById(id).classList.remove('show'); document.getElementById('overlay').classList.remove('show'); }
+function closeAll(){ document.querySelectorAll('.modal.show,.drawer.show').forEach(el=>el.classList.remove('show')); document.getElementById('overlay').classList.remove('show'); }
+
+function toggleTheme(){
+  const cur=document.documentElement.getAttribute('data-theme');
+  const next=cur==='dark'?'light':'dark';
+  document.documentElement.setAttribute('data-theme',next);
+  localStorage.setItem('theme',next);
+}
+
+function showToast(msg, type='info'){
+  const c=document.getElementById('toastContainer');
+  const t=document.createElement('div');
+  t.className=`toast ${type}`;
+  t.innerHTML=`<span class="toast-msg">${msg}</span><button class="toast-close" onclick="this.parentElement.remove()">✕</button>`;
+  c.appendChild(t);
+  setTimeout(()=>t.remove(),3500);
+}
+
+renderTable();
+</script>
+</body>
+</html>

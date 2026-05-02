@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>分销比例规则说明 · 长图海报</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: rgba(148, 163, 184, 0.35);
+      --card: rgba(255, 255, 255, 0.72);
+      --card-border: rgba(255, 255, 255, 0.6);
+      --shadow: 0 8px 32px rgba(15, 23, 42, 0.08);
+      --radius: 12px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+      color: var(--text);
+      background: linear-gradient(165deg, #e0e7ff 0%, #f8fafc 35%, #dbeafe 100%);
+      -webkit-font-smoothing: antialiased;
+    }
+    .poster {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 28px 18px 56px;
+    }
+    .tip {
+      font-size: 12px;
+      color: var(--muted);
+      text-align: center;
+      margin-bottom: 20px;
+      line-height: 1.6;
+      padding: 10px 14px;
+      background: rgba(255, 255, 255, 0.55);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+    }
+    .hero {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+    .hero h1 {
+      margin: 0 0 8px;
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      color: #1e3a8a;
+    }
+    .hero p { margin: 0; font-size: 13px; color: var(--muted); }
+    .hero-upgrade {
+      margin-top: 18px;
+      text-align: left;
+      max-width: 100%;
+      padding: 14px 16px;
+      background: rgba(255, 255, 255, 0.65);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 13px;
+      line-height: 1.65;
+      color: #334155;
+      box-shadow: 0 2px 12px rgba(15, 23, 42, 0.04);
+    }
+    .hero-upgrade .lead {
+      margin: 0 0 10px;
+      font-weight: 600;
+      color: #1e293b;
+    }
+    .hero-upgrade ol {
+      margin: 0;
+      padding-left: 1.35em;
+    }
+    .hero-upgrade li {
+      margin: 8px 0;
+    }
+    .hero-upgrade li:first-child { margin-top: 0; }
+    .block {
+      margin-bottom: 22px;
+      padding: 18px 16px;
+      background: var(--card);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: var(--radius);
+      border: 1px solid var(--card-border);
+      box-shadow: var(--shadow);
+    }
+    .block-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 0 0 14px;
+      font-size: 15px;
+      font-weight: 700;
+      color: #1e293b;
+    }
+    .num {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .alert {
+      font-size: 13px;
+      line-height: 1.65;
+      padding: 12px 14px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+    }
+    .alert-info {
+      background: rgba(37, 99, 235, 0.08);
+      border: 1px solid rgba(37, 99, 235, 0.2);
+      color: #1e40af;
+    }
+    .alert-warn {
+      background: rgba(217, 119, 6, 0.08);
+      border: 1px solid rgba(217, 119, 6, 0.22);
+      color: #92400e;
+    }
+    .scene-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted);
+      letter-spacing: 0.04em;
+      margin: 12px 0 8px;
+    }
+    .scene-box {
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: rgba(248, 250, 252, 0.9);
+      margin-top: 10px;
+    }
+    .footnote {
+      margin: 10px 0 0;
+      font-size: 12px;
+      color: #475569;
+      line-height: 1.55;
+    }
+    table.data {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12.5px;
+    }
+    table.data th,
+    table.data td {
+      border: 1px solid var(--border);
+      padding: 8px 8px;
+      text-align: left;
+      vertical-align: middle;
+    }
+    table.data th {
+      background: rgba(241, 245, 249, 0.95);
+      font-weight: 600;
+      color: #475569;
+      font-size: 11.5px;
+    }
+    table.data td.center { text-align: center; }
+    .lv {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      border: 1px solid transparent;
+    }
+    .lv-v1 { background: linear-gradient(135deg, #fef3c7, #fde68a); color: #92400e; border-color: #fcd34d; }
+    .lv-v2 { background: linear-gradient(135deg, #d1fae5, #a7f3d0); color: #065f46; border-color: #6ee7b7; }
+    .lv-v3 { background: linear-gradient(135deg, #dbeafe, #bfdbfe); color: #1e40af; border-color: #93c5fd; }
+    .ok { color: #15803d; font-weight: 600; }
+    .na { color: var(--muted); }
+    .chain {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+      margin: 10px 0;
+    }
+    .cn {
+      padding: 5px 11px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      border: 2px solid;
+    }
+    .cn-v1 { background: #fef3c7; color: #92400e; border-color: #fcd34d; }
+    .cn-v2 { background: #d1fae5; color: #065f46; border-color: #6ee7b7; }
+    .cn-v2-hl { background: #bbf7d0; color: #065f46; border-color: #34d399; }
+    .cn-v3 { background: #dbeafe; color: #1e40af; border-color: #93c5fd; }
+    .cn-me { background: #f1f5f9; color: #64748b; border-color: #cbd5e1; font-style: italic; }
+    .cn-order { background: #16a34a; color: #fff; border-color: #15803d; }
+    .arr { color: #94a3b8; font-weight: 700; }
+    .ann { font-size: 12px; color: #475569; margin: 4px 0; display: flex; gap: 8px; align-items: flex-start; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+    .svg-wrap { overflow-x: auto; margin-top: 8px; border-radius: 8px; background: rgba(255, 255, 255, 0.5); }
+    .footer {
+      text-align: center;
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 28px;
+      padding-top: 16px;
+      border-top: 1px dashed var(--border);
+    }
+    @media print {
+      body { background: #fff; }
+      .tip { display: none; }
+      .poster { max-width: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="poster">
+    <p class="tip">
+      本页为独立长图版式。使用浏览器「全页截图」扩展、或打印为 PDF（选纵向、边距默认），即可得到与后台弹窗一致内容的长图海报。
+    </p>
+
+    <header class="hero">
+      <h1>分销比例规则说明</h1>
+      <p>与「团长体系 · 分销比例配置」弹窗内容同步（V1–V3）</p>
+      <div class="hero-upgrade">
+        <p class="lead">V1➡️V2➡️V3 可根据条件升级；一般满足以下<strong>所有</strong>条件即可自动升级：</p>
+        <ol>
+          <li><strong>直接邀请人数达标：</strong>需要被邀请人 30 天的收益大于等于 10 元（具体达标人数可在详情页查看）</li>
+          <li><strong>30 天直推人数的总收益达标：</strong>需要直接邀请的用户数总收益达标（具体达标人数可在详情页查看）</li>
+        </ol>
+      </div>
+    </header>
+
+    <section class="block">
+      <h2 class="block-title"><span class="num">1</span>等级分佣权限总览</h2>
+      <table class="data">
+        <thead>
+          <tr>
+            <th class="center" style="width:72px">等级</th>
+            <th>用户关系分佣</th>
+            <th>团队关系分佣</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="center"><span class="lv lv-v1">V1</span></td>
+            <td>直邀 + 间邀（对下级 V1，无无限）</td>
+            <td class="na">✗ 不适用（非团长）</td>
+          </tr>
+          <tr>
+            <td class="center"><span class="lv lv-v2">V2</span></td>
+            <td>对 V1：直+间+∞；对 V2：直+间（无无限）</td>
+            <td>直属团 + 间属团（同级无无限团）</td>
+          </tr>
+          <tr>
+            <td class="center"><span class="lv lv-v3">V3</span></td>
+            <td>对 V1：直+间+∞；对 V2/V3：直+间（无无限）</td>
+            <td>直属团 + 间属团 + 无限团（仅对下级 V2）</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="block">
+      <h2 class="block-title"><span class="num">2</span>用户关系分佣规则</h2>
+      <div class="alert alert-info">
+        <strong>用户关系分佣：</strong><strong>V2、V3</strong> 对下级 <strong>V1、V2、V3</strong> 均可获得并配置「直邀 + 间邀」；
+        「无限」比例<strong>仅</strong>在针对下级 <strong>V1</strong> 时配置（V2/V3→V1）。
+        <strong>V1</strong> 对下级 V1 为直邀 + 间邀（无无限）。各分佣等级需<strong>分别配置</strong>不同下级目标等级的比例。
+      </div>
+      <div class="scene-label">场景：V3 等级的用户关系分佣配置项</div>
+      <table class="data">
+        <thead>
+          <tr>
+            <th class="center">下级等级</th>
+            <th class="center">直邀比例</th>
+            <th class="center">间邀比例</th>
+            <th class="center">无限比例</th>
+            <th>说明</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="center"><span class="lv lv-v1">V1</span></td>
+            <td class="center"><span class="ok">✓ 配置</span></td>
+            <td class="center"><span class="ok">✓ 配置</span></td>
+            <td class="center"><span class="ok">✓ 配置（V2/V3→V1）</span></td>
+            <td>邀请下级 V1：直+间+∞</td>
+          </tr>
+          <tr>
+            <td class="center"><span class="lv lv-v2">V2</span></td>
+            <td class="center"><span class="ok">✓ 配置</span></td>
+            <td class="center"><span class="ok">✓ 配置</span></td>
+            <td class="center"><span class="na">✗ 不配置</span></td>
+            <td>V3 邀 V2：直+间</td>
+          </tr>
+          <tr>
+            <td class="center"><span class="lv lv-v3">V3</span></td>
+            <td class="center"><span class="ok">✓ 配置</span></td>
+            <td class="center"><span class="ok">✓ 配置</span></td>
+            <td class="center"><span class="na">✗ 不配置</span></td>
+            <td>V3 邀 V3：直+间</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="footnote">
+        补充：针对下级 <strong>V2、V3</strong> 不配「无限」用户关系分佣；间邀比例仍须配置。
+      </p>
+      <div class="scene-box">
+        <div class="scene-label">示例：H(V1) 出单链路中，G 为直邀、F 为间邀（V2/V3 均可参与直邀+间邀分佣）</div>
+        <div class="chain">
+          <span class="cn cn-me">…更高层</span><span class="arr">←</span>
+          <span class="cn cn-v2">E(V2)</span><span class="arr">←</span>
+          <span class="cn cn-v2">F(V2)</span><span class="arr">←</span>
+          <span class="cn cn-v1">G(V1)</span><span class="arr">←</span>
+          <span class="cn cn-v1">H(V1)</span><span class="arr">←</span>
+          <span class="cn cn-order">出单</span>
+        </div>
+        <div class="ann"><span class="dot" style="background:#2563eb"></span><span>G(V1) 获得【直邀比例】（G 直接邀请了 H，同 V1 等级）</span></div>
+        <div class="ann"><span class="dot" style="background:#7c3aed"></span><span>F(V2) 获得【间邀比例】（F 是 G 的上级，V2 高于 V1）</span></div>
+        <div class="ann"><span class="dot" style="background:#94a3b8"></span><span>E 及以上：<strong>无用户关系分佣</strong>，超出 2 层截止</span></div>
+      </div>
+    </section>
+
+    <section class="block">
+      <h2 class="block-title"><span class="num">3</span>团队关系分佣规则</h2>
+      <div class="alert alert-warn">
+        V1 不是团长，<strong>无团队关系分佣</strong>。V2+ 按目标团长等级分别配置。
+        以<strong>团长节点跳数</strong>计算：第 1 跳=直属团；第 2 跳=间属团；≥3 跳=无限团（仅高等级对低等级）。
+      </div>
+      <div class="scene-label">场景：V3 等级的团队关系分佣配置项</div>
+      <table class="data">
+        <thead>
+          <tr>
+            <th class="center">目标团长等级</th>
+            <th class="center">直属团</th>
+            <th class="center">间属团</th>
+            <th class="center">无限团</th>
+            <th>说明</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="center"><span class="lv lv-v1">V1</span></td>
+            <td class="center na">—</td>
+            <td class="center na">—</td>
+            <td class="center na">不适用（V1 非团长）</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td class="center"><span class="lv lv-v2">V2</span></td>
+            <td class="center"><span class="ok">✓ 配置</span></td>
+            <td class="center"><span class="ok">✓ 配置</span></td>
+            <td class="center"><span class="ok">✓ 配置（V3&gt;V2）</span></td>
+            <td>高等级对低等级团长，三项全配</td>
+          </tr>
+          <tr>
+            <td class="center"><span class="lv lv-v3">V3</span></td>
+            <td class="center"><span class="ok">✓ 配置</span></td>
+            <td class="center"><span class="ok">✓ 配置</span></td>
+            <td class="center"><span class="na">✗ 不配置</span></td>
+            <td>同等级团长，仅直属+间属</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="scene-box" style="margin-top:14px">
+        <div class="scene-label">示例：H(V1) 出单，F(V2) 是所属团长，团队分佣链路</div>
+        <div class="chain">
+          <span class="cn cn-v3">A(V3)</span><span class="arr">←</span>
+          <span class="cn cn-v3">B(V3)</span><span class="arr">←</span>
+          <span class="cn cn-v3">C(V3)</span><span class="arr">←</span>
+          <span class="cn cn-v2">D(V2)</span><span class="arr">←</span>
+          <span class="cn cn-v2">E(V2)</span><span class="arr">←</span>
+          <span class="cn cn-v2-hl">F(V2)</span><span class="arr">←</span>
+          <span class="cn cn-v1">H(V1)</span><span class="arr">←</span>
+          <span class="cn cn-order">出单</span>
+        </div>
+        <div class="ann"><span class="dot" style="background:#0891b2"></span><span>E(V2) → <strong style="color:#0891b2">直属团</strong>（F 第 1 跳，同 V2 级）</span></div>
+        <div class="ann"><span class="dot" style="background:#d97706"></span><span>D(V2) → <strong style="color:#d97706">间属团</strong>（F 第 2 跳，同 V2 截止）</span></div>
+        <div class="ann"><span class="dot" style="background:#dc2626"></span><span>C(V3) → <strong style="color:#dc2626">无限团</strong>（F 第 3 跳，V3&gt;V2 穿透，重置新起点）</span></div>
+        <div class="ann"><span class="dot" style="background:#0891b2"></span><span>B(V3) → <strong style="color:#0891b2">直属团</strong>（C 重置起点第 1 跳，同 V3 级）</span></div>
+        <div class="ann"><span class="dot" style="background:#d97706"></span><span>A(V3) → <strong style="color:#d97706">间属团</strong>（C 重置起点第 2 跳，同 V3 级截止）</span></div>
+      </div>
+    </section>
+
+    <section class="block" style="margin-bottom:0">
+      <h2 class="block-title"><span class="num">4</span>完整分佣链路图例</h2>
+      <div class="svg-wrap">
+        <svg width="820" height="760" viewBox="0 0 820 760" style="display:block;margin:0 auto;max-width:100%;font-family:'PingFang SC','Microsoft YaHei',sans-serif">
+          <defs>
+            <marker id="prm-mg" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#64748b"/></marker>
+            <marker id="prm-mb" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#2563eb"/></marker>
+            <marker id="prm-mv" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#7c3aed"/></marker>
+            <marker id="prm-mt" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#0891b2"/></marker>
+            <marker id="prm-ma" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#d97706"/></marker>
+            <marker id="prm-mr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#dc2626"/></marker>
+          </defs>
+          <rect x="8" y="8" width="318" height="740" rx="10" fill="rgba(8,145,178,0.03)" stroke="rgba(8,145,178,0.12)" stroke-width="1" stroke-dasharray="4,3"/>
+          <text x="167" y="24" text-anchor="middle" font-size="10" font-weight="700" fill="#0891b2" letter-spacing="1">团队关系分佣</text>
+          <rect x="500" y="430" width="308" height="150" rx="10" fill="rgba(37,99,235,0.03)" stroke="rgba(37,99,235,0.12)" stroke-width="1" stroke-dasharray="4,3"/>
+          <text x="654" y="446" text-anchor="middle" font-size="10" font-weight="700" fill="#2563eb" letter-spacing="1">用户关系分佣</text>
+          <text x="654" y="464" text-anchor="middle" font-size="9" fill="#64748b">右侧：直邀 + 间邀（V2/V3 用户关系）</text>
+          <text x="654" y="478" text-anchor="middle" font-size="9" fill="#64748b">无限用户关系比例仅 V2/V3→V1 可配</text>
+          <line x1="370" y1="65" x2="370" y2="107" stroke="#64748b" stroke-width="2" marker-end="url(#prm-mg)"/>
+          <line x1="370" y1="147" x2="370" y2="187" stroke="#64748b" stroke-width="2" marker-end="url(#prm-mg)"/>
+          <line x1="370" y1="227" x2="370" y2="267" stroke="#64748b" stroke-width="2" marker-end="url(#prm-mg)"/>
+          <line x1="370" y1="307" x2="370" y2="347" stroke="#64748b" stroke-width="2" marker-end="url(#prm-mg)"/>
+          <line x1="370" y1="387" x2="370" y2="427" stroke="#64748b" stroke-width="2" marker-end="url(#prm-mg)"/>
+          <line x1="370" y1="467" x2="370" y2="507" stroke="#64748b" stroke-width="2" marker-end="url(#prm-mg)"/>
+          <line x1="370" y1="547" x2="370" y2="587" stroke="#64748b" stroke-width="2" marker-end="url(#prm-mg)"/>
+          <line x1="370" y1="623" x2="370" y2="669" stroke="#64748b" stroke-width="2" marker-end="url(#prm-mg)"/>
+          <ellipse cx="370" cy="47" rx="44" ry="16" fill="#dbeafe" stroke="#93c5fd" stroke-width="1.5"/>
+          <text x="370" y="52" text-anchor="middle" font-size="12" font-weight="700" fill="#1e40af">A(V3)</text>
+          <ellipse cx="370" cy="127" rx="44" ry="16" fill="#dbeafe" stroke="#93c5fd" stroke-width="1.5"/>
+          <text x="370" y="132" text-anchor="middle" font-size="12" font-weight="700" fill="#1e40af">B(V3)</text>
+          <ellipse cx="370" cy="207" rx="44" ry="16" fill="#dbeafe" stroke="#93c5fd" stroke-width="1.5"/>
+          <text x="370" y="212" text-anchor="middle" font-size="12" font-weight="700" fill="#1e40af">C(V3)</text>
+          <ellipse cx="370" cy="287" rx="44" ry="16" fill="#d1fae5" stroke="#6ee7b7" stroke-width="1.5"/>
+          <text x="370" y="292" text-anchor="middle" font-size="12" font-weight="700" fill="#065f46">D(V2)</text>
+          <ellipse cx="370" cy="367" rx="44" ry="16" fill="#d1fae5" stroke="#6ee7b7" stroke-width="1.5"/>
+          <text x="370" y="372" text-anchor="middle" font-size="12" font-weight="700" fill="#065f46">E(V2)</text>
+          <ellipse cx="370" cy="447" rx="50" ry="18" fill="#bbf7d0" stroke="#34d399" stroke-width="2"/>
+          <text x="370" y="452" text-anchor="middle" font-size="12" font-weight="700" fill="#065f46">F(V2)</text>
+          <text x="422" y="445" font-size="9" fill="#065f46">所属团长</text>
+          <ellipse cx="370" cy="527" rx="44" ry="16" fill="#fef3c7" stroke="#fcd34d" stroke-width="1.5"/>
+          <text x="370" y="532" text-anchor="middle" font-size="12" font-weight="700" fill="#92400e">G(V1)</text>
+          <ellipse cx="370" cy="607" rx="44" ry="16" fill="#fef3c7" stroke="#fcd34d" stroke-width="1.5"/>
+          <text x="370" y="612" text-anchor="middle" font-size="12" font-weight="700" fill="#92400e">H(V1)</text>
+          <ellipse cx="370" cy="687" rx="36" ry="16" fill="#16a34a"/>
+          <text x="370" y="692" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">出单</text>
+          <path d="M414,527 L700,527" fill="none" stroke="#2563eb" stroke-width="2" stroke-dasharray="6,3" marker-end="url(#prm-mb)"/>
+          <rect x="660" y="512" width="52" height="18" rx="4" fill="rgba(37,99,235,0.10)"/>
+          <text x="686" y="525" text-anchor="middle" font-size="10" font-weight="600" fill="#2563eb">直邀</text>
+          <path d="M420,447 L730,447 L730,513" fill="none" stroke="#7c3aed" stroke-width="2" stroke-dasharray="6,3" marker-end="url(#prm-mv)"/>
+          <rect x="685" y="467" width="52" height="18" rx="4" fill="rgba(124,58,237,0.10)"/>
+          <text x="711" y="480" text-anchor="middle" font-size="10" font-weight="600" fill="#7c3aed">间邀</text>
+          <line x1="420" y1="367" x2="790" y2="367" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3,2"/>
+          <text x="506" y="362" font-size="10" fill="#94a3b8">E及以上无用户关系分佣 ↑</text>
+          <path d="M326,367 L260,367 L260,432" fill="none" stroke="#0891b2" stroke-width="2" stroke-dasharray="6,3" marker-end="url(#prm-mt)"/>
+          <rect x="225" y="387" width="44" height="18" rx="4" fill="rgba(8,145,178,0.10)"/>
+          <text x="247" y="400" text-anchor="middle" font-size="10" font-weight="600" fill="#0891b2">直属团</text>
+          <path d="M326,287 L230,287 L230,432" fill="none" stroke="#d97706" stroke-width="2" stroke-dasharray="6,3" marker-end="url(#prm-ma)"/>
+          <rect x="190" y="347" width="44" height="18" rx="4" fill="rgba(217,119,6,0.10)"/>
+          <text x="212" y="360" text-anchor="middle" font-size="10" font-weight="600" fill="#d97706">间属团</text>
+          <line x1="180" y1="267" x2="326" y2="267" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3,2"/>
+          <text x="182" y="262" font-size="9" fill="#94a3b8">↑ V2同级截止</text>
+          <path d="M326,207 L150,207 L150,432" fill="none" stroke="#dc2626" stroke-width="2.5" stroke-dasharray="6,3" marker-end="url(#prm-mr)"/>
+          <rect x="100" y="307" width="52" height="18" rx="4" fill="rgba(220,38,38,0.10)"/>
+          <text x="126" y="320" text-anchor="middle" font-size="10" font-weight="600" fill="#dc2626">无限团</text>
+          <path d="M326,127 L100,127 L100,192" fill="none" stroke="#0891b2" stroke-width="2" stroke-dasharray="6,3" marker-end="url(#prm-mt)"/>
+          <rect x="56" y="147" width="44" height="18" rx="4" fill="rgba(8,145,178,0.10)"/>
+          <text x="78" y="160" text-anchor="middle" font-size="10" font-weight="600" fill="#0891b2">直属团</text>
+          <path d="M326,47 L60,47 L60,112" fill="none" stroke="#d97706" stroke-width="2" stroke-dasharray="6,3" marker-end="url(#prm-ma)"/>
+          <rect x="20" y="67" width="44" height="18" rx="4" fill="rgba(217,119,6,0.10)"/>
+          <text x="42" y="80" text-anchor="middle" font-size="10" font-weight="600" fill="#d97706">间属团</text>
+          <line x1="20" y1="25" x2="326" y2="25" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3,2"/>
+          <text x="22" y="21" font-size="9" fill="#94a3b8">↑ V3同级截止</text>
+          <rect x="340" y="710" width="470" height="44" rx="6" fill="rgba(200,200,200,0.1)"/>
+          <circle cx="355" cy="728" r="4" fill="#2563eb"/><text x="363" y="732" font-size="10" fill="#2563eb">直邀</text>
+          <circle cx="395" cy="728" r="4" fill="#7c3aed"/><text x="403" y="732" font-size="10" fill="#7c3aed">间邀</text>
+          <circle cx="435" cy="728" r="4" fill="#0891b2"/><text x="443" y="732" font-size="10" fill="#0891b2">直属团</text>
+          <circle cx="487" cy="728" r="4" fill="#d97706"/><text x="495" y="732" font-size="10" fill="#d97706">间属团</text>
+          <circle cx="541" cy="728" r="4" fill="#dc2626"/><text x="549" y="732" font-size="10" fill="#dc2626">无限团</text>
+          <circle cx="597" cy="728" r="4" fill="#64748b"/><text x="605" y="732" font-size="10" fill="#64748b">邀请链</text>
+          <text x="355" y="748" font-size="9" fill="#94a3b8">虚线 = 分佣流向；紫色 = 间邀示意（V2/V3 均可配间邀）</text>
+        </svg>
+      </div>
+    </section>
+
+    <p class="footer">内容同步自仓库内 Vue 弹窗组件 · 可直接打印或全页截图导出</p>
+  </div>
+</body>
+</html>

@@ -1,0 +1,68 @@
+/* ===================================================
+   Element Plus 主题覆盖 — 对齐右豹设计规范
+   只覆盖 CSS 变量，不改结构，确保 Dark 模式正常
+   =================================================== */
+
+:root {
+  --el-color-primary: #2563eb;
+  --el-color-primary-light-3: #60a5fa;
+  --el-color-primary-light-5: #93c5fd;
+  --el-color-primary-light-7: #bfdbfe;
+  --el-color-primary-light-8: #dbeafe;
+  --el-color-primary-light-9: #eff6ff;
+  --el-color-primary-dark-2: #1d4ed8;
+
+  --el-color-success: #16a34a;
+  --el-color-warning: #d97706;
+  --el-color-danger: #dc2626;
+  --el-color-info: #0891b2;
+
+  --el-border-radius-base: 7px;
+  --el-border-radius-small: 4px;
+  --el-border-radius-round: 20px;
+
+  --el-font-size-base: 13px;
+  --el-font-family: 'PingFang SC', 'Microsoft YaHei', 'Segoe UI', -apple-system, sans-serif;
+
+  /* 输入框高度 34px */
+  --el-component-size: 34px;
+  --el-component-size-small: 30px;
+  --el-component-size-large: 38px;
+}
+
+/* ===== 表格样式对齐规范 ===== */
+.el-table {
+  --el-table-header-bg-color: var(--surface-hover, #f8fafc);
+  --el-table-header-text-color: var(--text-secondary, #4a5568);
+  --el-table-row-hover-bg-color: var(--primary-light, #eff6ff);
+  font-size: 13px;
+}
+.el-table th.el-table__cell {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+/* 行 hover 左侧蓝色竖线 */
+.el-table__body tr:hover > td.el-table__cell {
+  box-shadow: inset 3px 0 0 var(--primary, #2563eb);
+}
+
+/* ===== 弹窗圆角 ===== */
+.el-dialog {
+  border-radius: 14px !important;
+}
+.el-drawer {
+  border-radius: 14px 0 0 14px !important;
+}
+
+/* ===== 按钮禁用态 ===== */
+.el-button.is-disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ===== 分页 ===== */
+.el-pagination {
+  font-size: 12px;
+}

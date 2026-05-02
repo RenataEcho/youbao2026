@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>右豹管理后台 · 用户等级</title>
+  <script>(function(){var s=localStorage.getItem('theme'),p=window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',s||p);})();</script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --primary: #2563eb; --primary-hover: #1d4ed8; --primary-light: #eff6ff; --primary-border: #bfdbfe;
+      --success: #16a34a; --success-bg: #f0fdf4;
+      --warning: #d97706; --warning-bg: #fffbeb;
+      --danger: #dc2626; --danger-bg: #fef2f2;
+      --info: #0891b2; --info-bg: #ecfeff;
+      --bg: #f0f4f8; --surface: #ffffff; --surface-hover: #f8fafc;
+      --border: #e8edf3; --border-hover: #c8d5e2;
+      --text-primary: #18222f; --text-secondary: #4a5568; --text-muted: #9aa5b4;
+      --shadow-sm: 0 1px 4px rgba(30,40,60,0.06); --shadow: 0 2px 10px rgba(30,40,60,0.08);
+      --shadow-lg: 0 8px 28px rgba(30,40,60,0.11); --shadow-xl: 0 20px 60px rgba(30,40,60,0.18);
+      --radius-xs: 4px; --radius-sm: 7px; --radius: 10px; --radius-lg: 14px;
+      --transition: all 0.16s ease;
+      --topnav-h: 54px; --sidebar-w: 196px;
+      --topnav-bg: linear-gradient(135deg, #dbeafe 0%, #ede9fe 40%, #e0f2fe 100%);
+      --topnav-text: #3b4d6b; --topnav-text-active: #1e3a8a;
+      --topnav-hover-bg: rgba(99,102,241,0.09); --topnav-active-bg: rgba(99,102,241,0.13);
+      --topnav-border: rgba(148,163,196,0.25);
+      --sidebar-bg: rgba(240,244,255,0.92); --sidebar-border: rgba(148,163,196,0.22);
+    }
+    [data-theme="dark"] {
+      --bg: #0f172a; --surface: #1e293b; --surface-hover: #273348;
+      --border: #334155; --border-hover: #475569;
+      --text-primary: #f1f5f9; --text-secondary: #94a3b8; --text-muted: #475569;
+      --shadow-sm: 0 1px 4px rgba(0,0,0,0.3); --shadow: 0 2px 10px rgba(0,0,0,0.35);
+      --shadow-lg: 0 8px 28px rgba(0,0,0,0.45); --shadow-xl: 0 20px 60px rgba(0,0,0,0.6);
+      --topnav-bg: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0c1a2e 100%);
+      --topnav-text: rgba(203,213,225,0.85); --topnav-text-active: #f1f5f9;
+      --topnav-hover-bg: rgba(255,255,255,0.08); --topnav-active-bg: rgba(255,255,255,0.13);
+      --topnav-border: rgba(255,255,255,0.10);
+      --sidebar-bg: rgba(15,23,42,0.97); --sidebar-border: rgba(255,255,255,0.07);
+    }
+    html,body{height:100%;}
+    body{font-family:'PingFang SC','Microsoft YaHei','Segoe UI',-apple-system,sans-serif;font-size:13px;color:var(--text-primary);background:#f0f4f8;transition:background 0.2s,color 0.2s;}
+    [data-theme="dark"] body{background:#0f172a;}
+    .topnav{position:fixed;top:0;left:0;right:0;height:var(--topnav-h);z-index:300;display:flex;align-items:center;background:var(--topnav-bg);backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);border-bottom:1px solid var(--topnav-border);box-shadow:0 2px 16px rgba(99,102,241,0.10);}
+    .topnav-logo{display:flex;align-items:center;gap:9px;padding:0 18px;height:100%;flex-shrink:0;text-decoration:none;border-right:1px solid var(--topnav-border);}
+    .logo-icon{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#6366f1,#2563eb);display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0;}
+    .logo-name{font-size:15px;font-weight:700;color:var(--topnav-text-active);white-space:nowrap;}
+    .primary-nav{display:flex;align-items:stretch;flex:1;height:100%;overflow-x:auto;overflow-y:hidden;padding:0 6px;scrollbar-width:none;}
+    .primary-nav::-webkit-scrollbar{display:none;}
+    .pnav-item{display:flex;align-items:center;gap:6px;padding:0 14px;height:100%;font-size:13px;font-weight:500;color:var(--topnav-text);cursor:pointer;white-space:nowrap;border:none;background:none;font-family:inherit;position:relative;transition:color .15s,background .15s;flex-shrink:0;text-decoration:none;}
+    .pnav-item:hover{color:var(--topnav-text-active);background:var(--topnav-hover-bg);}
+    .pnav-item.active{color:var(--topnav-text-active);background:var(--topnav-active-bg);font-weight:600;}
+    .pnav-item.active::after{content:'';position:absolute;bottom:0;left:10px;right:10px;height:2px;border-radius:2px 2px 0 0;background:#4f46e5;}
+    [data-theme="dark"] .pnav-item.active::after{background:rgba(255,255,255,0.85);}
+    .topnav-actions{display:flex;align-items:center;gap:4px;flex-shrink:0;padding:0 12px;border-left:1px solid var(--topnav-border);}
+    .nav-icon-btn{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:none;border:none;cursor:pointer;color:var(--topnav-text);transition:var(--transition);}
+    .nav-icon-btn:hover{background:var(--topnav-hover-bg);color:var(--topnav-text-active);}
+    .nav-user{display:flex;align-items:center;gap:7px;padding:4px 10px;border-radius:8px;cursor:pointer;}
+    .user-avatar{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#2563eb);display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700;}
+    .user-name{font-size:13px;font-weight:600;color:var(--topnav-text-active);}
+    .icon-sun{display:none;}
+    [data-theme="dark"] .icon-moon{display:none;}
+    [data-theme="dark"] .icon-sun{display:block;}
+    .layout{display:flex;margin-top:var(--topnav-h);min-height:calc(100vh - var(--topnav-h));}
+    .sidebar{width:var(--sidebar-w);flex-shrink:0;position:fixed;top:var(--topnav-h);bottom:0;left:0;z-index:200;display:flex;flex-direction:column;background:var(--sidebar-bg);backdrop-filter:blur(20px) saturate(160%);-webkit-backdrop-filter:blur(20px) saturate(160%);border-right:1px solid var(--sidebar-border);box-shadow:2px 0 12px rgba(99,102,241,0.07);overflow:hidden;}
+    .sidebar-header{display:flex;align-items:center;gap:8px;padding:14px 14px 10px;border-bottom:1px solid var(--sidebar-border);flex-shrink:0;min-height:48px;}
+    .sidebar-module-icon{width:22px;height:22px;border-radius:5px;background:rgba(99,102,241,0.12);display:flex;align-items:center;justify-content:center;color:#4f46e5;flex-shrink:0;}
+    .sidebar-module-name{font-size:13px;font-weight:700;color:#1e3a8a;white-space:nowrap;}
+    [data-theme="dark"] .sidebar-module-name{color:#e2e8f0;}
+    .sidebar-scroll{flex:1;overflow-y:auto;overflow-x:hidden;padding:8px 0;}
+    .sidebar-scroll::-webkit-scrollbar{width:3px;}
+    .sidebar-scroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+    .nav-group-label{padding:14px 22px 4px;font-size:10.5px;font-weight:700;color:#8a9abf;text-transform:uppercase;letter-spacing:0.8px;white-space:nowrap;}
+    [data-theme="dark"] .nav-group-label{color:#475569;}
+    .nav-subitem{display:flex;align-items:center;padding:0 14px 0 22px;height:36px;font-size:12.5px;color:#5a6a8a;cursor:pointer;transition:var(--transition);border:none;background:none;width:calc(100% - 16px);margin:1px 8px;font-family:inherit;position:relative;white-space:nowrap;overflow:hidden;text-align:left;border-radius:7px;text-decoration:none;}
+    [data-theme="dark"] .nav-subitem{color:rgba(148,163,184,0.80);}
+    .nav-subitem:hover{color:#2563eb;background:rgba(37,99,235,0.07);}
+    [data-theme="dark"] .nav-subitem:hover{color:#93c5fd;background:rgba(37,99,235,0.12);}
+    .nav-subitem.active{color:#2563eb;font-weight:600;background:rgba(37,99,235,0.10);}
+    [data-theme="dark"] .nav-subitem.active{color:#93c5fd;background:rgba(37,99,235,0.18);}
+    .nav-subitem::before{content:'';position:absolute;left:10px;top:50%;transform:translateY(-50%);width:5px;height:5px;border-radius:50%;background:currentColor;opacity:0.35;}
+    .nav-subitem.active::before{opacity:1;}
+    .sidebar-footer{padding:8px 10px;border-top:1px solid var(--sidebar-border);flex-shrink:0;}
+    .sidebar-version{font-size:10px;color:var(--text-muted);}
+    .main{flex:1;margin-left:var(--sidebar-w);min-height:calc(100vh - var(--topnav-h));}
+    .breadcrumb-bar{display:flex;align-items:center;gap:6px;padding:10px 20px 0;font-size:12px;color:var(--text-muted);}
+    .breadcrumb-bar a{color:var(--text-secondary);text-decoration:none;transition:var(--transition);}
+    .breadcrumb-bar a:hover{color:var(--primary);}
+    .bc-sep{opacity:0.5;}.bc-cur{color:var(--text-primary);font-weight:500;}
+    .page-content{padding:10px 20px 24px;}
+    .glass-card{background:rgba(255,255,255,0.72);backdrop-filter:blur(16px) saturate(180%);-webkit-backdrop-filter:blur(16px) saturate(180%);border:1px solid rgba(255,255,255,0.55);box-shadow:0 8px 32px rgba(30,40,80,0.10),inset 0 1px 0 rgba(255,255,255,0.8);border-radius:var(--radius-lg);}
+    [data-theme="dark"] .glass-card{background:rgba(30,41,59,0.65);backdrop-filter:blur(16px) saturate(160%);border:1px solid rgba(255,255,255,0.08);box-shadow:0 8px 32px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.05);}
+    .filter-card{padding:16px 18px;margin-bottom:14px;}
+    .filter-grid{display:grid;grid-template-columns:repeat(4,minmax(0,200px));gap:10px;}
+    .filter-footer{display:flex;align-items:center;justify-content:flex-end;margin-top:14px;padding-top:14px;border-top:1px solid var(--border);}
+    .filter-actions{display:flex;gap:8px;}
+    .form-group-filter{display:flex;flex-direction:column;gap:5px;}
+    .form-label-sm{font-size:12px;color:var(--text-secondary);font-weight:500;}
+    .form-input-sm{width:100%;height:30px;padding:0 9px;font-size:12px;font-family:inherit;color:var(--text-primary);background:var(--surface);border:1px solid var(--border);border-radius:6px;outline:none;transition:var(--transition);}
+    .form-input-sm:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(37,99,235,0.10);}
+    .form-input-sm::placeholder{color:var(--text-muted);}
+    .form-select-sm{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%239aa5b4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;padding-right:26px;cursor:pointer;}
+    .table-card{overflow:hidden;}
+    .table-header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border);}
+    .table-title{font-size:14px;font-weight:600;color:var(--text-primary);display:flex;align-items:center;gap:8px;}
+    .table-count{font-size:12px;font-weight:400;color:var(--text-muted);}
+    .table-wrap{overflow-x:auto;}
+    table{width:100%;border-collapse:collapse;min-width:900px;}
+    thead th{background:var(--surface-hover);font-size:12px;font-weight:600;color:var(--text-secondary);letter-spacing:0.5px;padding:10px 12px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap;}
+    [data-theme="dark"] thead th{background:rgba(39,51,72,0.8);}
+    tbody tr{border-bottom:1px solid var(--border);transition:var(--transition);}
+    tbody tr:last-child{border-bottom:none;}
+    tbody tr:hover{background:rgba(37,99,235,0.04);}
+    tbody td{padding:10px 12px;font-size:13px;color:var(--text-primary);vertical-align:middle;}
+    .td-mono{font-family:monospace;font-size:12px;}
+    .td-right{text-align:right;}
+    .btn{display:inline-flex;align-items:center;gap:5px;height:34px;padding:0 16px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;font-family:inherit;cursor:pointer;transition:var(--transition);border:1px solid transparent;white-space:nowrap;}
+    .btn:active{transform:translateY(1px);}
+    .btn:disabled{opacity:0.45;cursor:not-allowed;transform:none;}
+    .btn-primary{background:var(--primary);color:#fff;border-color:var(--primary);}
+    .btn-primary:hover{background:var(--primary-hover);}
+    .btn-default{background:var(--surface);color:var(--text-primary);border-color:var(--border);}
+    .btn-default:hover{border-color:var(--border-hover);background:var(--surface-hover);}
+    .btn-sm{height:30px;padding:0 12px;font-size:12px;}
+    .btn-xs{height:26px;padding:0 9px;font-size:11.5px;border-radius:5px;}
+    .action-btns{display:flex;align-items:center;gap:2px;}
+    .action-btn{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;background:transparent;border:none;cursor:pointer;transition:background .15s,color .15s;flex-shrink:0;}
+    .action-btn.edit{color:var(--primary);}
+    .action-btn.edit:hover{background:var(--primary-light);}
+    .tag{display:inline-flex;align-items:center;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;white-space:nowrap;}
+    .tag-blue{background:#eff6ff;color:#2563eb;}
+    .tag-blue-mid{background:#dbeafe;color:#1d4ed8;}
+    .tag-blue-deep{background:#bfdbfe;color:#1e40af;}
+    .tag-green{background:#f0fdf4;color:#16a34a;}
+    .tag-amber{background:#fffbeb;color:#92400e;}
+    .tag-gray{background:#f1f5f9;color:#64748b;}
+    .tag-red{background:#fef2f2;color:#dc2626;}
+    [data-theme="dark"] .tag-blue{background:rgba(37,99,235,0.18);color:#93c5fd;}
+    [data-theme="dark"] .tag-blue-mid{background:rgba(29,78,216,0.22);color:#60a5fa;}
+    [data-theme="dark"] .tag-blue-deep{background:rgba(30,64,175,0.28);color:#3b82f6;}
+    [data-theme="dark"] .tag-green{background:rgba(22,163,74,0.18);color:#86efac;}
+    [data-theme="dark"] .tag-amber{background:rgba(217,119,6,0.18);color:#fcd34d;}
+    [data-theme="dark"] .tag-gray{background:rgba(100,116,139,0.18);color:#94a3b8;}
+    .badge{display:inline-flex;align-items:center;gap:5px;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:600;}
+    .badge::before{content:'';width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0;}
+    .badge-green{background:#f0fdf4;color:#16a34a;}
+    .badge-amber{background:#fffbeb;color:#d97706;}
+    .badge-gray{background:#f1f5f9;color:#64748b;}
+    .badge-red{background:#fef2f2;color:#dc2626;}
+    [data-theme="dark"] .badge-green{background:rgba(22,163,74,0.15);}
+    [data-theme="dark"] .badge-amber{background:rgba(217,119,6,0.15);}
+    [data-theme="dark"] .badge-gray{background:rgba(100,116,139,0.15);}
+    .pagination{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-top:1px solid var(--border);}
+    .page-info{font-size:12px;color:var(--text-muted);}
+    .page-info span{color:var(--text-primary);font-weight:600;}
+    .page-btns{display:flex;align-items:center;gap:4px;}
+    .page-btn{width:30px;height:30px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:13px;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--text-secondary);transition:var(--transition);font-family:inherit;}
+    .page-btn:hover:not(:disabled){border-color:var(--primary);color:var(--primary);}
+    .page-btn.active{background:var(--primary);border-color:var(--primary);color:#fff;font-weight:600;}
+    .page-btn:disabled{opacity:0.4;cursor:not-allowed;}
+    .page-size{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-muted);}
+    .page-size select{height:30px;padding:0 24px 0 8px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text-primary);font-size:12px;font-family:inherit;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%239aa5b4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 6px center;}
+    .page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;}
+    .page-title{font-size:19px;font-weight:700;color:var(--text-primary);}
+    .page-desc{font-size:12px;color:var(--text-muted);margin-top:3px;}
+    .overlay{position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:699;opacity:0;pointer-events:none;transition:opacity 0.22s ease;}
+    .overlay.show{opacity:1;pointer-events:all;}
+    .drawer{position:fixed;top:0;right:0;height:100vh;z-index:700;width:520px;background:var(--surface);box-shadow:var(--shadow-xl);display:flex;flex-direction:column;transform:translateX(100%);transition:transform 0.28s cubic-bezier(0.4,0,0.2,1);}
+    .drawer.show{transform:translateX(0);}
+    .drawer-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);flex-shrink:0;}
+    .drawer-title-main{font-size:15px;font-weight:700;color:var(--text-primary);}
+    .drawer-close{width:30px;height:30px;border-radius:6px;display:flex;align-items:center;justify-content:center;background:none;border:none;cursor:pointer;color:var(--text-muted);transition:var(--transition);}
+    .drawer-close:hover{background:var(--surface-hover);}
+    .drawer-body{flex:1;overflow-y:auto;padding:20px;}
+    .drawer-footer{display:flex;align-items:center;justify-content:flex-end;gap:10px;padding:14px 20px;border-top:1px solid var(--border);flex-shrink:0;}
+    .form-group{display:flex;flex-direction:column;gap:6px;margin-bottom:16px;}
+    .form-label{font-size:13px;color:var(--text-secondary);font-weight:500;}
+    .form-label .req{color:var(--danger);}
+    .form-input{width:100%;height:36px;padding:0 10px;font-size:13px;font-family:inherit;color:var(--text-primary);background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);outline:none;transition:var(--transition);}
+    .form-input:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(37,99,235,0.10);}
+    .form-input[readonly]{background:var(--surface-hover);color:var(--text-muted);cursor:default;}
+    .form-select{appearance:none;-webkit-appearance:none;height:36px;padding:0 28px 0 10px;font-size:13px;font-family:inherit;color:var(--text-primary);background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);outline:none;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%239aa5b4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;width:100%;transition:var(--transition);}
+    .form-select:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(37,99,235,0.10);}
+    .radio-group{display:flex;gap:16px;}
+    .radio-label{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text-primary);cursor:pointer;}
+    input[type=radio]{accent-color:var(--primary);}
+    .benefit-list{display:flex;flex-direction:column;gap:8px;}
+    .benefit-item{display:flex;align-items:center;gap:8px;}
+    .benefit-item input{flex:1;height:34px;padding:0 10px;font-size:13px;font-family:inherit;color:var(--text-primary);background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);outline:none;transition:var(--transition);}
+    .benefit-item input:focus{border-color:var(--primary);}
+    .benefit-remove{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;background:none;border:none;cursor:pointer;color:var(--danger);transition:var(--transition);}
+    .benefit-remove:hover{background:var(--danger-bg);}
+    .add-benefit-btn{display:inline-flex;align-items:center;gap:5px;font-size:12px;color:var(--primary);background:none;border:none;cursor:pointer;padding:4px 0;font-family:inherit;}
+    .add-benefit-btn:hover{text-decoration:underline;}
+    .img-thumb-placeholder{width:32px;height:32px;border-radius:6px;background:var(--surface-hover);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:16px;}
+    .img-upload-area{width:80px;height:80px;border:2px dashed var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:var(--transition);font-size:22px;color:var(--text-muted);}
+    .img-upload-area:hover{border-color:var(--primary);background:var(--primary-light);}
+    .toast-container{position:fixed;top:66px;right:22px;z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none;}
+    .toast{min-width:200px;max-width:360px;padding:12px 14px 12px 16px;background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow-lg);border-left:3px solid;display:flex;align-items:flex-start;gap:8px;font-size:13px;pointer-events:all;animation:toastIn 0.28s ease;}
+    @keyframes toastIn{from{opacity:0;transform:translateX(80px)}to{opacity:1;transform:translateX(0)}}
+    .toast.success{border-left-color:var(--success);}
+    .toast.info{border-left-color:var(--info);}
+    .toast.warning{border-left-color:var(--warning);}
+    .toast-msg{flex:1;color:var(--text-primary);line-height:1.5;}
+    .toast-close{flex-shrink:0;background:none;border:none;cursor:pointer;color:var(--text-muted);padding:0;font-size:14px;}
+    .form-hint{font-size:12px;color:var(--text-muted);}
+    .readonly-text{padding:8px 10px;background:var(--surface-hover);border-radius:var(--radius-sm);font-size:13px;color:var(--text-muted);border:1px solid var(--border);}
+  </style>
+</head>
+<body>
+<div class="toast-container" id="toastContainer"></div>
+<nav class="topnav">
+  <a class="topnav-logo" href="index.html">
+    <div class="logo-icon"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+    <span class="logo-name">右豹后台</span>
+  </a>
+  <div class="primary-nav">
+    <a class="pnav-item" href="index.html">首页</a>
+    <a class="pnav-item" href="#">内容域</a>
+    <a class="pnav-item" href="#">订单域</a>
+    <a class="pnav-item" href="#">项目域</a>
+    <a class="pnav-item active" href="user.html">用户域</a>
+    <a class="pnav-item" href="#">系统域</a>
+    <a class="pnav-item" href="#">数据域</a>
+  </div>
+  <div class="topnav-actions">
+    <button class="nav-icon-btn" onclick="toggleTheme()">
+      <svg class="icon-moon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+      <svg class="icon-sun" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/></svg>
+    </button>
+    <div class="nav-user"><div class="user-avatar">管</div><span class="user-name">管理员</span></div>
+  </div>
+</nav>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-module-icon"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
+      <span class="sidebar-module-name">用户域</span>
+    </div>
+    <div class="sidebar-scroll">
+      <div class="nav-group-label">用户管理</div>
+      <a class="nav-subitem" href="user.html">用户列表</a>
+      <a class="nav-subitem" href="realname-company.html">实名信息</a>
+      <a class="nav-subitem" href="media-account.html">媒体账号</a>
+      <a class="nav-subitem" href="withdrawal-account.html">提现账户</a>
+      <a class="nav-subitem" href="blacklist.html">黑名单</a>
+      <a class="nav-subitem" href="user-gift-word.html">赠词记录</a>
+      <a class="nav-subitem" href="user-redeem.html">兑换记录</a>
+      <div class="nav-group-label">用户资金</div>
+      <a class="nav-subitem" href="user-wallet.html">用户钱包</a>
+      <a class="nav-subitem" href="dividend-detail.html">分红明细</a>
+      <a class="nav-subitem" href="reward-detail.html">奖励明细</a>
+      <a class="nav-subitem" href="withdrawal-record.html">提现记录</a>
+      <div class="nav-group-label">用户通知</div>
+      <a class="nav-subitem" href="wechat-notify.html">微信通知</a>
+      <a class="nav-subitem" href="inbox-notify.html">站内信通知</a>
+      <div class="nav-group-label">用户体系</div>
+      <a class="nav-subitem active" href="user-level.html">用户等级</a>
+      <a class="nav-subitem" href="user-rank.html">用户段位</a>
+      <a class="nav-subitem" href="commission-config.html">权益配置</a>
+      <a class="nav-subitem" href="medal-config.html">勋章配置</a>
+      <a class="nav-subitem" href="level-log.html">用户等级日志</a>
+      <div class="nav-group-label">团长体系</div>
+      <a class="nav-subitem" href="captain-level.html">团长等级配置</a>
+      <a class="nav-subitem" href="commission-ratio.html">分销比例配置</a>
+      <a class="nav-subitem" href="captain-log.html">团长身份日志</a>
+    </div>
+    <div class="sidebar-footer"><span class="sidebar-version">v2.4.0</span></div>
+  </aside>
+  <main class="main">
+    <div class="breadcrumb-bar">
+      <a href="index.html">首页</a><span class="bc-sep">/</span>
+      <span>用户体系</span><span class="bc-sep">/</span>
+      <span class="bc-cur">用户等级</span>
+    </div>
+    <div class="page-content">
+      <div class="page-header">
+        <div>
+          <div class="page-title">用户等级</div>
+          <div class="page-desc">配置平台用户等级体系（LV1-LV10），共10条固定数据</div>
+        </div>
+      </div>
+      <!-- 筛选区 -->
+      <div class="glass-card filter-card">
+        <div class="filter-grid">
+          <div class="form-group-filter">
+            <label class="form-label-sm">等级</label>
+            <select class="form-input-sm form-select-sm">
+              <option>全部</option>
+              <option>LV1</option><option>LV2</option><option>LV3</option><option>LV4</option><option>LV5</option>
+              <option>LV6</option><option>LV7</option><option>LV8</option><option>LV9</option><option>LV10</option>
+            </select>
+          </div>
+          <div class="form-group-filter">
+            <label class="form-label-sm">状态</label>
+            <select class="form-input-sm form-select-sm">
+              <option>全部</option><option>启用</option><option>禁用</option>
+            </select>
+          </div>
+          <div class="form-group-filter">
+            <label class="form-label-sm">操作人</label>
+            <input class="form-input-sm" type="text" placeholder="请输入操作人">
+          </div>
+        </div>
+        <div class="filter-footer">
+          <div class="filter-actions">
+            <button class="btn btn-default btn-sm" onclick="resetFilter()">重置</button>
+            <button class="btn btn-primary btn-sm">查询</button>
+          </div>
+        </div>
+      </div>
+      <!-- 数据表 -->
+      <div class="glass-card table-card">
+        <div class="table-header">
+          <div class="table-title">用户等级列表 <span class="table-count">共 10 条</span></div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>等级</th>
+                <th>等级图标</th>
+                <th>等级昵称</th>
+                <th>等级条件</th>
+                <th>升级需审核</th>
+                <th>等级权益</th>
+                <th style="text-align:right">改等级人数</th>
+                <th>状态</th>
+                <th>操作人</th>
+                <th>创建时间</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+          </table>
+        </div>
+        <div class="pagination">
+          <div class="page-info">共 <span>10</span> 条，第 <span>1</span>/1 页</div>
+          <div class="page-btns">
+            <button class="page-btn" disabled>«</button>
+            <button class="page-btn active">1</button>
+            <button class="page-btn" disabled>»</button>
+          </div>
+          <div class="page-size">每页 <select><option>10</option><option>20</option></select> 条</div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="overlay" id="overlay" onclick="closeDrawer()"></div>
+
+<!-- 抽屉-编辑 -->
+<div class="drawer" id="editDrawer">
+  <div class="drawer-header">
+    <span class="drawer-title-main">编辑用户等级</span>
+    <button class="drawer-close" onclick="closeDrawer()">✕</button>
+  </div>
+  <div class="drawer-body">
+    <div class="form-group">
+      <label class="form-label">等级</label>
+      <div class="readonly-text" id="drawerLevel">LV1</div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">等级图标</label>
+      <div class="img-upload-area" onclick="showToast('图片上传功能演示','info')">＋</div>
+      <p class="form-hint">建议尺寸 80×80，支持 PNG/JPG</p>
+    </div>
+    <div class="form-group">
+      <label class="form-label">等级昵称 <span class="req">*</span></label>
+      <input class="form-input" type="text" id="drawerNickname" placeholder="请输入等级昵称">
+    </div>
+    <div class="form-group" id="conditionGroup">
+      <label class="form-label">等级条件 <span class="req">*</span></label>
+      <div class="readonly-text" id="condDefault" style="display:none">默认等级（所有新注册用户自动获得，不可更改）</div>
+      <div id="condEditor" style="display:none;border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;background:var(--surface-hover);">
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px">多个条件同时满足方可升级（且关系）</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <label style="display:flex;align-items:center;gap:8px;font-size:13px;">
+            <input type="checkbox" id="ucond-income" style="accent-color:var(--primary)">
+            项目收益累计 ≥
+            <input type="number" id="ucond-income-val" class="form-input" style="width:90px;height:30px;padding:0 8px;font-size:13px" placeholder="0" min="0">
+            元
+          </label>
+          <label style="display:flex;align-items:center;gap:8px;font-size:13px;">
+            <input type="checkbox" id="ucond-invite" style="accent-color:var(--primary)">
+            累计直邀 ≥
+            <input type="number" id="ucond-invite-val" class="form-input" style="width:90px;height:30px;padding:0 8px;font-size:13px" placeholder="0" min="0">
+            人
+          </label>
+          <label style="display:flex;align-items:center;gap:8px;font-size:13px;flex-wrap:wrap;">
+            <input type="checkbox" id="ucond-invite-lv" style="accent-color:var(--primary)">
+            直邀
+            <input type="number" id="ucond-invite-lv-num" class="form-input" style="width:60px;height:30px;padding:0 8px;font-size:13px" placeholder="0" min="0">
+            名
+            <select id="ucond-invite-lv-sel" class="form-input" style="width:80px;height:30px;padding:0 4px;font-size:13px">
+              <option>LV1</option><option>LV2</option><option>LV3</option><option>LV4</option><option>LV5</option>
+              <option>LV6</option><option>LV7</option><option>LV8</option><option>LV9</option><option>LV10</option>
+            </select>
+            用户
+          </label>
+        </div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">升级是否需要审核</label>
+      <div class="radio-group">
+        <label class="radio-label"><input type="radio" name="drawerAudit" value="yes">是</label>
+        <label class="radio-label"><input type="radio" name="drawerAudit" value="no" checked>否</label>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">等级权益</label>
+      <div class="benefit-list" id="benefitList"></div>
+      <button class="add-benefit-btn" onclick="addBenefit()">＋ 添加权益</button>
+    </div>
+    <div class="form-group">
+      <label class="form-label">状态</label>
+      <div class="radio-group">
+        <label class="radio-label"><input type="radio" name="drawerStatus" value="enable" checked>启用</label>
+        <label class="radio-label"><input type="radio" name="drawerStatus" value="disable">禁用</label>
+      </div>
+    </div>
+  </div>
+  <div class="drawer-footer">
+    <button class="btn btn-default" onclick="closeDrawer()">取消</button>
+    <button class="btn btn-primary" onclick="saveDrawer()">保存</button>
+  </div>
+</div>
+
+<script>
+const levels = [
+  {lv:'LV1',nick:'初学者',cond:'默认等级（所有用户）',audit:'否',benefits:['基础内容浏览','参与普通任务'],count:12486,status:'启用',op:'系统初始化',time:'2024-01-01',conditions:{}},
+  {lv:'LV2',nick:'进阶者',cond:'项目收益累计 ≥ 500 元',audit:'否',benefits:['解锁进阶任务','享受LV2专属优惠'],count:5832,status:'启用',op:'张管理',time:'2024-01-01',conditions:{income:500}},
+  {lv:'LV3',nick:'熟练者',cond:'项目收益累计 ≥ 2,000 元 / 累计直邀 ≥ 5 人',audit:'否',benefits:['优先任务通知','专属客服通道'],count:3241,status:'启用',op:'张管理',time:'2024-01-01',conditions:{income:2000,invite:5}},
+  {lv:'LV4',nick:'专家',cond:'项目收益累计 ≥ 5,000 元 / 直邀 3 名 LV2 用户',audit:'否',benefits:['高佣金任务权限','专属标签'],count:1856,status:'启用',op:'李运营',time:'2024-01-01',conditions:{income:5000,inviteLv:3,inviteLvTarget:'LV2'}},
+  {lv:'LV5',nick:'精英',cond:'项目收益累计 ≥ 10,000 元 / 累计直邀 ≥ 10 人',audit:'是',benefits:['精英任务资格','每月专属活动','独家合作资格'],count:892,status:'启用',op:'李运营',time:'2024-01-01',conditions:{income:10000,invite:10}},
+  {lv:'LV6',nick:'大师',cond:'项目收益累计 ≥ 20,000 元 / 直邀 5 名 LV3 用户',audit:'是',benefits:['大师专属任务','品牌直接合作','VIP客服'],count:423,status:'启用',op:'王审核',time:'2024-01-01',conditions:{income:20000,inviteLv:5,inviteLvTarget:'LV3'}},
+  {lv:'LV7',nick:'宗师',cond:'项目收益累计 ≥ 50,000 元 / 累计直邀 ≥ 30 人',audit:'是',benefits:['宗师专属频道','线下活动邀请'],count:186,status:'启用',op:'王审核',time:'2024-01-01',conditions:{income:50000,invite:30}},
+  {lv:'LV8',nick:'传说',cond:'项目收益累计 ≥ 100,000 元 / 直邀 10 名 LV5 用户',audit:'是',benefits:['传说等级专属任务','顶级品牌合作','年度峰会邀请'],count:67,status:'启用',op:'陈审核',time:'2024-01-01',conditions:{income:100000,inviteLv:10,inviteLvTarget:'LV5'}},
+  {lv:'LV9',nick:'神话',cond:'项目收益累计 ≥ 200,000 元 / 累计直邀 ≥ 80 人',audit:'是',benefits:['神话专属权益包','平台共创权限'],count:18,status:'启用',op:'陈审核',time:'2024-01-01',conditions:{income:200000,invite:80}},
+  {lv:'LV10',nick:'无双',cond:'项目收益累计 ≥ 500,000 元 / 累计直邀 ≥ 200 人 / 直邀 20 名 LV8 用户',audit:'是',benefits:['无双至尊礼遇','平台战略合作伙伴'],count:3,status:'启用',op:'系统管理员',time:'2024-01-01',conditions:{income:500000,invite:200,inviteLv:20,inviteLvTarget:'LV8'}},
+];
+
+const lvTagClass = (lv)=>{
+  const n=parseInt(lv.replace('LV',''));
+  if(n<=4) return 'tag-blue';
+  if(n<=7) return 'tag-blue-mid';
+  return 'tag-blue-deep';
+};
+
+function renderTable(){
+  const tbody=document.getElementById('tableBody');
+  tbody.innerHTML=levels.map((r,i)=>`
+    <tr>
+      <td><span class="tag ${lvTagClass(r.lv)}">${r.lv}</span></td>
+      <td><div class="img-thumb-placeholder">🏅</div></td>
+      <td style="font-weight:600">${r.nick}</td>
+      <td style="font-size:12px;color:var(--text-secondary);max-width:160px">${r.cond}</td>
+      <td>${r.audit==='是'?'<span class="badge badge-amber">是</span>':'<span class="badge badge-green">否</span>'}</td>
+      <td style="font-size:12px;color:var(--text-secondary)">${r.benefits.map(b=>`<div>${b}</div>`).join('')}</td>
+      <td class="td-right td-mono" style="font-weight:700">${r.count.toLocaleString()}</td>
+      <td>${r.status==='启用'?'<span class="badge badge-green">启用</span>':'<span class="badge badge-gray">禁用</span>'}</td>
+      <td style="color:var(--text-secondary)">${r.op}</td>
+      <td style="font-size:12px;color:var(--text-muted)">${r.time}</td>
+      <td>
+        <div class="action-btns">
+          <button class="action-btn edit" onclick="openEdit(${i})" title="编辑">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function openEdit(i){
+  const r=levels[i];
+  document.getElementById('drawerLevel').textContent=r.lv;
+  document.getElementById('drawerNickname').value=r.nick;
+
+  const condDefault=document.getElementById('condDefault');
+  const condEditor=document.getElementById('condEditor');
+  if(r.lv==='LV1'){
+    condDefault.style.display='';
+    condEditor.style.display='none';
+  } else {
+    condDefault.style.display='none';
+    condEditor.style.display='';
+    const conds=r.conditions||{};
+    const setCond=(cbId,valId,key)=>{
+      document.getElementById(cbId).checked=!!conds[key];
+      document.getElementById(valId).value=conds[key]||'';
+      document.getElementById(valId).disabled=!conds[key];
+      document.getElementById(cbId).onchange=function(){
+        document.getElementById(valId).disabled=!this.checked;
+        if(!this.checked)document.getElementById(valId).value='';
+      };
+    };
+    setCond('ucond-income','ucond-income-val','income');
+    setCond('ucond-invite','ucond-invite-val','invite');
+    const lvCb=document.getElementById('ucond-invite-lv');
+    const lvNum=document.getElementById('ucond-invite-lv-num');
+    const lvSel=document.getElementById('ucond-invite-lv-sel');
+    lvCb.checked=!!conds.inviteLv;
+    lvNum.value=conds.inviteLv||'';
+    lvNum.disabled=!conds.inviteLv;
+    lvSel.value=conds.inviteLvTarget||'LV1';
+    lvSel.disabled=!conds.inviteLv;
+    lvCb.onchange=function(){
+      lvNum.disabled=!this.checked;lvSel.disabled=!this.checked;
+      if(!this.checked){lvNum.value='';lvSel.selectedIndex=0;}
+    };
+  }
+  document.querySelector(`input[name=drawerAudit][value=${r.audit==='是'?'yes':'no'}]`).checked=true;
+  const bl=document.getElementById('benefitList');
+  bl.innerHTML=r.benefits.map(b=>`
+    <div class="benefit-item">
+      <input type="text" value="${b}">
+      <button class="benefit-remove" onclick="this.parentElement.remove()">✕</button>
+    </div>
+  `).join('');
+  document.getElementById('editDrawer').classList.add('show');
+  document.getElementById('overlay').classList.add('show');
+}
+
+function addBenefit(){
+  const bl=document.getElementById('benefitList');
+  const div=document.createElement('div');
+  div.className='benefit-item';
+  div.innerHTML='<input type="text" placeholder="请输入权益描述"><button class="benefit-remove" onclick="this.parentElement.remove()">✕</button>';
+  bl.appendChild(div);
+}
+
+function saveDrawer(){
+  closeDrawer();
+  showToast('保存成功','success');
+}
+
+function closeDrawer(){
+  document.getElementById('editDrawer').classList.remove('show');
+  document.getElementById('overlay').classList.remove('show');
+}
+
+function resetFilter(){
+  document.querySelectorAll('.filter-card input,.filter-card select').forEach(el=>{
+    if(el.tagName==='SELECT') el.selectedIndex=0; else el.value='';
+  });
+  showToast('筛选条件已重置','info');
+}
+
+function toggleTheme(){
+  const cur=document.documentElement.getAttribute('data-theme');
+  const next=cur==='dark'?'light':'dark';
+  document.documentElement.setAttribute('data-theme',next);
+  localStorage.setItem('theme',next);
+}
+
+function showToast(msg,type='info'){
+  const c=document.getElementById('toastContainer');
+  const t=document.createElement('div');
+  t.className=`toast ${type}`;
+  t.innerHTML=`<span class="toast-msg">${msg}</span><button class="toast-close" onclick="this.parentElement.remove()">✕</button>`;
+  c.appendChild(t);
+  setTimeout(()=>t.remove(),3500);
+}
+
+renderTable();
+</script>
+</body>
+</html>

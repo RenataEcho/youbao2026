@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>原型 · 运营数据大屏 — 右豹</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg-deep: #060a14;
+      --bg-panel: rgba(12, 22, 42, 0.72);
+      --border: rgba(56, 189, 248, 0.22);
+      --cyan: #22d3ee;
+      --blue: #38bdf8;
+      --violet: #a78bfa;
+      --green: #4ade80;
+      --amber: #fbbf24;
+      --rose: #fb7185;
+      --text: #e2e8f0;
+      --text-dim: #94a3b8;
+      --text-muted: #64748b;
+      --font: "PingFang SC", "Microsoft YaHei", "Segoe UI", system-ui, sans-serif;
+      --mono: ui-monospace, "SF Mono", Consolas, monospace;
+    }
+    html, body { height: 100%; }
+    body {
+      font-family: var(--font);
+      font-size: 13px;
+      color: var(--text);
+      background: var(--bg-deep);
+      background-image:
+        radial-gradient(ellipse 120% 80% at 50% -20%, rgba(56, 189, 248, 0.12), transparent 55%),
+        radial-gradient(ellipse 60% 40% at 100% 50%, rgba(167, 139, 250, 0.06), transparent),
+        radial-gradient(ellipse 50% 50% at 0% 80%, rgba(34, 211, 238, 0.05), transparent);
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* —— 全局动态背景 —— */
+    .ob-fx-bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background:
+        linear-gradient(90deg, rgba(34, 211, 238, 0.03) 1px, transparent 1px),
+        linear-gradient(rgba(34, 211, 238, 0.03) 1px, transparent 1px);
+      background-size: 48px 48px;
+      animation: obGridDrift 48s linear infinite;
+      mask-image: radial-gradient(ellipse 85% 70% at 50% 45%, #000 20%, transparent 72%);
+    }
+    .ob-fx-bg::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        105deg,
+        transparent 0%,
+        rgba(56, 189, 248, 0.04) 45%,
+        rgba(167, 139, 250, 0.06) 50%,
+        rgba(56, 189, 248, 0.04) 55%,
+        transparent 100%
+      );
+      background-size: 200% 100%;
+      animation: obSweep 14s ease-in-out infinite;
+    }
+    @keyframes obGridDrift {
+      0% { background-position: 0 0, 0 0; }
+      100% { background-position: 48px 24px, 24px 48px; }
+    }
+    @keyframes obSweep {
+      0%, 100% { background-position: 120% 0; }
+      50% { background-position: -20% 0; }
+    }
+
+    .ob-head-sticky {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(6, 10, 20, 0.75);
+      backdrop-filter: blur(8px);
+    }
+    .ob-top, .ob-footnote, .ob-ticker { position: relative; z-index: 1; }
+    .ob-main { position: relative; z-index: 0; }
+
+    /* —— 顶部滚动资讯条 —— */
+    .ob-ticker {
+      overflow: hidden;
+      border-bottom: 1px solid rgba(56, 189, 248, 0.12);
+      background: rgba(6, 10, 20, 0.85);
+      font-size: 11px;
+      color: var(--text-dim);
+    }
+    .ob-ticker-inner {
+      display: flex;
+      width: max-content;
+      gap: 48px;
+      padding: 8px 0;
+      animation: obMarquee 38s linear infinite;
+    }
+    .ob-ticker-inner:hover { animation-play-state: paused; }
+    .ob-ticker span { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+    .ob-ticker span::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--cyan);
+      box-shadow: 0 0 10px var(--cyan);
+      animation: obBlink 1.8s ease-in-out infinite;
+    }
+    .ob-ticker .hot { color: var(--amber); }
+    @keyframes obMarquee {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+    @keyframes obBlink {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.45; transform: scale(0.85); }
+    }
+
+    /* —— 顶栏 —— */
+    .ob-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px 20px;
+      padding: 14px 22px;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(15, 23, 42, 0.95) 0%, rgba(6, 10, 20, 0.6) 100%);
+      backdrop-filter: blur(10px);
+    }
+    .ob-top-left { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+    .ob-badge {
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--cyan);
+      border: 1px solid rgba(34, 211, 238, 0.35);
+      padding: 3px 8px;
+      border-radius: 4px;
+      opacity: 0.9;
+    }
+    .ob-title {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      background: linear-gradient(90deg, #f0f9ff 0%, var(--cyan) 35%, var(--violet) 65%, #f0f9ff 100%);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      animation: obTitleShine 6s ease-in-out infinite;
+    }
+    @keyframes obTitleShine {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+    .ob-top-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .ob-time {
+      font-family: var(--mono);
+      font-size: 14px;
+      color: var(--cyan);
+      text-shadow: 0 0 20px rgba(34, 211, 238, 0.35);
+    }
+    .ob-meta { font-size: 11px; color: var(--text-muted); }
+    .ob-pills { display: flex; gap: 6px; flex-wrap: wrap; }
+    .ob-pill {
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      background: rgba(15, 23, 42, 0.6);
+      color: var(--text-dim);
+      padding: 5px 12px;
+      border-radius: 999px;
+      cursor: pointer;
+      font-size: 12px;
+      transition: border-color 0.15s, color 0.15s, box-shadow 0.15s;
+    }
+    .ob-pill:hover { border-color: var(--blue); color: var(--text); }
+    .ob-pill.active {
+      border-color: var(--cyan);
+      color: var(--cyan);
+      box-shadow: 0 0 12px rgba(34, 211, 238, 0.2);
+      animation: obPillPulse 3s ease-in-out infinite;
+    }
+    @keyframes obPillPulse {
+      0%, 100% { box-shadow: 0 0 12px rgba(34, 211, 238, 0.2); }
+      50% { box-shadow: 0 0 18px rgba(34, 211, 238, 0.38); }
+    }
+    .ob-btn {
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      background: rgba(56, 189, 248, 0.12);
+      color: var(--cyan);
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .ob-btn:hover { background: rgba(56, 189, 248, 0.22); }
+    .ob-btn.secondary {
+      border-color: rgba(148, 163, 184, 0.35);
+      background: rgba(30, 41, 59, 0.8);
+      color: var(--text-dim);
+    }
+
+    /* —— 主栅格 —— */
+    .ob-main {
+      display: grid;
+      grid-template-columns: minmax(260px, 1fr) minmax(320px, 1.25fr) minmax(260px, 1fr);
+      gap: 14px;
+      padding: 14px 18px 18px;
+      max-width: 1680px;
+      margin: 0 auto;
+    }
+    @media (max-width: 1100px) {
+      .ob-main { grid-template-columns: 1fr; }
+    }
+
+    .ob-panel {
+      position: relative;
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 16px;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+      animation: obPanelBorder 5s ease-in-out infinite;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+    .ob-panel:nth-child(1) { animation-delay: 0s; }
+    .ob-main > .ob-panel:nth-child(2),
+    .ob-bottom .ob-panel:nth-child(1) { animation-delay: 0.4s; }
+    .ob-main > .ob-panel:nth-child(3),
+    .ob-bottom .ob-panel:nth-child(2) { animation-delay: 0.8s; }
+    @keyframes obPanelBorder {
+      0%, 100% {
+        border-color: rgba(56, 189, 248, 0.18);
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+      }
+      50% {
+        border-color: rgba(56, 189, 248, 0.38);
+        box-shadow: 0 4px 28px rgba(0, 0, 0, 0.4), 0 0 24px rgba(56, 189, 248, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      }
+    }
+    .ob-panel:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.42), 0 0 28px rgba(34, 211, 238, 0.08);
+    }
+    .ob-panel-hd {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(56, 189, 248, 0.12);
+    }
+    .ob-panel-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .ob-panel-title::before {
+      content: "";
+      width: 3px;
+      height: 14px;
+      border-radius: 2px;
+      background: linear-gradient(180deg, var(--cyan), var(--violet));
+    }
+    .ob-tag {
+      font-size: 10px;
+      color: var(--amber);
+      border: 1px solid rgba(251, 191, 36, 0.35);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    .ob-tag.green { color: var(--green); border-color: rgba(74, 222, 128, 0.35); }
+    .ob-link {
+      font-size: 11px;
+      color: var(--blue);
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .ob-link:hover { text-decoration: underline; }
+
+    /* KPI 卡 */
+    .ob-kpi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .ob-kpi {
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: rgba(15, 23, 42, 0.65);
+      border: 1px solid rgba(148, 163, 184, 0.12);
+    }
+    .ob-kpi-label { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
+    .ob-kpi-val {
+      font-size: 20px;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      font-family: var(--mono);
+    }
+    .ob-kpi-sub { font-size: 11px; margin-top: 4px; color: var(--green); }
+    .ob-kpi-sub.down { color: var(--rose); }
+
+    /* 简易折线区 */
+    .ob-chart-cap { font-size: 11px; color: var(--text-muted); margin-bottom: 6px; }
+    .ob-spark {
+      height: 88px;
+      border-radius: 8px;
+      background: linear-gradient(180deg, rgba(56, 189, 248, 0.08), transparent);
+      border: 1px solid rgba(56, 189, 248, 0.15);
+      position: relative;
+      overflow: hidden;
+    }
+    .ob-spark svg { width: 100%; height: 100%; display: block; }
+    .ob-spark .ob-line-draw {
+      stroke-dasharray: 520;
+      stroke-dashoffset: 520;
+      animation: obLineDraw 2.4s cubic-bezier(0.45, 0, 0.55, 1) forwards;
+    }
+    .ob-spark .ob-line-draw.ob-line-delay { animation-delay: 0.35s; }
+    .ob-spark .ob-area-fade {
+      opacity: 0;
+      animation: obAreaFade 1s ease 0.6s forwards;
+    }
+    @keyframes obLineDraw {
+      to { stroke-dashoffset: 0; }
+    }
+    @keyframes obAreaFade {
+      to { opacity: 1; }
+    }
+    .ob-spark::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent 0%, rgba(34, 211, 238, 0.06) 50%, transparent 100%);
+      background-size: 180% 100%;
+      animation: obChartSweep 3.5s ease-in-out infinite;
+      pointer-events: none;
+    }
+    @keyframes obChartSweep {
+      0%, 100% { background-position: 100% 0; }
+      50% { background-position: -80% 0; }
+    }
+
+    /* 渠道条 */
+    .ob-rows { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+    .ob-row {
+      display: grid;
+      grid-template-columns: 1fr 48px 40px;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+    }
+    .ob-row-name { color: var(--text-dim); }
+    .ob-bar-bg {
+      height: 6px;
+      border-radius: 3px;
+      background: rgba(30, 41, 59, 0.9);
+      overflow: hidden;
+    }
+    .ob-bar-fill {
+      height: 100%;
+      border-radius: 3px;
+      background: linear-gradient(90deg, var(--blue), var(--violet));
+      transform-origin: left center;
+      transform: scaleX(0);
+      animation: obBarGrow 1.15s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+    .ob-rows .ob-row:nth-child(2) .ob-bar-fill { animation-delay: 0.15s; }
+    .ob-rows .ob-row:nth-child(3) .ob-bar-fill { animation-delay: 0.3s; }
+    .ob-rows .ob-row:nth-child(4) .ob-bar-fill { animation-delay: 0.45s; }
+    @keyframes obBarGrow {
+      from { transform: scaleX(0); }
+      to { transform: scaleX(1); }
+    }
+    .ob-row-pct { text-align: right; color: var(--cyan); font-family: var(--mono); }
+
+    /* 双业务 KPI 横排 */
+    .ob-split { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+    .ob-subpanel {
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid rgba(167, 139, 250, 0.15);
+      background: rgba(15, 23, 42, 0.5);
+    }
+    .ob-subpanel.brand { border-color: rgba(56, 189, 248, 0.2); }
+    .ob-subpanel h4 { font-size: 11px; color: var(--violet); margin-bottom: 8px; }
+    .ob-subpanel.brand h4 { color: var(--blue); }
+    .ob-mini-kpis { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; font-size: 10px; color: var(--text-muted); }
+    .ob-mini-kpis strong { display: block; color: var(--text); font-size: 13px; font-family: var(--mono); margin-top: 2px; }
+
+    /* 环形占位 */
+    .ob-donut-wrap { display: flex; align-items: center; justify-content: center; gap: 16px; padding: 8px 0; flex-wrap: wrap; }
+    .ob-donut {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background: conic-gradient(var(--blue) 0 58%, var(--violet) 58% 100%);
+      mask: radial-gradient(circle at center, transparent 58%, #000 59%);
+      -webkit-mask: radial-gradient(circle at center, transparent 58%, #000 59%);
+      animation: obDonutPulse 3.2s ease-in-out infinite;
+    }
+    @keyframes obDonutPulse {
+      0%, 100% { filter: brightness(1) drop-shadow(0 0 6px rgba(56, 189, 248, 0.25)); }
+      50% { filter: brightness(1.12) drop-shadow(0 0 14px rgba(167, 139, 250, 0.35)); }
+    }
+    .ob-legend { font-size: 11px; color: var(--text-dim); line-height: 1.8; }
+    .ob-legend i { display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin-right: 6px; vertical-align: middle; }
+    .ob-legend i.b { background: var(--blue); }
+    .ob-legend i.v { background: var(--violet); }
+
+    /* 财务块 */
+    .ob-finance-big {
+      text-align: center;
+      padding: 12px;
+      border-radius: 10px;
+      background: rgba(56, 189, 248, 0.06);
+      border: 1px solid rgba(56, 189, 248, 0.2);
+      margin-bottom: 10px;
+    }
+    .ob-finance-big .lbl { font-size: 11px; color: var(--text-muted); }
+    .ob-finance-big .num {
+      font-size: 26px;
+      font-weight: 800;
+      font-family: var(--mono);
+      color: var(--cyan);
+      margin-top: 4px;
+      text-shadow: 0 0 24px rgba(34, 211, 238, 0.25);
+      animation: obNumGlow 2.8s ease-in-out infinite;
+    }
+    @keyframes obNumGlow {
+      0%, 100% { text-shadow: 0 0 18px rgba(34, 211, 238, 0.2); }
+      50% { text-shadow: 0 0 28px rgba(34, 211, 238, 0.45), 0 0 40px rgba(56, 189, 248, 0.15); }
+    }
+    .ob-finance-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 11px; margin-top: 10px; }
+    .ob-finance-row div {
+      padding: 8px;
+      border-radius: 8px;
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(148, 163, 184, 0.1);
+    }
+    .ob-finance-row span { color: var(--text-muted); display: block; }
+    .ob-finance-row strong { font-family: var(--mono); color: var(--text); }
+
+    /* 待办 */
+    .ob-alerts { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+    .ob-alert {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 10px;
+      border-radius: 8px;
+      background: rgba(251, 191, 36, 0.08);
+      border: 1px solid rgba(251, 191, 36, 0.25);
+      font-size: 11px;
+    }
+    .ob-alert.danger { background: rgba(251, 113, 133, 0.08); border-color: rgba(251, 113, 133, 0.28); }
+    .ob-alert em {
+      font-style: normal;
+      font-family: var(--mono);
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--amber);
+      display: inline-block;
+      animation: obEmPulse 2s ease-in-out infinite;
+    }
+    .ob-alert.danger em {
+      color: var(--rose);
+      animation-delay: 0.5s;
+    }
+    @keyframes obEmPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.06); }
+    }
+
+    /* 底部 TOP 区 */
+    .ob-bottom {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    @media (max-width: 900px) { .ob-bottom { grid-template-columns: 1fr; } }
+
+    .ob-tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 10px;
+    }
+    .ob-tab {
+      padding: 4px 12px;
+      font-size: 11px;
+      border-radius: 6px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+    .ob-tab.active {
+      border-color: rgba(34, 211, 238, 0.4);
+      color: var(--cyan);
+      background: rgba(34, 211, 238, 0.08);
+    }
+    .ob-tab.auto-flash {
+      animation: obTabAutoHint 0.45s ease;
+    }
+    @keyframes obTabAutoHint {
+      0%, 100% { box-shadow: none; }
+      50% { box-shadow: 0 0 12px rgba(34, 211, 238, 0.35); }
+    }
+
+    .ob-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+    .ob-table th {
+      text-align: left;
+      color: var(--text-muted);
+      font-weight: 500;
+      padding: 6px 8px;
+      border-bottom: 1px solid rgba(56, 189, 248, 0.12);
+    }
+    .ob-table td { padding: 7px 8px; border-bottom: 1px solid rgba(30, 41, 59, 0.8); color: var(--text-dim); }
+    .ob-table td.num { font-family: var(--mono); color: var(--cyan); text-align: right; }
+    .ob-table tr:hover td { background: rgba(56, 189, 248, 0.04); }
+    .ob-table tbody tr {
+      opacity: 0;
+      animation: obRowIn 0.55s ease forwards;
+    }
+    .ob-table tbody tr:nth-child(1) { animation-delay: 0.05s; }
+    .ob-table tbody tr:nth-child(2) { animation-delay: 0.1s; }
+    .ob-table tbody tr:nth-child(3) { animation-delay: 0.15s; }
+    .ob-table tbody tr:nth-child(4) { animation-delay: 0.2s; }
+    .ob-table tbody tr:nth-child(5) { animation-delay: 0.25s; }
+    @keyframes obRowIn {
+      from { opacity: 0; transform: translateX(-8px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    .ob-tab-panels table.ob-tab-anim {
+      animation: obTabPanel 0.38s ease;
+    }
+    @keyframes obTabPanel {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .ob-main.ob-refresh-pulse .ob-panel {
+      animation: obRefreshFlash 0.65s ease, obPanelBorder 5s ease-in-out infinite;
+    }
+    @keyframes obRefreshFlash {
+      0%, 100% { filter: brightness(1); }
+      40% { filter: brightness(1.15); }
+    }
+
+    .ob-footnote {
+      grid-column: 1 / -1;
+      padding: 10px 16px;
+      font-size: 11px;
+      color: var(--text-muted);
+      line-height: 1.6;
+      border-top: 1px solid rgba(56, 189, 248, 0.1);
+      max-width: 1680px;
+      margin: 0 auto;
+      width: 100%;
+    }
+    .ob-footnote code { font-size: 10px; color: var(--text-dim); }
+
+    /* 全屏态 */
+    body.is-fullscreen .ob-top { position: relative; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .ob-fx-bg, .ob-fx-bg::after,
+      .ob-ticker-inner, .ob-title, .ob-pill.active, .ob-panel,
+      .ob-donut, .ob-finance-big .num, .ob-alert em,
+      .ob-bar-fill, .ob-spark::after, .ob-spark .ob-line-draw, .ob-spark .ob-area-fade,
+      .ob-table tbody tr {
+        animation: none !important;
+      }
+      .ob-tab-panels table.ob-tab-anim,
+      .ob-tab.auto-flash { animation: none !important; }
+      .ob-bar-fill { transform: scaleX(1) !important; }
+      .ob-spark .ob-line-draw { stroke-dashoffset: 0 !important; }
+      .ob-spark .ob-area-fade { opacity: 1 !important; }
+      .ob-table tbody tr { opacity: 1 !important; transform: none !important; }
+      .ob-panel:hover { transform: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="ob-fx-bg" aria-hidden="true"></div>
+  <div class="ob-head-sticky">
+  <div class="ob-ticker" aria-label="运营动态">
+    <div class="ob-ticker-inner">
+      <span><strong class="hot">财务日切</strong> 今日业务日已切换 · 聚合任务 02:12 完成</span>
+      <span>品牌线 昨日订单量环比 <strong class="hot">+12.4%</strong></span>
+      <span>海外文娱 分佣未打款批次 <strong>3</strong> 笔待处理</span>
+      <span>TOP 项目「短剧达人 · 春季档」贡献订单 <strong>8,420</strong> 单（示意）</span>
+      <span>数据大屏自动刷新间隔 <strong>60s</strong>（PRD 建议）</span>
+      <span><strong class="hot">财务日切</strong> 今日业务日已切换 · 聚合任务 02:12 完成</span>
+      <span>品牌线 昨日订单量环比 <strong class="hot">+12.4%</strong></span>
+      <span>海外文娱 分佣未打款批次 <strong>3</strong> 笔待处理</span>
+      <span>TOP 项目「短剧达人 · 春季档」贡献订单 <strong>8,420</strong> 单（示意）</span>
+      <span>数据大屏自动刷新间隔 <strong>60s</strong>（PRD 建议）</span>
+    </div>
+  </div>
+  <header class="ob-top">
+    <div class="ob-top-left">
+      <span class="ob-badge">PRD 原型 v0.1</span>
+      <h1 class="ob-title">运营数据大屏</h1>
+    </div>
+    <div class="ob-top-right">
+      <span class="ob-meta">数据更新 · 延迟约 2min（示意）</span>
+      <span class="ob-time" id="obClock">—</span>
+      <div class="ob-pills" role="group" aria-label="时间范围">
+        <button type="button" class="ob-pill">今天</button>
+        <button type="button" class="ob-pill">昨天</button>
+        <button type="button" class="ob-pill active">近 7 天</button>
+        <button type="button" class="ob-pill">近 30 天</button>
+      </div>
+      <div class="ob-pills" role="group" aria-label="业务线">
+        <button type="button" class="ob-pill active">全部</button>
+        <button type="button" class="ob-pill">品牌</button>
+        <button type="button" class="ob-pill">海外文娱</button>
+      </div>
+      <button type="button" class="ob-btn secondary" id="obRefresh">手动刷新</button>
+      <button type="button" class="ob-btn" id="obFs">全屏预览</button>
+    </div>
+  </header>
+  </div>
+
+  <div class="ob-main" id="obMain">
+    <!-- 左：用户与增长 -->
+    <section class="ob-panel">
+      <div class="ob-panel-hd">
+        <div class="ob-panel-title">用户与增长</div>
+        <span class="ob-tag green">自然日</span>
+      </div>
+      <div class="ob-kpi-grid">
+        <div class="ob-kpi">
+          <div class="ob-kpi-label">新增用户</div>
+          <div class="ob-kpi-val ob-count" data-count-end="12580" data-count-type="intComma">0</div>
+          <div class="ob-kpi-sub">↑ 8.2% 较上一周期</div>
+        </div>
+        <div class="ob-kpi">
+          <div class="ob-kpi-label">活跃用户（示意）</div>
+          <div class="ob-kpi-val ob-count" data-count-end="86400" data-count-type="k1">0</div>
+          <div class="ob-kpi-sub down">↓ 1.1%</div>
+        </div>
+      </div>
+      <div style="margin-top:12px">
+        <div class="ob-chart-cap">新增趋势 · 与用户数据看板同源（示意）</div>
+        <div class="ob-spark">
+          <svg viewBox="0 0 400 88" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="rgba(56,189,248,0.35)"/>
+                <stop offset="100%" stop-color="rgba(56,189,248,0)"/>
+              </linearGradient>
+            </defs>
+            <path class="ob-area-fade" d="M0,60 L50,45 L100,55 L150,30 L200,40 L250,25 L300,35 L350,20 L400,28 L400,88 L0,88 Z" fill="url(#g1)"/>
+            <path class="ob-line-draw" d="M0,60 L50,45 L100,55 L150,30 L200,40 L250,25 L300,35 L350,20 L400,28" fill="none" stroke="#38bdf8" stroke-width="2"/>
+            <path class="ob-line-draw ob-line-delay" d="M0,70 L60,65 L120,68 L180,62 L240,58 L300,52 L360,48 L400,50" fill="none" stroke="#a78bfa" stroke-width="1.5" opacity="0.85"/>
+          </svg>
+        </div>
+      </div>
+      <div class="ob-rows">
+        <div class="ob-chart-cap" style="margin-top:4px">渠道 Top（示意）</div>
+        <div class="ob-row">
+          <span class="ob-row-name">应用商店 A</span>
+          <div class="ob-bar-bg"><div class="ob-bar-fill" style="width:92%"></div></div>
+          <span class="ob-row-pct">32%</span>
+        </div>
+        <div class="ob-row">
+          <span class="ob-row-name">社交分享</span>
+          <div class="ob-bar-bg"><div class="ob-bar-fill" style="width:68%"></div></div>
+          <span class="ob-row-pct">24%</span>
+        </div>
+        <div class="ob-row">
+          <span class="ob-row-name">搜索 / SEM</span>
+          <div class="ob-bar-bg"><div class="ob-bar-fill" style="width:52%"></div></div>
+          <span class="ob-row-pct">18%</span>
+        </div>
+      </div>
+      <p style="margin-top:12px"><a class="ob-link">进入用户数据 →</a></p>
+    </section>
+
+    <!-- 中：业务线 -->
+    <section class="ob-panel">
+      <div class="ob-panel-hd">
+        <div class="ob-panel-title">业务线经营</div>
+        <span class="ob-tag">财务日切</span>
+      </div>
+      <div class="ob-split">
+        <div class="ob-subpanel brand">
+          <h4>品牌项目</h4>
+          <div class="ob-mini-kpis">
+            <div>上线项目 <strong class="ob-count" data-count-end="128" data-count-type="intComma">0</strong></div>
+            <div>订单量 <strong class="ob-count" data-count-end="42600" data-count-type="k1">0</strong></div>
+            <div>收益（元） <strong class="ob-count" data-count-end="1280000" data-count-type="m2">0</strong></div>
+            <div>有效用户 <strong class="ob-count" data-count-end="9200" data-count-type="k1">0</strong></div>
+          </div>
+        </div>
+        <div class="ob-subpanel">
+          <h4>海外文娱</h4>
+          <div class="ob-mini-kpis">
+            <div>项目数 <strong class="ob-count" data-count-end="36" data-count-type="intComma">0</strong></div>
+            <div>订单量 <strong class="ob-count" data-count-end="8100" data-count-type="k1">0</strong></div>
+            <div>分佣（元） <strong class="ob-count" data-count-end="402000" data-count-type="k0">0</strong></div>
+            <div>有效用户 <strong class="ob-count" data-count-end="2100" data-count-type="k1">0</strong></div>
+          </div>
+        </div>
+      </div>
+      <div class="ob-chart-cap">订单金额趋势 · 品牌 vs 海外（示意）</div>
+      <div class="ob-spark" style="height:100px">
+        <svg viewBox="0 0 400 100" preserveAspectRatio="none">
+          <path class="ob-area-fade" d="M0,75 L57,70 L114,55 L171,62 L228,40 L285,48 L342,35 L400,30 L400,100 L0,100 Z" fill="rgba(56,189,248,0.12)"/>
+          <path class="ob-line-draw" d="M0,75 L57,70 L114,55 L171,62 L228,40 L285,48 L342,35 L400,30" fill="none" stroke="#38bdf8" stroke-width="2.2"/>
+          <path class="ob-line-draw ob-line-delay" d="M0,85 L57,82 L114,78 L171,80 L228,72 L285,68 L342,65 L400,58" fill="none" stroke="#a78bfa" stroke-width="2"/>
+        </svg>
+      </div>
+      <div class="ob-donut-wrap">
+        <div class="ob-donut" aria-hidden="true"></div>
+        <div class="ob-legend">
+          <div><i class="b"></i>品牌 订单金额 58%</div>
+          <div><i class="v"></i>海外文娱 42%</div>
+        </div>
+      </div>
+      <p style="margin-top:8px;font-size:11px">
+        <a class="ob-link">品牌项目数据</a> · <a class="ob-link">海外文娱数据</a>
+      </p>
+    </section>
+
+    <!-- 右：资金 -->
+    <section class="ob-panel">
+      <div class="ob-panel-hd">
+        <div class="ob-panel-title">资金与打款</div>
+        <span class="ob-tag">财务日切</span>
+      </div>
+      <div class="ob-finance-big">
+        <div class="lbl">已打款总额（所选周期）</div>
+        <div class="num ob-count" data-count-end="3842600" data-count-type="moneyFull">¥ 0</div>
+      </div>
+      <div class="ob-finance-row">
+        <div><span>品牌已打款</span><strong class="ob-count" data-count-end="2100000" data-count-type="moneyCompact">¥ 0</strong></div>
+        <div><span>海外文娱打款</span><strong class="ob-count" data-count-end="980000" data-count-type="moneyCompact">¥ 0</strong></div>
+        <div><span>分红打款</span><strong class="ob-count" data-count-end="412000" data-count-type="moneyCompact">¥ 0</strong></div>
+        <div><span>奖励打款</span><strong class="ob-count" data-count-end="356000" data-count-type="moneyCompact">¥ 0</strong></div>
+      </div>
+      <div style="margin-top:12px">
+        <div class="ob-chart-cap">打款趋势（示意）</div>
+        <div class="ob-spark" style="height:72px">
+          <svg viewBox="0 0 400 72" preserveAspectRatio="none">
+            <path class="ob-area-fade" d="M0,50 L100,45 L200,55 L300,30 L400,38 L400,72 L0,72 Z" fill="rgba(167,139,250,0.12)"/>
+            <path class="ob-line-draw" d="M0,50 L100,45 L200,55 L300,30 L400,38" fill="none" stroke="#a78bfa" stroke-width="2"/>
+          </svg>
+        </div>
+      </div>
+      <div class="ob-alerts">
+        <div class="ob-alert"><span>待审核订单（示意）</span><em class="ob-count" data-count-end="186" data-count-type="intComma">0</em></div>
+        <div class="ob-alert danger"><span>已审核未打款 · 超 48h（示意）</span><em class="ob-count" data-count-end="23" data-count-type="intComma">0</em></div>
+      </div>
+      <p style="margin-top:12px"><a class="ob-link">进入财务数据 →</a></p>
+    </section>
+
+    <!-- 底：TOP -->
+    <div class="ob-bottom" id="obBottom">
+      <section class="ob-panel">
+        <div class="ob-panel-hd">
+          <div class="ob-panel-title">TOP 项目</div>
+          <span class="ob-tag">财务日切 · Top 10</span>
+        </div>
+        <div class="ob-tabs" data-tabs="proj">
+          <button type="button" class="ob-tab active" data-dim="qty">按订单量</button>
+          <button type="button" class="ob-tab" data-dim="amt">按订单金额</button>
+        </div>
+        <div class="ob-tab-panels" id="projPanels">
+          <table class="ob-table" data-panel="qty">
+            <thead><tr><th>#</th><th>项目名称</th><th>业务线</th><th class="num">订单量</th></tr></thead>
+            <tbody>
+              <tr><td>1</td><td>短剧达人 · 春季档</td><td>品牌</td><td class="num ob-count" data-count-end="8420" data-count-type="intComma">0</td></tr>
+              <tr><td>2</td><td>网盘运营 S 级</td><td>品牌</td><td class="num ob-count" data-count-end="6102" data-count-type="intComma">0</td></tr>
+              <tr><td>3</td><td>海外小说 · 拉美线</td><td>海外</td><td class="num ob-count" data-count-end="4881" data-count-type="intComma">0</td></tr>
+              <tr><td>4</td><td>推文达人 · 旗舰</td><td>品牌</td><td class="num ob-count" data-count-end="3905" data-count-type="intComma">0</td></tr>
+              <tr><td>5</td><td>短剧 · 东南亚</td><td>海外</td><td class="num ob-count" data-count-end="3210" data-count-type="intComma">0</td></tr>
+            </tbody>
+          </table>
+          <table class="ob-table" data-panel="amt" hidden>
+            <thead><tr><th>#</th><th>项目名称</th><th>业务线</th><th class="num">订单金额</th></tr></thead>
+            <tbody>
+              <tr><td>1</td><td>短剧达人 · 春季档</td><td>品牌</td><td class="num ob-count" data-count-end="1020000" data-count-type="moneyCompact">¥ 0</td></tr>
+              <tr><td>2</td><td>海外短剧 · 北美</td><td>海外</td><td class="num ob-count" data-count-end="886000" data-count-type="moneyCompact">¥ 0</td></tr>
+              <tr><td>3</td><td>网盘运营 S 级</td><td>品牌</td><td class="num ob-count" data-count-end="612000" data-count-type="moneyCompact">¥ 0</td></tr>
+              <tr><td>4</td><td>漫剧达人 · 暑期</td><td>品牌</td><td class="num ob-count" data-count-end="540000" data-count-type="moneyCompact">¥ 0</td></tr>
+              <tr><td>5</td><td>海外小说 · 拉美线</td><td>海外</td><td class="num ob-count" data-count-end="421000" data-count-type="moneyCompact">¥ 0</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+      <section class="ob-panel">
+        <div class="ob-panel-hd">
+          <div class="ob-panel-title">TOP 用户</div>
+          <span class="ob-tag">财务日切 · Top 10</span>
+        </div>
+        <div class="ob-tabs" data-tabs="user">
+          <button type="button" class="ob-tab active" data-dim="qty">按订单量</button>
+          <button type="button" class="ob-tab" data-dim="amt">按订单金额</button>
+        </div>
+        <div class="ob-tab-panels" id="userPanels">
+          <table class="ob-table" data-panel="qty">
+            <thead><tr><th>#</th><th>用户</th><th class="num">订单量</th></tr></thead>
+            <tbody>
+              <tr><td>1</td><td>用户 U_928**41</td><td class="num ob-count" data-count-end="612" data-count-type="intComma">0</td></tr>
+              <tr><td>2</td><td>用户 U_103**77</td><td class="num ob-count" data-count-end="508" data-count-type="intComma">0</td></tr>
+              <tr><td>3</td><td>用户 U_441**02</td><td class="num ob-count" data-count-end="421" data-count-type="intComma">0</td></tr>
+              <tr><td>4</td><td>用户 U_772**19</td><td class="num ob-count" data-count-end="390" data-count-type="intComma">0</td></tr>
+              <tr><td>5</td><td>用户 U_201**56</td><td class="num ob-count" data-count-end="355" data-count-type="intComma">0</td></tr>
+            </tbody>
+          </table>
+          <table class="ob-table" data-panel="amt" hidden>
+            <thead><tr><th>#</th><th>用户</th><th class="num">订单金额</th></tr></thead>
+            <tbody>
+              <tr><td>1</td><td>用户 U_103**77</td><td class="num ob-count" data-count-end="182400" data-count-type="moneyFull">¥ 0</td></tr>
+              <tr><td>2</td><td>用户 U_928**41</td><td class="num ob-count" data-count-end="156200" data-count-type="moneyFull">¥ 0</td></tr>
+              <tr><td>3</td><td>用户 U_556**88</td><td class="num ob-count" data-count-end="128900" data-count-type="moneyFull">¥ 0</td></tr>
+              <tr><td>4</td><td>用户 U_441**02</td><td class="num ob-count" data-count-end="112000" data-count-type="moneyFull">¥ 0</td></tr>
+              <tr><td>5</td><td>用户 U_772**19</td><td class="num ob-count" data-count-end="98600" data-count-type="moneyFull">¥ 0</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <footer class="ob-footnote">
+    <strong>原型说明：</strong>本页为 <code>prd-operation-bigscreen.md</code> 的静态示意，数据均为 Mock；含<strong>数字滚动累加（count-up）、TOP 区 Tab 约 8s 自动轮播（悬停底部区块或聚焦 Tab 时暂停）</strong>及既有动效（系统「减少动态效果」下 count-up 直达终值、不自动切 Tab）。
+    正式开发在 Vue 工程 <code>admin/</code> 内实现，不以此 HTML 为交付载体。
+  </footer>
+
+  <script>
+    (function () {
+      var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      function commaInt(n) {
+        return String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+      }
+      function formatByType(n, type) {
+        n = Number(n);
+        if (type === 'intComma') return commaInt(n);
+        if (type === 'k1') {
+          var k = n / 1000;
+          return (Math.round(k * 10) / 10).toFixed(1).replace(/\.0$/, '') + 'k';
+        }
+        if (type === 'k0') return Math.round(n / 1000) + 'k';
+        if (type === 'm2') {
+          var m = Math.round(n / 10000) / 100;
+          return m.toFixed(2).replace(/\.?0+$/, '') + 'M';
+        }
+        if (type === 'moneyFull') return '¥ ' + commaInt(n);
+        if (type === 'moneyCompact') {
+          if (n >= 1e6) {
+            var v = Math.round((n / 1e6) * 100) / 100;
+            return '¥ ' + v.toFixed(2).replace(/\.?0+$/, '') + 'M';
+          }
+          if (n >= 1e3) return '¥ ' + Math.round(n / 1000) + 'k';
+          return '¥ ' + commaInt(n);
+        }
+        return String(n);
+      }
+      function easeOutExpo(t) {
+        return t >= 1 ? 1 : 1 - Math.pow(2, -10 * t);
+      }
+      function isCountElementVisible(el) {
+        return !el.closest('[hidden]');
+      }
+      function runCountUp(el, duration, delay) {
+        var end = parseFloat(el.getAttribute('data-count-end'));
+        var type = el.getAttribute('data-count-type') || 'intComma';
+        if (reduceMotion || isNaN(end)) {
+          el.textContent = formatByType(end, type);
+          return;
+        }
+        function start() {
+          var start = 0;
+          var startT = null;
+          function frame(ts) {
+            if (startT === null) startT = ts;
+            var t = Math.min(1, (ts - startT) / duration);
+            var eased = easeOutExpo(t);
+            var cur = start + (end - start) * eased;
+            el.textContent = formatByType(cur, type);
+            if (t < 1) requestAnimationFrame(frame);
+            else el.textContent = formatByType(end, type);
+          }
+          requestAnimationFrame(frame);
+        }
+        if (delay > 0) setTimeout(start, delay);
+        else start();
+      }
+      function runAllCountUps(opts) {
+        opts = opts || {};
+        var root = opts.root || document.getElementById('obMain');
+        if (!root) return;
+        var stagger = opts.stagger != null ? opts.stagger : 40;
+        var duration = opts.duration != null ? opts.duration : 1400;
+        var i = 0;
+        root.querySelectorAll('.ob-count').forEach(function (el) {
+          if (!isCountElementVisible(el)) return;
+          runCountUp(el, duration, i * stagger);
+          i++;
+        });
+      }
+
+      var bottomHover = 0;
+      var bottomEl = document.getElementById('obBottom');
+      if (bottomEl) {
+        bottomEl.addEventListener('mouseenter', function () { bottomHover++; });
+        bottomEl.addEventListener('mouseleave', function () { bottomHover = Math.max(0, bottomHover - 1); });
+      }
+
+      function setupTabGroup(tabsRootSelector, opts) {
+        opts = opts || {};
+        var intervalMs = opts.intervalMs != null ? opts.intervalMs : 8000;
+        var firstDelay = opts.phase != null ? opts.phase : intervalMs;
+        var root = document.querySelector(tabsRootSelector);
+        if (!root) return;
+        var tabs = root.querySelectorAll('.ob-tab');
+        var panels = root.parentElement.querySelectorAll('.ob-tab-panels [data-panel]');
+        var section = root.closest('.ob-panel') || root.parentElement;
+        var timer = null;
+        var paused = false;
+        function isPaused() {
+          return paused || bottomHover > 0;
+        }
+
+        function activate(dim, animOpts) {
+          animOpts = animOpts || {};
+          tabs.forEach(function (x) {
+            x.classList.toggle('active', x.getAttribute('data-dim') === dim);
+          });
+          panels.forEach(function (p) {
+            var show = p.getAttribute('data-panel') === dim;
+            p.hidden = !show;
+            p.classList.remove('ob-tab-anim');
+            if (show && !animOpts.noAnim) {
+              void p.offsetWidth;
+              p.classList.add('ob-tab-anim');
+            }
+          });
+          if (!animOpts.noCount) {
+            var vis = root.parentElement.querySelector('.ob-tab-panels [data-panel="' + dim + '"]');
+            if (vis) {
+              vis.querySelectorAll('.ob-count').forEach(function (c, idx) {
+                runCountUp(c, 900, idx * 35);
+              });
+            }
+          }
+          tabs.forEach(function (tb) {
+            tb.classList.remove('auto-flash');
+            if (animOpts.flash && tb.getAttribute('data-dim') === dim) {
+              void tb.offsetWidth;
+              tb.classList.add('auto-flash');
+            }
+          });
+        }
+        function activeDim() {
+          var a = root.querySelector('.ob-tab.active');
+          return a ? a.getAttribute('data-dim') : 'qty';
+        }
+        function nextDim() {
+          return activeDim() === 'qty' ? 'amt' : 'qty';
+        }
+        function schedule(fromUserClick) {
+          if (timer) clearTimeout(timer);
+          if (reduceMotion) return;
+          var delay = fromUserClick ? intervalMs : firstDelay;
+          function tick() {
+            if (!isPaused()) activate(nextDim(), { flash: true });
+            timer = setTimeout(tick, intervalMs);
+          }
+          timer = setTimeout(tick, delay);
+        }
+        function pause() {
+          paused = true;
+        }
+        function resume() {
+          paused = false;
+        }
+
+        tabs.forEach(function (tab) {
+          tab.addEventListener('click', function () {
+            activate(tab.getAttribute('data-dim'), {});
+            schedule(true);
+          });
+        });
+        section.addEventListener('mouseenter', pause);
+        section.addEventListener('mouseleave', resume);
+        root.addEventListener('focusin', pause);
+        root.addEventListener('focusout', function () {
+          setTimeout(function () {
+            if (!section.contains(document.activeElement)) resume();
+          }, 0);
+        });
+
+        schedule(false);
+      }
+
+      var clock = document.getElementById('obClock');
+      function pad(n) { return n < 10 ? '0' + n : String(n); }
+      function tick() {
+        var d = new Date();
+        clock.textContent =
+          d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) +
+          ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds());
+      }
+      tick();
+      setInterval(tick, 1000);
+
+      document.querySelectorAll('.ob-pills').forEach(function (group) {
+        group.addEventListener('click', function (e) {
+          var t = e.target;
+          if (!t.classList.contains('ob-pill')) return;
+          group.querySelectorAll('.ob-pill').forEach(function (p) { p.classList.remove('active'); });
+          t.classList.add('active');
+        });
+      });
+
+      setupTabGroup('[data-tabs="proj"]', { intervalMs: 8000 });
+      setupTabGroup('[data-tabs="user"]', { intervalMs: 8000, phase: 4000 });
+
+      requestAnimationFrame(function () {
+        runAllCountUps({ stagger: 40, duration: 1400 });
+      });
+
+      document.getElementById('obRefresh').addEventListener('click', function () {
+        this.textContent = '已刷新';
+        var self = this;
+        var main = document.getElementById('obMain');
+        if (main) {
+          main.classList.remove('ob-refresh-pulse');
+          void main.offsetWidth;
+          main.classList.add('ob-refresh-pulse');
+          setTimeout(function () { main.classList.remove('ob-refresh-pulse'); }, 720);
+          main.querySelectorAll('.ob-count').forEach(function (el) {
+            if (!isCountElementVisible(el)) return;
+            var t = el.getAttribute('data-count-type') || 'intComma';
+            el.textContent = t.indexOf('money') === 0 ? '¥ 0' : '0';
+          });
+          runAllCountUps({ stagger: 35, duration: 1200 });
+        }
+        setTimeout(function () { self.textContent = '手动刷新'; }, 900);
+      });
+
+      var fsBtn = document.getElementById('obFs');
+      fsBtn.addEventListener('click', function () {
+        var el = document.documentElement;
+        if (!document.fullscreenElement) {
+          el.requestFullscreen().then(function () {
+            document.body.classList.add('is-fullscreen');
+            fsBtn.textContent = '退出全屏';
+          }).catch(function () {});
+        } else {
+          document.exitFullscreen();
+          document.body.classList.remove('is-fullscreen');
+          fsBtn.textContent = '全屏预览';
+        }
+      });
+      document.addEventListener('fullscreenchange', function () {
+        if (!document.fullscreenElement) {
+          document.body.classList.remove('is-fullscreen');
+          fsBtn.textContent = '全屏预览';
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

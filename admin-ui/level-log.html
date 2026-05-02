@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>右豹管理后台 · 用户等级日志</title>
+  <script>(function(){var s=localStorage.getItem('theme'),p=window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',s||p);})();</script>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    :root{
+      --primary:#2563eb;--primary-hover:#1d4ed8;--primary-light:#eff6ff;--primary-border:#bfdbfe;
+      --success:#16a34a;--success-bg:#f0fdf4;--warning:#d97706;--warning-bg:#fffbeb;
+      --danger:#dc2626;--danger-bg:#fef2f2;--info:#0891b2;--info-bg:#ecfeff;
+      --bg:#f0f4f8;--surface:#ffffff;--surface-hover:#f8fafc;
+      --border:#e8edf3;--border-hover:#c8d5e2;
+      --text-primary:#18222f;--text-secondary:#4a5568;--text-muted:#9aa5b4;
+      --shadow-sm:0 1px 4px rgba(30,40,60,0.06);--shadow:0 2px 10px rgba(30,40,60,0.08);
+      --shadow-lg:0 8px 28px rgba(30,40,60,0.11);--shadow-xl:0 20px 60px rgba(30,40,60,0.18);
+      --radius-xs:4px;--radius-sm:7px;--radius:10px;--radius-lg:14px;--transition:all 0.16s ease;
+      --topnav-h:54px;--sidebar-w:196px;
+      --topnav-bg:linear-gradient(135deg,#dbeafe 0%,#ede9fe 40%,#e0f2fe 100%);
+      --topnav-text:#3b4d6b;--topnav-text-active:#1e3a8a;
+      --topnav-hover-bg:rgba(99,102,241,0.09);--topnav-active-bg:rgba(99,102,241,0.13);
+      --topnav-border:rgba(148,163,196,0.25);
+      --sidebar-bg:rgba(240,244,255,0.92);--sidebar-border:rgba(148,163,196,0.22);
+    }
+    [data-theme="dark"]{
+      --bg:#0f172a;--surface:#1e293b;--surface-hover:#273348;--border:#334155;--border-hover:#475569;
+      --text-primary:#f1f5f9;--text-secondary:#94a3b8;--text-muted:#475569;
+      --shadow-lg:0 8px 28px rgba(0,0,0,0.45);--shadow-xl:0 20px 60px rgba(0,0,0,0.6);
+      --topnav-bg:linear-gradient(135deg,#0f172a 0%,#1e1b4b 50%,#0c1a2e 100%);
+      --topnav-text:rgba(203,213,225,0.85);--topnav-text-active:#f1f5f9;
+      --topnav-hover-bg:rgba(255,255,255,0.08);--topnav-active-bg:rgba(255,255,255,0.13);
+      --topnav-border:rgba(255,255,255,0.10);
+      --sidebar-bg:rgba(15,23,42,0.97);--sidebar-border:rgba(255,255,255,0.07);
+    }
+    html,body{height:100%;}
+    body{font-family:'PingFang SC','Microsoft YaHei','Segoe UI',-apple-system,sans-serif;font-size:13px;color:var(--text-primary);background:#f0f4f8;transition:background 0.2s,color 0.2s;}
+    [data-theme="dark"] body{background:#0f172a;}
+    .topnav{position:fixed;top:0;left:0;right:0;height:var(--topnav-h);z-index:300;display:flex;align-items:center;background:var(--topnav-bg);backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);border-bottom:1px solid var(--topnav-border);box-shadow:0 2px 16px rgba(99,102,241,0.10);}
+    .topnav-logo{display:flex;align-items:center;gap:9px;padding:0 18px;height:100%;flex-shrink:0;text-decoration:none;border-right:1px solid var(--topnav-border);}
+    .logo-icon{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#6366f1,#2563eb);display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0;}
+    .logo-name{font-size:15px;font-weight:700;color:var(--topnav-text-active);}
+    .primary-nav{display:flex;align-items:stretch;flex:1;height:100%;overflow-x:auto;overflow-y:hidden;padding:0 6px;scrollbar-width:none;}
+    .primary-nav::-webkit-scrollbar{display:none;}
+    .pnav-item{display:flex;align-items:center;gap:6px;padding:0 14px;height:100%;font-size:13px;font-weight:500;color:var(--topnav-text);cursor:pointer;white-space:nowrap;border:none;background:none;font-family:inherit;position:relative;transition:color .15s,background .15s;flex-shrink:0;text-decoration:none;}
+    .pnav-item:hover{color:var(--topnav-text-active);background:var(--topnav-hover-bg);}
+    .pnav-item.active{color:var(--topnav-text-active);background:var(--topnav-active-bg);font-weight:600;}
+    .pnav-item.active::after{content:'';position:absolute;bottom:0;left:10px;right:10px;height:2px;border-radius:2px 2px 0 0;background:#4f46e5;}
+    [data-theme="dark"] .pnav-item.active::after{background:rgba(255,255,255,0.85);}
+    .topnav-actions{display:flex;align-items:center;gap:4px;flex-shrink:0;padding:0 12px;border-left:1px solid var(--topnav-border);}
+    .nav-icon-btn{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:none;border:none;cursor:pointer;color:var(--topnav-text);transition:var(--transition);}
+    .nav-icon-btn:hover{background:var(--topnav-hover-bg);}
+    .nav-user{display:flex;align-items:center;gap:7px;padding:4px 10px;border-radius:8px;cursor:pointer;}
+    .user-avatar{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#2563eb);display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700;}
+    .user-name{font-size:13px;font-weight:600;color:var(--topnav-text-active);}
+    .icon-sun{display:none;}[data-theme="dark"] .icon-moon{display:none;}[data-theme="dark"] .icon-sun{display:block;}
+    .layout{display:flex;margin-top:var(--topnav-h);min-height:calc(100vh - var(--topnav-h));}
+    .sidebar{width:var(--sidebar-w);flex-shrink:0;position:fixed;top:var(--topnav-h);bottom:0;left:0;z-index:200;display:flex;flex-direction:column;background:var(--sidebar-bg);backdrop-filter:blur(20px) saturate(160%);-webkit-backdrop-filter:blur(20px) saturate(160%);border-right:1px solid var(--sidebar-border);overflow:hidden;}
+    .sidebar-header{display:flex;align-items:center;gap:8px;padding:14px 14px 10px;border-bottom:1px solid var(--sidebar-border);flex-shrink:0;min-height:48px;}
+    .sidebar-module-icon{width:22px;height:22px;border-radius:5px;background:rgba(99,102,241,0.12);display:flex;align-items:center;justify-content:center;color:#4f46e5;flex-shrink:0;}
+    .sidebar-module-name{font-size:13px;font-weight:700;color:#1e3a8a;}[data-theme="dark"] .sidebar-module-name{color:#e2e8f0;}
+    .sidebar-scroll{flex:1;overflow-y:auto;overflow-x:hidden;padding:8px 0;}
+    .sidebar-scroll::-webkit-scrollbar{width:3px;}
+    .sidebar-scroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+    .nav-group-label{padding:14px 22px 4px;font-size:10.5px;font-weight:700;color:#8a9abf;text-transform:uppercase;letter-spacing:0.8px;}
+    [data-theme="dark"] .nav-group-label{color:#475569;}
+    .nav-subitem{display:flex;align-items:center;padding:0 14px 0 22px;height:36px;font-size:12.5px;color:#5a6a8a;cursor:pointer;transition:var(--transition);border:none;background:none;width:calc(100% - 16px);margin:1px 8px;font-family:inherit;position:relative;white-space:nowrap;overflow:hidden;text-align:left;border-radius:7px;text-decoration:none;}
+    [data-theme="dark"] .nav-subitem{color:rgba(148,163,184,0.80);}
+    .nav-subitem:hover{color:#2563eb;background:rgba(37,99,235,0.07);}[data-theme="dark"] .nav-subitem:hover{color:#93c5fd;background:rgba(37,99,235,0.12);}
+    .nav-subitem.active{color:#2563eb;font-weight:600;background:rgba(37,99,235,0.10);}[data-theme="dark"] .nav-subitem.active{color:#93c5fd;background:rgba(37,99,235,0.18);}
+    .nav-subitem::before{content:'';position:absolute;left:10px;top:50%;transform:translateY(-50%);width:5px;height:5px;border-radius:50%;background:currentColor;opacity:0.35;}
+    .nav-subitem.active::before{opacity:1;}
+    .sidebar-footer{padding:8px 10px;border-top:1px solid var(--sidebar-border);flex-shrink:0;}
+    .sidebar-version{font-size:10px;color:var(--text-muted);}
+    .main{flex:1;margin-left:var(--sidebar-w);min-height:calc(100vh - var(--topnav-h));}
+    .breadcrumb-bar{display:flex;align-items:center;gap:6px;padding:10px 20px 0;font-size:12px;color:var(--text-muted);}
+    .breadcrumb-bar a{color:var(--text-secondary);text-decoration:none;transition:var(--transition);}
+    .breadcrumb-bar a:hover{color:var(--primary);}
+    .bc-sep{opacity:0.5;}.bc-cur{color:var(--text-primary);font-weight:500;}
+    .page-content{padding:10px 20px 24px;}
+    .glass-card{background:rgba(255,255,255,0.72);backdrop-filter:blur(16px) saturate(180%);-webkit-backdrop-filter:blur(16px) saturate(180%);border:1px solid rgba(255,255,255,0.55);box-shadow:0 8px 32px rgba(30,40,80,0.10),inset 0 1px 0 rgba(255,255,255,0.8);border-radius:var(--radius-lg);}
+    [data-theme="dark"] .glass-card{background:rgba(30,41,59,0.65);backdrop-filter:blur(16px) saturate(160%);border:1px solid rgba(255,255,255,0.08);box-shadow:0 8px 32px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.05);}
+    .filter-card{padding:16px 18px;margin-bottom:14px;}
+    .filter-grid{display:grid;grid-template-columns:repeat(4,minmax(0,200px));gap:10px;}
+    .filter-extra{display:none;grid-template-columns:repeat(4,minmax(0,200px));gap:10px;margin-top:10px;}
+    .filter-extra.show{display:grid;}
+    .filter-footer{display:flex;align-items:center;justify-content:space-between;margin-top:14px;padding-top:14px;border-top:1px solid var(--border);}
+    .filter-expand-btn{font-size:12px;color:var(--primary);background:none;border:none;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:4px;padding:0;}
+    .filter-expand-btn svg{transition:transform 0.2s ease;}
+    .filter-expand-btn.expanded svg{transform:rotate(180deg);}
+    .filter-actions{display:flex;gap:8px;}
+    .form-group-filter{display:flex;flex-direction:column;gap:5px;}
+    .form-label-sm{font-size:12px;color:var(--text-secondary);font-weight:500;}
+    .form-input-sm{width:100%;height:30px;padding:0 9px;font-size:12px;font-family:inherit;color:var(--text-primary);background:var(--surface);border:1px solid var(--border);border-radius:6px;outline:none;transition:var(--transition);}
+    .form-input-sm:focus{border-color:var(--primary);}
+    .form-input-sm::placeholder{color:var(--text-muted);}
+    .form-select-sm{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%239aa5b4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;padding-right:26px;cursor:pointer;}
+    .table-card{overflow:hidden;}
+    .table-header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:8px;}
+    .table-title{font-size:14px;font-weight:600;color:var(--text-primary);display:flex;align-items:center;gap:8px;}
+    .table-count{font-size:12px;font-weight:400;color:var(--text-muted);}
+    .table-header-right{display:flex;align-items:center;gap:8px;}
+    .bulk-bar{display:none;align-items:center;gap:8px;}
+    .bulk-bar.show{display:flex;}
+    .bulk-count{font-size:13px;color:var(--text-primary);}
+    .bulk-count span{color:var(--primary);font-weight:700;}
+    .table-wrap{overflow-x:auto;}
+    table{width:100%;border-collapse:collapse;min-width:1100px;}
+    thead th{background:var(--surface-hover);font-size:12px;font-weight:600;color:var(--text-secondary);letter-spacing:0.5px;padding:10px 12px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap;}
+    [data-theme="dark"] thead th{background:rgba(39,51,72,0.8);}
+    tbody tr{border-bottom:1px solid var(--border);transition:var(--transition);}
+    tbody tr:last-child{border-bottom:none;}
+    tbody tr:hover{background:rgba(37,99,235,0.04);box-shadow:inset 3px 0 0 var(--primary);}
+    tbody tr.selected{background:rgba(37,99,235,0.06);box-shadow:inset 3px 0 0 var(--primary);}
+    tbody td{padding:10px 12px;font-size:13px;color:var(--text-primary);vertical-align:middle;}
+    .td-mono{font-family:monospace;font-size:12px;}
+    input[type=checkbox]{width:15px;height:15px;cursor:pointer;accent-color:var(--primary);}
+    .btn{display:inline-flex;align-items:center;gap:5px;height:34px;padding:0 16px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;font-family:inherit;cursor:pointer;transition:var(--transition);border:1px solid transparent;white-space:nowrap;}
+    .btn:active{transform:translateY(1px);}
+    .btn:disabled{opacity:0.45;cursor:not-allowed;transform:none;}
+    .btn-primary{background:var(--primary);color:#fff;border-color:var(--primary);}
+    .btn-primary:hover{background:var(--primary-hover);}
+    .btn-default{background:var(--surface);color:var(--text-primary);border-color:var(--border);}
+    .btn-default:hover{border-color:var(--border-hover);background:var(--surface-hover);}
+    .btn-danger{background:var(--danger);color:#fff;border-color:var(--danger);}
+    .btn-danger:hover{background:#b91c1c;}
+    .btn-ghost{background:transparent;color:var(--text-secondary);border-color:transparent;}
+    .btn-ghost:hover{background:var(--surface-hover);}
+    .btn-sm{height:30px;padding:0 12px;font-size:12px;}
+    .btn-xs{height:26px;padding:0 9px;font-size:11.5px;border-radius:5px;}
+    .action-btns{display:flex;align-items:center;gap:2px;}
+    .action-btn{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;background:transparent;border:none;cursor:pointer;transition:background .15s,color .15s;flex-shrink:0;}
+    .action-btn.edit{color:var(--primary);}.action-btn.edit:hover{background:var(--primary-light);}
+    .action-btn.view{color:var(--success);}.action-btn.view:hover{background:var(--success-bg);}
+    .action-btn.approve{color:var(--success);}.action-btn.approve:hover{background:var(--success-bg);}
+    .action-btn.reject{color:var(--danger);}.action-btn.reject:hover{background:var(--danger-bg);}
+    .action-btn:disabled{opacity:0.3;cursor:not-allowed;pointer-events:none;}
+    .tag{display:inline-flex;align-items:center;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;white-space:nowrap;}
+    .tag-blue{background:#eff6ff;color:#2563eb;}.tag-blue-mid{background:#dbeafe;color:#1d4ed8;}
+    .tag-blue-deep{background:#bfdbfe;color:#1e40af;}
+    .tag-amber{background:#fffbeb;color:#92400e;}.tag-gray{background:#f1f5f9;color:#64748b;}
+    .tag-green{background:#f0fdf4;color:#16a34a;}
+    [data-theme="dark"] .tag-blue{background:rgba(37,99,235,0.18);color:#93c5fd;}
+    [data-theme="dark"] .tag-blue-mid{background:rgba(29,78,216,0.22);color:#60a5fa;}
+    [data-theme="dark"] .tag-blue-deep{background:rgba(30,64,175,0.28);color:#3b82f6;}
+    [data-theme="dark"] .tag-amber{background:rgba(217,119,6,0.18);color:#fcd34d;}
+    [data-theme="dark"] .tag-gray{background:rgba(100,116,139,0.18);color:#94a3b8;}
+    [data-theme="dark"] .tag-green{background:rgba(22,163,74,0.18);color:#86efac;}
+    .badge{display:inline-flex;align-items:center;gap:5px;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:600;}
+    .badge::before{content:'';width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0;}
+    .badge-green{background:#f0fdf4;color:#16a34a;}.badge-amber{background:#fffbeb;color:#d97706;}
+    .badge-gray{background:#f1f5f9;color:#64748b;}.badge-red{background:#fef2f2;color:#dc2626;}
+    .badge-amber-bold{background:#fffbeb;color:#d97706;font-weight:800;}
+    [data-theme="dark"] .badge-green{background:rgba(22,163,74,0.15);}
+    [data-theme="dark"] .badge-amber{background:rgba(217,119,6,0.15);}
+    [data-theme="dark"] .badge-gray{background:rgba(100,116,139,0.15);}
+    [data-theme="dark"] .badge-red{background:rgba(220,38,38,0.15);}
+    .lv-arrow{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:var(--text-muted);}
+    .lv-arrow svg{opacity:0.4;}
+    .pagination{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-top:1px solid var(--border);}
+    .page-info{font-size:12px;color:var(--text-muted);}
+    .page-info span{color:var(--text-primary);font-weight:600;}
+    .page-btns{display:flex;align-items:center;gap:4px;}
+    .page-btn{width:30px;height:30px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:13px;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--text-secondary);transition:var(--transition);font-family:inherit;}
+    .page-btn:hover:not(:disabled){border-color:var(--primary);color:var(--primary);}
+    .page-btn.active{background:var(--primary);border-color:var(--primary);color:#fff;font-weight:600;}
+    .page-btn:disabled{opacity:0.4;cursor:not-allowed;}
+    .page-size{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-muted);}
+    .page-size select{height:30px;padding:0 24px 0 8px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text-primary);font-size:12px;font-family:inherit;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%239aa5b4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 6px center;}
+    .page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;}
+    .page-title{font-size:19px;font-weight:700;color:var(--text-primary);}
+    .page-desc{font-size:12px;color:var(--text-muted);margin-top:3px;}
+    .page-actions{display:flex;gap:8px;flex-wrap:wrap;}
+    .stat-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:6px;font-size:12px;font-weight:700;}
+    .stat-badge-orange{background:#fff7ed;color:#c2410c;border:1px solid #fed7aa;}
+    [data-theme="dark"] .stat-badge-orange{background:rgba(194,65,12,0.15);border-color:rgba(194,65,12,0.3);}
+    .overlay{position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:699;opacity:0;pointer-events:none;transition:opacity 0.22s ease;}
+    .overlay.show{opacity:1;pointer-events:all;}
+    .modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0.95);background:var(--surface);border-radius:var(--radius-lg);z-index:700;box-shadow:var(--shadow-xl);opacity:0;pointer-events:none;transition:all 0.22s ease-out;}
+    .modal.show{opacity:1;pointer-events:all;transform:translate(-50%,-50%) scale(1);}
+    .modal-sm{width:420px;max-width:calc(100vw - 32px);}
+    .modal-md{width:520px;max-width:calc(100vw - 32px);}
+    .modal-lg{width:640px;max-width:calc(100vw - 32px);}
+    .modal-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);}
+    .modal-title{font-size:15px;font-weight:700;color:var(--text-primary);}
+    .modal-close{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;background:none;border:none;cursor:pointer;color:var(--text-muted);transition:var(--transition);}
+    .modal-close:hover{background:var(--surface-hover);}
+    .modal-body{padding:20px;}
+    .modal-desc{font-size:13px;color:var(--text-secondary);line-height:1.6;}
+    .modal-desc strong{color:var(--text-primary);}
+    .modal-footer{display:flex;align-items:center;justify-content:flex-end;gap:10px;padding:14px 20px;border-top:1px solid var(--border);}
+    .form-group{display:flex;flex-direction:column;gap:6px;margin-bottom:16px;}
+    .form-label{font-size:13px;color:var(--text-secondary);font-weight:500;}
+    .form-label .req{color:var(--danger);}
+    .form-input{width:100%;height:36px;padding:0 10px;font-size:13px;font-family:inherit;color:var(--text-primary);background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);outline:none;transition:var(--transition);}
+    .form-input:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(37,99,235,0.10);}
+    .form-input[readonly]{background:var(--surface-hover);color:var(--text-muted);}
+    .form-textarea{width:100%;padding:8px 10px;font-size:13px;font-family:inherit;color:var(--text-primary);background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);outline:none;transition:var(--transition);resize:vertical;min-height:80px;}
+    .form-textarea:focus{border-color:var(--primary);}
+    .form-select{appearance:none;-webkit-appearance:none;height:36px;padding:0 28px 0 10px;font-size:13px;font-family:inherit;color:var(--text-primary);background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);outline:none;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%239aa5b4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;width:100%;transition:var(--transition);}
+    .form-select:focus{border-color:var(--primary);}
+    .drawer{position:fixed;top:0;right:0;height:100vh;z-index:700;width:520px;background:var(--surface);box-shadow:var(--shadow-xl);display:flex;flex-direction:column;transform:translateX(100%);transition:transform 0.28s cubic-bezier(0.4,0,0.2,1);}
+    .drawer.show{transform:translateX(0);}
+    .drawer-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);flex-shrink:0;}
+    .drawer-title-main{font-size:15px;font-weight:700;color:var(--text-primary);}
+    .drawer-close{width:30px;height:30px;border-radius:6px;display:flex;align-items:center;justify-content:center;background:none;border:none;cursor:pointer;color:var(--text-muted);transition:var(--transition);}
+    .drawer-close:hover{background:var(--surface-hover);}
+    .drawer-body{flex:1;overflow-y:auto;padding:20px;}
+    .drawer-footer{display:flex;align-items:center;justify-content:flex-end;gap:10px;padding:14px 20px;border-top:1px solid var(--border);flex-shrink:0;}
+    .log-table{width:100%;border-collapse:collapse;}
+    .log-table th{background:var(--surface-hover);font-size:12px;font-weight:600;color:var(--text-secondary);padding:8px 10px;text-align:left;border-bottom:1px solid var(--border);}
+    .log-table td{padding:8px 10px;font-size:12px;color:var(--text-primary);border-bottom:1px solid var(--border);vertical-align:middle;}
+    .log-table tr:last-child td{border-bottom:none;}
+    .toast-container{position:fixed;top:66px;right:22px;z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none;}
+    .toast{min-width:200px;max-width:360px;padding:12px 14px 12px 16px;background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow-lg);border-left:3px solid;display:flex;align-items:flex-start;gap:8px;font-size:13px;pointer-events:all;animation:toastIn 0.28s ease;}
+    @keyframes toastIn{from{opacity:0;transform:translateX(80px)}to{opacity:1;transform:translateX(0)}}
+    .toast.success{border-left-color:var(--success);}.toast.info{border-left-color:var(--info);}.toast.warning{border-left-color:var(--warning);}
+    .toast-msg{flex:1;color:var(--text-primary);line-height:1.5;}
+    .toast-close{flex-shrink:0;background:none;border:none;cursor:pointer;color:var(--text-muted);padding:0;font-size:14px;}
+    .readonly-text{padding:8px 10px;background:var(--surface-hover);border-radius:var(--radius-sm);font-size:13px;color:var(--text-muted);border:1px solid var(--border);}
+  </style>
+</head>
+<body>
+<div class="toast-container" id="toastContainer"></div>
+<nav class="topnav">
+  <a class="topnav-logo" href="index.html">
+    <div class="logo-icon"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+    <span class="logo-name">右豹后台</span>
+  </a>
+  <div class="primary-nav">
+    <a class="pnav-item" href="index.html">首页</a>
+    <a class="pnav-item" href="#">内容域</a><a class="pnav-item" href="#">订单域</a><a class="pnav-item" href="#">项目域</a>
+    <a class="pnav-item active" href="user.html">用户域</a>
+    <a class="pnav-item" href="#">系统域</a><a class="pnav-item" href="#">数据域</a>
+  </div>
+  <div class="topnav-actions">
+    <button class="nav-icon-btn" onclick="toggleTheme()">
+      <svg class="icon-moon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+      <svg class="icon-sun" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/></svg>
+    </button>
+    <div class="nav-user"><div class="user-avatar">管</div><span class="user-name">管理员</span></div>
+  </div>
+</nav>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-module-icon"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
+      <span class="sidebar-module-name">用户域</span>
+    </div>
+    <div class="sidebar-scroll">
+      <div class="nav-group-label">用户管理</div>
+      <a class="nav-subitem" href="user.html">用户列表</a>
+      <a class="nav-subitem" href="realname-company.html">实名信息</a>
+      <a class="nav-subitem" href="media-account.html">媒体账号</a>
+      <a class="nav-subitem" href="withdrawal-account.html">提现账户</a>
+      <a class="nav-subitem" href="blacklist.html">黑名单</a>
+      <a class="nav-subitem" href="user-gift-word.html">赠词记录</a>
+      <a class="nav-subitem" href="user-redeem.html">兑换记录</a>
+      <div class="nav-group-label">用户资金</div>
+      <a class="nav-subitem" href="user-wallet.html">用户钱包</a>
+      <a class="nav-subitem" href="dividend-detail.html">分红明细</a>
+      <a class="nav-subitem" href="reward-detail.html">奖励明细</a>
+      <a class="nav-subitem" href="withdrawal-record.html">提现记录</a>
+      <div class="nav-group-label">用户通知</div>
+      <a class="nav-subitem" href="wechat-notify.html">微信通知</a>
+      <a class="nav-subitem" href="inbox-notify.html">站内信通知</a>
+      <div class="nav-group-label">用户体系</div>
+      <a class="nav-subitem" href="user-level.html">用户等级</a>
+      <a class="nav-subitem" href="user-rank.html">用户段位</a>
+      <a class="nav-subitem" href="commission-config.html">权益配置</a>
+      <a class="nav-subitem" href="medal-config.html">勋章配置</a>
+      <a class="nav-subitem active" href="level-log.html">用户等级日志</a>
+      <div class="nav-group-label">团长体系</div>
+      <a class="nav-subitem" href="captain-level.html">团长等级配置</a>
+      <a class="nav-subitem" href="commission-ratio.html">分销比例配置</a>
+      <a class="nav-subitem" href="captain-log.html">团长身份日志</a>
+    </div>
+    <div class="sidebar-footer"><span class="sidebar-version">v2.4.0</span></div>
+  </aside>
+  <main class="main">
+    <div class="breadcrumb-bar">
+      <a href="index.html">首页</a><span class="bc-sep">/</span>
+      <span>用户体系</span><span class="bc-sep">/</span>
+      <span class="bc-cur">用户等级日志</span>
+    </div>
+    <div class="page-content">
+      <div class="page-header">
+        <div>
+          <div class="page-title">用户等级日志</div>
+          <div class="page-desc">记录用户等级变更的完整历史</div>
+        </div>
+        <div class="page-actions">
+          <button class="btn btn-primary btn-sm" onclick="openModal('addModal')">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            新增
+          </button>
+          <button class="btn btn-default btn-sm" id="btnBatchApprove" disabled onclick="openModal('approveModal')">批量通过</button>
+          <button class="btn btn-default btn-sm" id="btnBatchReject" disabled onclick="openModal('rejectModal')">批量驳回</button>
+        </div>
+      </div>
+      <!-- 筛选区 -->
+      <div class="glass-card filter-card">
+        <div class="filter-grid">
+          <div class="form-group-filter">
+            <label class="form-label-sm">用户ID</label>
+            <input class="form-input-sm" type="text" placeholder="请输入用户ID">
+          </div>
+          <div class="form-group-filter">
+            <label class="form-label-sm">变更前等级</label>
+            <select class="form-input-sm form-select-sm">
+              <option>全部</option>
+              <option>LV1</option><option>LV2</option><option>LV3</option><option>LV4</option><option>LV5</option>
+              <option>LV6</option><option>LV7</option><option>LV8</option><option>LV9</option><option>LV10</option>
+            </select>
+          </div>
+          <div class="form-group-filter">
+            <label class="form-label-sm">变更后等级</label>
+            <select class="form-input-sm form-select-sm">
+              <option>全部</option>
+              <option>LV1</option><option>LV2</option><option>LV3</option><option>LV4</option><option>LV5</option>
+              <option>LV6</option><option>LV7</option><option>LV8</option><option>LV9</option><option>LV10</option>
+            </select>
+          </div>
+          <div class="form-group-filter">
+            <label class="form-label-sm">审核状态</label>
+            <select class="form-input-sm form-select-sm">
+              <option>全部</option><option>系统通过</option><option>待审核</option><option>审核通过</option><option>审核驳回</option>
+            </select>
+          </div>
+        </div>
+        <div class="filter-extra" id="filterExtra">
+          <div class="form-group-filter">
+            <label class="form-label-sm">变更类型</label>
+            <select class="form-input-sm form-select-sm">
+              <option>全部</option><option>系统升级</option><option>后台调整</option>
+            </select>
+          </div>
+          <div class="form-group-filter">
+            <label class="form-label-sm">操作人</label>
+            <input class="form-input-sm" type="text" placeholder="请输入操作人">
+          </div>
+          <div class="form-group-filter">
+            <label class="form-label-sm">操作开始时间</label>
+            <input class="form-input-sm" type="date">
+          </div>
+          <div class="form-group-filter">
+            <label class="form-label-sm">操作结束时间</label>
+            <input class="form-input-sm" type="date">
+          </div>
+        </div>
+        <div class="filter-footer">
+          <button class="filter-expand-btn" id="expandBtn" onclick="toggleFilter()">
+            展开更多<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="filter-actions">
+            <button class="btn btn-default btn-sm" onclick="resetFilter()">重置</button>
+            <button class="btn btn-primary btn-sm">查询</button>
+          </div>
+        </div>
+      </div>
+      <!-- 数据表 -->
+      <div class="glass-card table-card">
+        <div class="table-header">
+          <div class="table-title">
+            等级日志列表
+            <span class="table-count">共 15 条</span>
+            <span class="stat-badge stat-badge-orange">待审核：3 条</span>
+          </div>
+          <div class="table-header-right">
+            <div class="bulk-bar" id="bulkBar">
+              <span class="bulk-count">已选 <span id="selectedCount">0</span> 项</span>
+              <button class="btn btn-default btn-sm" onclick="openModal('approveModal')">审核通过</button>
+              <button class="btn btn-default btn-sm" onclick="openModal('rejectModal')">审核驳回</button>
+              <button class="btn btn-ghost btn-sm" onclick="clearSelection()">取消</button>
+            </div>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:40px"><input type="checkbox" id="checkAll" onchange="toggleAll(this)"></th>
+                <th>用户ID</th>
+                <th>等级变更</th>
+                <th>变更类型</th>
+                <th>审核状态</th>
+                <th>审核信息</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+          </table>
+        </div>
+        <div class="pagination">
+          <div class="page-info">共 <span>15</span> 条，第 <span>1</span>/2 页</div>
+          <div class="page-btns">
+            <button class="page-btn" disabled>«</button>
+            <button class="page-btn active">1</button>
+            <button class="page-btn">2</button>
+            <button class="page-btn">»</button>
+          </div>
+          <div class="page-size">每页 <select><option>10</option><option>20</option></select> 条</div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="overlay" id="overlay" onclick="closeAll()"></div>
+
+<!-- 弹窗-审核通过 -->
+<div class="modal modal-sm" id="approveModal">
+  <div class="modal-header"><span class="modal-title">审核通过确认</span><button class="modal-close" onclick="closeModal('approveModal')">✕</button></div>
+  <div class="modal-body"><p class="modal-desc">确认审核通过选中的等级变更记录？</p></div>
+  <div class="modal-footer">
+    <button class="btn btn-default" onclick="closeModal('approveModal')">取消</button>
+    <button class="btn btn-primary" onclick="closeModal('approveModal');showToast('审核通过操作已提交','success')">确认通过</button>
+  </div>
+</div>
+
+<!-- 弹窗-审核驳回 -->
+<div class="modal modal-md" id="rejectModal">
+  <div class="modal-header"><span class="modal-title">审核驳回</span><button class="modal-close" onclick="closeModal('rejectModal')">✕</button></div>
+  <div class="modal-body">
+    <div class="form-group">
+      <label class="form-label">驳回原因 <span class="req">*</span></label>
+      <textarea class="form-textarea" placeholder="请输入驳回原因（必填）" rows="4"></textarea>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-default" onclick="closeModal('rejectModal')">取消</button>
+    <button class="btn btn-danger" onclick="closeModal('rejectModal');showToast('驳回操作已提交','success')">确认驳回</button>
+  </div>
+</div>
+
+<!-- 弹窗-编辑 -->
+<div class="modal modal-md" id="editModal">
+  <div class="modal-header"><span class="modal-title">编辑等级变更</span><button class="modal-close" onclick="closeModal('editModal')">✕</button></div>
+  <div class="modal-body">
+    <div class="form-group">
+      <label class="form-label">变更后等级</label>
+      <select class="form-select">
+        <option>LV1</option><option>LV2</option><option>LV3</option><option>LV4</option><option>LV5</option>
+        <option>LV6</option><option>LV7</option><option>LV8</option><option>LV9</option><option>LV10</option>
+      </select>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-default" onclick="closeModal('editModal')">取消</button>
+    <button class="btn btn-primary" onclick="closeModal('editModal');showToast('保存成功','success')">保存</button>
+  </div>
+</div>
+
+<!-- 弹窗-新增 -->
+<div class="modal modal-lg" id="addModal">
+  <div class="modal-header"><span class="modal-title">新增等级变更</span><button class="modal-close" onclick="closeModal('addModal')">✕</button></div>
+  <div class="modal-body">
+    <div class="form-group">
+      <label class="form-label">用户ID <span class="req">*</span></label>
+      <input class="form-input" type="text" placeholder="请输入用户ID" oninput="autoFillLevel(this)">
+    </div>
+    <div class="form-group">
+      <label class="form-label">变更前等级</label>
+      <div class="readonly-text" id="prevLevelDisplay">请先输入用户ID</div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">变更后等级 <span class="req">*</span></label>
+      <select class="form-select">
+        <option value="">请选择变更后等级</option>
+        <option>LV1</option><option>LV2</option><option>LV3</option><option>LV4</option><option>LV5</option>
+        <option>LV6</option><option>LV7</option><option>LV8</option><option>LV9</option><option>LV10</option>
+      </select>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-default" onclick="closeModal('addModal')">取消</button>
+    <button class="btn btn-primary" onclick="closeModal('addModal');showToast('新增成功','success')">确认新增</button>
+  </div>
+</div>
+
+<!-- 抽屉-操作日志 -->
+<div class="drawer" id="logDrawer">
+  <div class="drawer-header">
+    <span class="drawer-title-main">操作日志</span>
+    <button class="drawer-close" onclick="closeDrawer()">✕</button>
+  </div>
+  <div class="drawer-body">
+    <table class="log-table">
+      <thead>
+        <tr><th>操作人</th><th>操作内容</th><th>操作时间</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>系统</td><td>触发等级升级至 LV3</td><td>2024-04-28 10:00</td></tr>
+        <tr><td>张管理</td><td>发起人工审核</td><td>2024-04-28 10:05</td></tr>
+        <tr><td>王审核</td><td>审核通过</td><td>2024-04-28 10:30</td></tr>
+        <tr><td>系统</td><td>等级变更生效</td><td>2024-04-28 10:31</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+const lvTagClass=(lv)=>{
+  const n=parseInt((lv||'').replace('LV',''));
+  if(n<=4) return 'tag-blue';
+  if(n<=7) return 'tag-blue-mid';
+  return 'tag-blue-deep';
+};
+
+const mockData=[
+  {uid:'U10001',from:'LV2',to:'LV3',type:'系统升级',auditStatus:'系统通过',auditOp:'系统',auditTime:'2024-04-28 09:00'},
+  {uid:'U10002',from:'LV3',to:'LV4',type:'后台调整',auditStatus:'待审核',auditOp:'-',auditTime:'-'},
+  {uid:'U10003',from:'LV1',to:'LV2',type:'系统升级',auditStatus:'系统通过',auditOp:'系统',auditTime:'2024-04-28 08:30'},
+  {uid:'U10004',from:'LV4',to:'LV5',type:'后台调整',auditStatus:'待审核',auditOp:'-',auditTime:'-'},
+  {uid:'U10005',from:'LV5',to:'LV6',type:'系统升级',auditStatus:'审核通过',auditOp:'王审核',auditTime:'2024-04-27 15:00'},
+  {uid:'U10006',from:'LV2',to:'LV3',type:'系统升级',auditStatus:'系统通过',auditOp:'系统',auditTime:'2024-04-27 14:20'},
+  {uid:'U10007',from:'LV6',to:'LV7',type:'后台调整',auditStatus:'审核驳回',auditOp:'张管理',auditTime:'2024-04-27 13:00'},
+  {uid:'U10008',from:'LV1',to:'LV3',type:'后台调整',auditStatus:'待审核',auditOp:'-',auditTime:'-'},
+  {uid:'U10009',from:'LV3',to:'LV4',type:'系统升级',auditStatus:'系统通过',auditOp:'系统',auditTime:'2024-04-26 18:00'},
+  {uid:'U10010',from:'LV7',to:'LV8',type:'后台调整',auditStatus:'审核通过',auditOp:'陈审核',auditTime:'2024-04-26 16:00'},
+];
+
+const auditBadgeMap={
+  '系统通过':'<span class="badge badge-green">系统通过</span>',
+  '待审核':'<span class="badge badge-amber" style="font-weight:800">待审核</span>',
+  '审核通过':'<span class="badge badge-green">审核通过</span>',
+  '审核驳回':'<span class="badge badge-red">审核驳回</span>',
+};
+const typeTagMap={
+  '系统升级':'<span class="tag tag-blue">系统升级</span>',
+  '后台调整':'<span class="tag tag-amber">后台调整</span>',
+};
+
+function renderTable(){
+  document.getElementById('tableBody').innerHTML=mockData.map((r,i)=>{
+    const canApprove=r.auditStatus==='待审核';
+    const canReject=r.auditStatus==='待审核';
+    return `
+    <tr id="row${i}">
+      <td><input type="checkbox" class="row-check" data-idx="${i}" onchange="rowCheck(this,${i})"></td>
+      <td class="td-mono">${r.uid}</td>
+      <td>
+        <div class="lv-arrow">
+          <span class="tag ${lvTagClass(r.from)}">${r.from}</span>
+          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+          <span class="tag ${lvTagClass(r.to)}">${r.to}</span>
+        </div>
+      </td>
+      <td>${typeTagMap[r.type]||r.type}</td>
+      <td>${auditBadgeMap[r.auditStatus]||r.auditStatus}</td>
+      <td style="font-size:12px">
+        <div style="color:var(--text-secondary)">${r.auditOp}</div>
+        <div style="color:var(--text-muted)">${r.auditTime}</div>
+      </td>
+      <td>
+        <div class="action-btns">
+          <button class="action-btn approve" ${!canApprove?'disabled':''} onclick="openModal('approveModal')" title="审核通过">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+          </button>
+          <button class="action-btn reject" ${!canReject?'disabled':''} onclick="openModal('rejectModal')" title="审核驳回">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+          <button class="action-btn edit" onclick="openModal('editModal')" title="编辑">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
+          <button class="action-btn view" onclick="openDrawer()" title="操作日志">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          </button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+let selectedRows=new Set();
+function rowCheck(cb,idx){
+  if(cb.checked) selectedRows.add(idx); else selectedRows.delete(idx);
+  document.getElementById('row'+idx).classList.toggle('selected',cb.checked);
+  updateBulk();
+}
+function toggleAll(cb){
+  document.querySelectorAll('.row-check').forEach((c,i)=>{c.checked=cb.checked;if(cb.checked)selectedRows.add(i);else selectedRows.delete(i);document.getElementById('row'+i).classList.toggle('selected',cb.checked);});
+  updateBulk();
+}
+function clearSelection(){
+  selectedRows.clear();
+  document.querySelectorAll('.row-check,.row-check').forEach(c=>c.checked=false);
+  document.getElementById('checkAll').checked=false;
+  document.querySelectorAll('tbody tr').forEach(r=>r.classList.remove('selected'));
+  updateBulk();
+}
+function updateBulk(){
+  const n=selectedRows.size;
+  document.getElementById('selectedCount').textContent=n;
+  const show=n>0;
+  document.getElementById('bulkBar').classList.toggle('show',show);
+  document.getElementById('btnBatchApprove').disabled=!show;
+  document.getElementById('btnBatchReject').disabled=!show;
+}
+
+function toggleFilter(){
+  const extra=document.getElementById('filterExtra');
+  const btn=document.getElementById('expandBtn');
+  const show=extra.classList.toggle('show');
+  btn.classList.toggle('expanded',show);
+  btn.childNodes[0].textContent=show?'收起':'展开更多';
+}
+function resetFilter(){
+  document.querySelectorAll('.filter-card input,.filter-card select').forEach(el=>{if(el.tagName==='SELECT')el.selectedIndex=0;else el.value='';});
+  showToast('筛选条件已重置','info');
+}
+
+function autoFillLevel(input){
+  const levelMap={'U10001':'LV2','U10002':'LV3','U10003':'LV1','U10004':'LV4','U10005':'LV5'};
+  const el=document.getElementById('prevLevelDisplay');
+  el.textContent=levelMap[input.value]||'未查到用户信息';
+}
+
+function openModal(id){document.getElementById(id).classList.add('show');document.getElementById('overlay').classList.add('show');}
+function closeModal(id){document.getElementById(id).classList.remove('show');document.getElementById('overlay').classList.remove('show');}
+function closeAll(){document.querySelectorAll('.modal.show,.drawer.show').forEach(el=>el.classList.remove('show'));document.getElementById('overlay').classList.remove('show');}
+function openDrawer(){document.getElementById('logDrawer').classList.add('show');document.getElementById('overlay').classList.add('show');}
+function closeDrawer(){document.getElementById('logDrawer').classList.remove('show');document.getElementById('overlay').classList.remove('show');}
+
+function toggleTheme(){const cur=document.documentElement.getAttribute('data-theme');const next=cur==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',next);localStorage.setItem('theme',next);}
+function showToast(msg,type='info'){const c=document.getElementById('toastContainer');const t=document.createElement('div');t.className=`toast ${type}`;t.innerHTML=`<span class="toast-msg">${msg}</span><button class="toast-close" onclick="this.parentElement.remove()">✕</button>`;c.appendChild(t);setTimeout(()=>t.remove(),3500);}
+
+renderTable();
+</script>
+</body>
+</html>

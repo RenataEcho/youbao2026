@@ -1,0 +1,122 @@
+{
+  "commissions": [
+    {
+      "id": 1,
+      "level": "V1",
+      "enabled": true,
+      "createdAt": "2026-01-10 09:00:00",
+      "updatedAt": "2026-04-20 10:30:22",
+      "operator": "超级管理员",
+      "targets": [
+        {
+          "targetLevel": "V1",
+          "user": { "direct": 3.0, "indirect": 2.0, "infinite": null },
+          "team": null
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "level": "V2",
+      "enabled": true,
+      "createdAt": "2026-01-10 09:00:00",
+      "updatedAt": "2026-04-20 10:30:45",
+      "operator": "超级管理员",
+      "targets": [
+        {
+          "targetLevel": "V1",
+          "user": { "direct": 5.0, "indirect": 3.0, "infinite": 1.0 },
+          "team": null
+        },
+        {
+          "targetLevel": "V2",
+          "user": { "direct": 5.0, "indirect": 2.5, "infinite": null },
+          "team": { "direct": 2.0, "indirect": 1.0, "infinite": null }
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "level": "V3",
+      "enabled": true,
+      "createdAt": "2026-01-10 09:00:00",
+      "updatedAt": "2026-04-22 14:15:38",
+      "operator": "超级管理员",
+      "targets": [
+        {
+          "targetLevel": "V1",
+          "user": { "direct": 8.5, "indirect": 5.5, "infinite": 3.5 },
+          "team": null
+        },
+        {
+          "targetLevel": "V2",
+          "user": { "direct": 8.5, "indirect": 4.0, "infinite": null },
+          "team": { "direct": 3.5, "indirect": 2.0, "infinite": 1.0 }
+        },
+        {
+          "targetLevel": "V3",
+          "user": { "direct": 8.5, "indirect": 3.5, "infinite": null },
+          "team": { "direct": 3.5, "indirect": 2.0, "infinite": null }
+        }
+      ]
+    }
+  ],
+  "logs": [
+    {
+      "id": 1,
+      "commissionId": 1,
+      "op": "编辑分佣配置",
+      "detail": "修改 V1 直邀比例：2.50% → 3.00%，间邀比例：1.50% → 2.00%",
+      "operator": "超级管理员",
+      "time": "2026-04-20 10:30:22"
+    },
+    {
+      "id": 2,
+      "commissionId": 1,
+      "op": "启用配置",
+      "detail": "将 V1 分佣配置状态设为启用",
+      "operator": "超级管理员",
+      "time": "2026-03-15 14:20:10"
+    },
+    {
+      "id": 3,
+      "commissionId": 1,
+      "op": "创建配置",
+      "detail": "初始化 V1 分佣配置",
+      "operator": "超级管理员",
+      "time": "2026-01-10 09:00:00"
+    },
+    {
+      "id": 4,
+      "commissionId": 2,
+      "op": "编辑分佣配置",
+      "detail": "调整 V2 针对 V1 直邀比例：4.00% → 5.00%",
+      "operator": "超级管理员",
+      "time": "2026-04-20 10:30:45"
+    },
+    {
+      "id": 5,
+      "commissionId": 2,
+      "op": "创建配置",
+      "detail": "初始化 V2 分佣配置",
+      "operator": "超级管理员",
+      "time": "2026-01-10 09:00:00"
+    },
+    {
+      "id": 6,
+      "commissionId": 3,
+      "op": "编辑分佣配置",
+      "detail": "调整 V3 针对 V1 的无限比例至 3.50%；V3→V2/V3 用户关系补充间邀比例",
+      "operator": "超级管理员",
+      "time": "2026-04-22 14:15:38"
+    },
+    {
+      "id": 7,
+      "commissionId": 3,
+      "op": "创建配置",
+      "detail": "初始化 V3 分佣配置",
+      "operator": "超级管理员",
+      "time": "2026-01-10 09:00:00"
+    }
+  ]
+}

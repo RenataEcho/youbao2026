@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>右豹管理后台 · 关键词管理</title>
+  <script>(function(){var s=localStorage.getItem('theme'),p=window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',s||p);})();</script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --primary: #2563eb; --primary-hover: #1d4ed8; --primary-active: #1e40af;
+      --primary-light: #eff6ff; --primary-border: #bfdbfe;
+      --success: #16a34a; --success-bg: #f0fdf4; --success-border: #bbf7d0;
+      --warning: #d97706; --warning-bg: #fffbeb; --warning-border: #fde68a;
+      --danger: #dc2626; --danger-bg: #fef2f2; --danger-border: #fca5a5;
+      --info: #0891b2; --info-bg: #ecfeff; --info-border: #a5f3fc;
+      --bg: #f0f4f8; --surface: #ffffff; --surface-hover: #f8fafc;
+      --border: #e8edf3; --border-hover: #c8d5e2;
+      --text-primary: #18222f; --text-secondary: #4a5568;
+      --text-muted: #9aa5b4; --text-disabled: #c8d5e2;
+      --shadow-sm: 0 1px 4px rgba(30,40,60,0.06);
+      --shadow: 0 2px 10px rgba(30,40,60,0.08);
+      --shadow-lg: 0 8px 28px rgba(30,40,60,0.11);
+      --radius-xs: 4px; --radius-sm: 7px; --radius: 10px;
+      --radius-lg: 14px; --radius-xl: 20px;
+      --transition: all 0.16s ease;
+      --topnav-h: 54px; --sidebar-w: 196px;
+      --topnav-bg: linear-gradient(135deg, #dbeafe 0%, #ede9fe 40%, #e0f2fe 100%);
+      --topnav-text: #3b4d6b; --topnav-text-active: #1e3a8a;
+      --topnav-hover-bg: rgba(99,102,241,0.09);
+      --topnav-active-bg: rgba(99,102,241,0.13);
+      --topnav-border: rgba(148,163,196,0.25);
+      --sidebar-bg: rgba(240,244,255,0.92);
+      --sidebar-border: rgba(148,163,196,0.22);
+    }
+    [data-theme="dark"] {
+      --bg: #0f172a; --surface: #1e293b; --surface-hover: #273348;
+      --border: #334155; --border-hover: #475569;
+      --text-primary: #f1f5f9; --text-secondary: #94a3b8;
+      --text-muted: #475569; --text-disabled: #334155;
+      --shadow-sm: 0 1px 4px rgba(0,0,0,0.3); --shadow: 0 2px 10px rgba(0,0,0,0.35);
+      --shadow-lg: 0 8px 28px rgba(0,0,0,0.45);
+      --topnav-bg: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0c1a2e 100%);
+      --topnav-text: rgba(203,213,225,0.85); --topnav-text-active: #f1f5f9;
+      --topnav-hover-bg: rgba(255,255,255,0.08);
+      --topnav-active-bg: rgba(255,255,255,0.13);
+      --topnav-border: rgba(255,255,255,0.10);
+      --sidebar-bg: rgba(15,23,42,0.97);
+      --sidebar-border: rgba(255,255,255,0.07);
+    }
+    html, body { height: 100%; }
+    body { font-family: 'PingFang SC','Microsoft YaHei','Segoe UI',-apple-system,sans-serif; font-size:13px; color:var(--text-primary); background:var(--bg); transition:background .2s,color .2s; }
+    [data-theme="dark"] body { background:#0f172a; }
+
+    /* ===== TopNav ===== */
+    .topnav { position:fixed;top:0;left:0;right:0;height:var(--topnav-h);z-index:300;display:flex;align-items:center;background:var(--topnav-bg);backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);border-bottom:1px solid var(--topnav-border);box-shadow:0 2px 16px rgba(99,102,241,0.10); }
+    .topnav-logo { display:flex;align-items:center;gap:9px;padding:0 18px;height:100%;flex-shrink:0;text-decoration:none;border-right:1px solid var(--topnav-border); }
+    .logo-icon { width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#6366f1,#2563eb);border:1px solid rgba(255,255,255,0.5);display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0;box-shadow:0 2px 8px rgba(99,102,241,0.30); }
+    .logo-name { font-size:15px;font-weight:700;color:var(--topnav-text-active);white-space:nowrap; }
+    .topnav-right { display:flex;align-items:center;gap:6px;padding:0 14px;flex-shrink:0;margin-left:auto; }
+    .btn-icon { width:32px;height:32px;border:none;background:none;cursor:pointer;border-radius:6px;display:flex;align-items:center;justify-content:center;color:var(--topnav-text);transition:var(--transition); }
+    .btn-icon:hover { background:var(--topnav-hover-bg);color:var(--topnav-text-active); }
+    .breadcrumb { flex:1;padding:0 18px;font-size:12px;color:var(--topnav-text);display:flex;align-items:center;gap:5px; }
+    .breadcrumb a { color:inherit;text-decoration:none;transition:color .15s; }
+    .breadcrumb a:hover { color:var(--topnav-text-active); }
+    .breadcrumb-sep { opacity:.4; }
+    .breadcrumb-cur { color:var(--topnav-text-active);font-weight:500; }
+
+    /* ===== Layout ===== */
+    .layout { display:flex;padding-top:var(--topnav-h);height:100vh; }
+    .main { flex:1;overflow:auto;padding:24px; }
+
+    /* ===== Page Header ===== */
+    .page-header { margin-bottom:20px; }
+    .page-title { font-size:18px;font-weight:700;color:var(--text-primary);margin-bottom:4px; }
+    .page-desc { font-size:12px;color:var(--text-muted); }
+
+    /* ===== Sub Tabs ===== */
+    .kw-tabs { display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:20px; }
+    .kw-tab { padding:10px 20px;border:none;background:none;cursor:pointer;font-size:13px;font-weight:500;color:var(--text-muted);border-bottom:2px solid transparent;margin-bottom:-2px;transition:var(--transition);font-family:inherit;border-radius:0;position:relative;display:flex;align-items:center;gap:6px; }
+    .kw-tab.active { color:var(--primary);border-bottom-color:var(--primary);font-weight:600; }
+    .kw-tab:hover:not(.active) { color:var(--text-secondary); }
+    .kw-tab .tab-count { background:var(--border);color:var(--text-muted);font-size:11px;font-weight:600;border-radius:10px;padding:1px 7px;line-height:1.4;transition:var(--transition); }
+    .kw-tab.active .tab-count { background:var(--primary-light);color:var(--primary); }
+
+    /* ===== Toolbar ===== */
+    .toolbar { display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:16px; }
+    .toolbar-left { display:flex;align-items:center;gap:8px;flex:1;flex-wrap:wrap;min-width:0; }
+    .toolbar-right { display:flex;align-items:center;gap:8px;flex-shrink:0; }
+    .search-box { display:flex;align-items:center;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:0 10px;gap:6px;height:32px;transition:var(--transition); }
+    .search-box:focus-within { border-color:var(--primary);box-shadow:0 0 0 3px rgba(37,99,235,0.10); }
+    .search-box svg { flex-shrink:0;color:var(--text-muted); }
+    .search-box input { border:none;outline:none;background:none;font-size:13px;color:var(--text-primary);width:180px; }
+    .search-box input::placeholder { color:var(--text-muted); }
+    .filter-select { height:32px;border:1px solid var(--border);border-radius:var(--radius-sm);padding:0 10px;font-size:13px;background:var(--surface);color:var(--text-primary);cursor:pointer;transition:var(--transition);outline:none; }
+    .filter-select:focus { border-color:var(--primary);box-shadow:0 0 0 3px rgba(37,99,235,0.10); }
+
+    /* ===== Buttons ===== */
+    .btn { display:inline-flex;align-items:center;gap:5px;height:32px;padding:0 14px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;cursor:pointer;border:1px solid transparent;font-family:inherit;transition:var(--transition);white-space:nowrap; }
+    .btn-sm { height:28px;padding:0 10px;font-size:12px; }
+    .btn-primary { background:var(--primary);color:#fff;border-color:var(--primary); }
+    .btn-primary:hover { background:var(--primary-hover);border-color:var(--primary-hover); }
+    .btn-secondary { background:var(--surface);color:var(--text-secondary);border-color:var(--border); }
+    .btn-secondary:hover { background:var(--surface-hover);border-color:var(--border-hover);color:var(--text-primary); }
+    .btn-danger { background:var(--danger-bg);color:var(--danger);border-color:var(--danger-border); }
+    .btn-danger:hover { background:var(--danger);color:#fff; }
+
+    /* ===== Table Card ===== */
+    .glass-card { background:var(--surface);border-radius:var(--radius-lg);border:1px solid var(--border);box-shadow:var(--shadow);overflow:hidden; }
+    .table-header { display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:8px; }
+    .table-title { font-size:14px;font-weight:600;color:var(--text-primary);display:flex;align-items:center;gap:8px; }
+    .table-count { font-size:12px;font-weight:400;color:var(--text-muted);background:var(--bg);padding:2px 8px;border-radius:10px; }
+    .table-header-right { display:flex;align-items:center;gap:8px; }
+    .table-wrap { overflow-x:auto; }
+    table { width:100%;border-collapse:collapse;min-width:900px; }
+    thead tr { background:var(--bg); }
+    th { padding:10px 12px;text-align:left;font-size:12px;font-weight:600;color:var(--text-secondary);white-space:nowrap;border-bottom:1px solid var(--border);user-select:none; }
+    td { padding:11px 12px;font-size:13px;color:var(--text-primary);border-bottom:1px solid var(--border);vertical-align:middle; }
+    tbody tr { transition:background .12s; }
+    tbody tr:last-child td { border-bottom:none; }
+    tbody tr:hover { background:var(--surface-hover); }
+    .td-muted { color:var(--text-muted);font-size:12px; }
+    .td-mono { font-family:monospace;font-size:12px;color:var(--text-secondary); }
+
+    /* ===== Checkbox ===== */
+    input[type="checkbox"] { width:14px;height:14px;cursor:pointer;accent-color:var(--primary); }
+
+    /* ===== Badge ===== */
+    .badge { display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:500;padding:2px 8px;border-radius:10px;white-space:nowrap; }
+    .badge-blue   { background:var(--primary-light);color:var(--primary);border:1px solid var(--primary-border); }
+    .badge-green  { background:var(--success-bg);color:var(--success);border:1px solid var(--success-border); }
+    .badge-yellow { background:var(--warning-bg);color:var(--warning);border:1px solid var(--warning-border); }
+    .badge-red    { background:var(--danger-bg);color:var(--danger);border:1px solid var(--danger-border); }
+    .badge-gray   { background:var(--bg);color:var(--text-muted);border:1px solid var(--border); }
+    .badge-cyan   { background:var(--info-bg);color:var(--info);border:1px solid var(--info-border); }
+
+    /* 审核状态徽标颜色映射 */
+    .badge-audit-pending  { background:#eff6ff;color:#2563eb;border:1px solid #bfdbfe; }    /* 审核中 */
+    .badge-audit-passed   { background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0; }    /* 已通过待回填 */
+    .badge-audit-filled   { background:#f5f3ff;color:#7c3aed;border:1px solid #ddd6fe; }    /* 已回填发布中 */
+    .badge-audit-invalid  { background:#fffbeb;color:#d97706;border:1px solid #fde68a; }    /* 失效可传 */
+    /* 回收原因徽标颜色映射 */
+    .badge-rec-invalid    { background:#fef2f2;color:#dc2626;border:1px solid #fca5a5; }    /* 关键词失效不可传 */
+    .badge-rec-user       { background:#fffbeb;color:#d97706;border:1px solid #fde68a; }    /* 用户删除 */
+    .badge-rec-offline    { background:#f1f5f9;color:#475569;border:1px solid #cbd5e1; }    /* 关键词已下线 */
+    .badge-rec-expired    { background:#fff7ed;color:#ea580c;border:1px solid #fed7aa; }    /* 关键词过期 */
+    /* 导出状态 */
+    .badge-export-none    { background:var(--bg);color:var(--text-muted);border:1px solid var(--border); }
+    .badge-export-done    { background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0; }
+    .badge-export-import  { background:#eff6ff;color:#2563eb;border:1px solid #bfdbfe; }
+
+    /* ===== Action Buttons ===== */
+    .action-btns { display:flex;align-items:center;justify-content:center;gap:4px; }
+    .action-btn { width:28px;height:28px;border:none;background:none;cursor:pointer;border-radius:var(--radius-xs);display:flex;align-items:center;justify-content:center;transition:var(--transition);color:var(--text-muted); }
+    .action-btn:hover { background:var(--bg); }
+    .action-btn.edit:hover { color:var(--primary);background:var(--primary-light); }
+    .action-btn.del:hover { color:var(--danger);background:var(--danger-bg); }
+    .action-btn.restore:hover { color:var(--success);background:var(--success-bg); }
+
+    /* ===== Pagination ===== */
+    .pagination { display:flex;align-items:center;justify-content:space-between;padding:12px 18px;border-top:1px solid var(--border);flex-wrap:wrap;gap:8px; }
+    .page-info { font-size:12px;color:var(--text-muted); }
+    .page-btns { display:flex;align-items:center;gap:4px; }
+    .page-btn { width:28px;height:28px;border:1px solid var(--border);background:var(--surface);border-radius:var(--radius-xs);cursor:pointer;font-size:12px;color:var(--text-secondary);display:flex;align-items:center;justify-content:center;transition:var(--transition); }
+    .page-btn:hover:not(:disabled) { border-color:var(--primary);color:var(--primary); }
+    .page-btn.active { background:var(--primary);color:#fff;border-color:var(--primary); }
+    .page-btn:disabled { opacity:.4;cursor:not-allowed; }
+
+    /* ===== Batch Bar ===== */
+    .batch-bar { display:none;align-items:center;gap:10px;background:var(--primary-light);border:1px solid var(--primary-border);border-radius:var(--radius-sm);padding:8px 14px;margin-bottom:12px;font-size:13px;color:var(--primary); }
+    .batch-bar.show { display:flex; }
+    .batch-bar-text { font-weight:500; }
+    .batch-bar-btns { display:flex;gap:6px;margin-left:auto; }
+
+    /* ===== Import Dropdown ===== */
+    .dropdown-wrap { position:relative;display:inline-flex; }
+    .dropdown-menu { position:absolute;top:calc(100% + 4px);right:0;min-width:140px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);box-shadow:var(--shadow-lg);z-index:200;overflow:hidden;display:none; }
+    .dropdown-menu.show { display:block; }
+    .dropdown-item { display:flex;align-items:center;gap:8px;padding:9px 14px;font-size:13px;color:var(--text-primary);cursor:pointer;transition:background .12s; }
+    .dropdown-item:hover { background:var(--surface-hover); }
+
+    /* ===== Edit Inline Select ===== */
+    .inline-select { border:1px solid var(--border);border-radius:var(--radius-xs);padding:2px 6px;font-size:12px;background:var(--surface);color:var(--text-primary);cursor:pointer;outline:none;height:24px; }
+    .inline-select:focus { border-color:var(--primary); }
+
+    /* ===== Toast ===== */
+    #toastContainer { position:fixed;bottom:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:8px; }
+    .toast { display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);box-shadow:var(--shadow-lg);font-size:13px;max-width:320px;min-width:220px; }
+    .toast.success { border-left:3px solid var(--success); }
+    .toast.error   { border-left:3px solid var(--danger); }
+    .toast.info    { border-left:3px solid var(--info); }
+    .toast.warning { border-left:3px solid var(--warning); }
+    .toast-msg { flex:1;color:var(--text-primary); }
+    .toast-close { border:none;background:none;cursor:pointer;color:var(--text-muted);font-size:15px;padding:0 2px;line-height:1; }
+
+    /* ===== Empty State ===== */
+    .empty-state { display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;color:var(--text-muted);gap:10px; }
+    .empty-state svg { opacity:.35; }
+    .empty-state p { font-size:13px; }
+  </style>
+</head>
+<body>
+
+<!-- ===== TopNav ===== -->
+<nav class="topnav">
+  <a class="topnav-logo" href="index.html">
+    <div class="logo-icon">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    </div>
+    <span class="logo-name">右豹管理后台</span>
+  </a>
+  <div class="breadcrumb">
+    <a href="index.html#menu=brand">品牌项目</a>
+    <span class="breadcrumb-sep">›</span>
+    <span class="breadcrumb-cur">关键词管理</span>
+  </div>
+  <div class="topnav-right">
+    <button class="btn-icon" title="切换主题" onclick="toggleTheme()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+    </button>
+  </div>
+</nav>
+
+<!-- ===== Main ===== -->
+<div class="layout">
+  <div class="main">
+
+    <!-- Page Header -->
+    <div class="page-header">
+      <div class="page-title">关键词管理</div>
+      <div class="page-desc">品牌项目 › 管理推广关键词库</div>
+    </div>
+
+    <!-- Sub Tabs -->
+    <div class="kw-tabs" id="kwTabs">
+      <button class="kw-tab active" id="tab-normal" onclick="switchTab('normal',this)">
+        正常词库
+        <span class="tab-count" id="cnt-normal">86</span>
+      </button>
+      <button class="kw-tab" id="tab-recycle" onclick="switchTab('recycle',this)">
+        回收站
+        <span class="tab-count" id="cnt-recycle">12</span>
+      </button>
+    </div>
+
+    <!-- ===== 正常词库 Tab ===== -->
+    <div id="pane-normal">
+      <!-- Toolbar -->
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <div class="search-box">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="normal-kw-search" placeholder="搜索关键词…" oninput="filterTable('normal')">
+          </div>
+          <select class="filter-select" id="normal-proj-filter" onchange="filterTable('normal')">
+            <option value="">全部项目</option>
+            <option value="番茄小说">番茄小说</option>
+            <option value="剪映海外">剪映海外</option>
+            <option value="网盘推广">网盘推广</option>
+          </select>
+          <select class="filter-select" id="normal-audit-filter" onchange="filterTable('normal')">
+            <option value="">全部审核状态</option>
+            <option value="审核中">审核中</option>
+            <option value="已通过待回填">已通过待回填</option>
+            <option value="已回填发布中">已回填发布中</option>
+            <option value="失效可传">失效可传</option>
+          </select>
+          <select class="filter-select" id="normal-export-filter" onchange="filterTable('normal')">
+            <option value="">全部导出状态</option>
+            <option value="未导出">未导出</option>
+            <option value="已导出">已导出</option>
+            <option value="已导入">已导入</option>
+          </select>
+        </div>
+        <div class="toolbar-right">
+          <button class="btn btn-secondary btn-sm" onclick="exportData('normal')">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            导出
+          </button>
+          <div class="dropdown-wrap">
+            <button class="btn btn-primary btn-sm" onclick="toggleDropdown('import-menu')">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              导入
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="dropdown-menu" id="import-menu">
+              <div class="dropdown-item" onclick="doImport('source')">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                源数据导入
+              </div>
+              <div class="dropdown-item" onclick="doImport('invalid')">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+                导入失效词
+              </div>
+              <div class="dropdown-item" onclick="doImport('offline')">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="1" y1="1" x2="23" y2="23"/><path d="M21 21H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h3m3-3h6l2 3h4a2 2 0 0 1 2 2v9.34"/></svg>
+                导入下线词
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Batch Bar -->
+      <div class="batch-bar" id="batch-bar-normal">
+        <span class="batch-bar-text">已选 <strong id="batch-sel-count-normal">0</strong> 条</span>
+        <div class="batch-bar-btns">
+          <button class="btn btn-danger btn-sm" onclick="batchDelete('normal')">批量删除</button>
+          <button class="btn btn-secondary btn-sm" onclick="clearSelection('normal')">取消选择</button>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="glass-card">
+        <div class="table-header">
+          <div class="table-title">正常词库 <span class="table-count" id="normal-tbl-count">共 86 条</span></div>
+        </div>
+        <div class="table-wrap">
+          <table id="normal-table">
+            <thead>
+              <tr>
+                <th style="width:36px"><input type="checkbox" id="check-all-normal" onchange="toggleAllCheck('normal',this)"></th>
+                <th>序号</th>
+                <th>所属项目</th>
+                <th>用户ID</th>
+                <th>关键词</th>
+                <th>导出状态</th>
+                <th>导出时间</th>
+                <th>审核状态</th>
+                <th>审核时间</th>
+                <th>审核反馈</th>
+                <th>创建时间</th>
+                <th style="width:80px;text-align:center">操作</th>
+              </tr>
+            </thead>
+            <tbody id="normal-tbody"></tbody>
+          </table>
+        </div>
+        <div class="pagination" id="normal-pagination"></div>
+      </div>
+    </div>
+
+    <!-- ===== 回收站 Tab ===== -->
+    <div id="pane-recycle" style="display:none">
+      <!-- Toolbar -->
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <div class="search-box">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="recycle-kw-search" placeholder="搜索关键词…" oninput="filterTable('recycle')">
+          </div>
+          <select class="filter-select" id="recycle-proj-filter" onchange="filterTable('recycle')">
+            <option value="">全部项目</option>
+            <option value="番茄小说">番茄小说</option>
+            <option value="剪映海外">剪映海外</option>
+            <option value="网盘推广">网盘推广</option>
+          </select>
+          <select class="filter-select" id="recycle-reason-filter" onchange="filterTable('recycle')">
+            <option value="">全部回收原因</option>
+            <option value="关键词失效不可传">关键词失效不可传</option>
+            <option value="用户删除">用户删除</option>
+            <option value="关键词已下线">关键词已下线</option>
+            <option value="关键词过期">关键词过期</option>
+          </select>
+        </div>
+        <div class="toolbar-right">
+          <button class="btn btn-secondary btn-sm" onclick="exportData('recycle')">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            导出
+          </button>
+        </div>
+      </div>
+
+      <!-- Batch Bar -->
+      <div class="batch-bar" id="batch-bar-recycle">
+        <span class="batch-bar-text">已选 <strong id="batch-sel-count-recycle">0</strong> 条</span>
+        <div class="batch-bar-btns">
+          <button class="btn btn-danger btn-sm" onclick="batchDelete('recycle')">批量删除</button>
+          <button class="btn btn-secondary btn-sm" onclick="clearSelection('recycle')">取消选择</button>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="glass-card">
+        <div class="table-header">
+          <div class="table-title">回收站 <span class="table-count" id="recycle-tbl-count">共 12 条</span></div>
+        </div>
+        <div class="table-wrap">
+          <table id="recycle-table">
+            <thead>
+              <tr>
+                <th style="width:36px"><input type="checkbox" id="check-all-recycle" onchange="toggleAllCheck('recycle',this)"></th>
+                <th>序号</th>
+                <th>所属项目</th>
+                <th>用户ID</th>
+                <th>关键词</th>
+                <th>导出状态</th>
+                <th>回收原因</th>
+                <th>审核时间</th>
+                <th>审核反馈</th>
+                <th>创建时间</th>
+                <th style="width:80px;text-align:center">操作</th>
+              </tr>
+            </thead>
+            <tbody id="recycle-tbody"></tbody>
+          </table>
+        </div>
+        <div class="pagination" id="recycle-pagination"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div id="toastContainer"></div>
+
+<script>
+/* ===== 模拟数据 ===== */
+const AUDIT_STATUS_LIST = ['审核中','已通过待回填','已回填发布中','失效可传'];
+const RECOVERY_REASON_LIST = ['关键词失效不可传','用户删除','关键词已下线','关键词过期'];
+const EXPORT_STATUS_LIST = ['未导出','已导出','已导入'];
+const PROJECTS = ['番茄小说','剪映海外','网盘推广'];
+
+function rand(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+function randId(){ return Math.floor(10000+Math.random()*90000); }
+function randDate(y=2026){ const m=String(Math.floor(1+Math.random()*4)).padStart(2,'0'),d=String(Math.floor(1+Math.random()*28)).padStart(2,'0'); return `${y}-${m}-${d}`; }
+function randKeyword(){ const ws=['番茄小说推广','短剧推广','网盘活动','AI工具导流','剪映教程','版权合规','海外发行','推文引流','新人任务','达人扶持'];return rand(ws)+(Math.random()>.5?`_${Math.floor(100+Math.random()*900)}`:''); }
+
+const normalData = Array.from({length:86},(_,i)=>({
+  id: 1000+i+1,
+  project: rand(PROJECTS),
+  user_id: randId(),
+  keyword: randKeyword(),
+  export_status: rand(EXPORT_STATUS_LIST),
+  export_time: Math.random()>.4 ? randDate() : '',
+  audit_status: rand(AUDIT_STATUS_LIST),
+  audit_time: Math.random()>.3 ? randDate() : '',
+  audit_remark: Math.random()>.6 ? '反馈内容示例' : '',
+  create_time: randDate(2025),
+  keyword_status: '正常词库',
+}));
+
+const recycleData = Array.from({length:12},(_,i)=>({
+  id: 2000+i+1,
+  project: rand(PROJECTS),
+  user_id: randId(),
+  keyword: randKeyword(),
+  export_status: rand(EXPORT_STATUS_LIST),
+  recovery_reason: rand(RECOVERY_REASON_LIST),
+  audit_time: Math.random()>.3 ? randDate() : '',
+  audit_remark: Math.random()>.6 ? '反馈内容示例' : '',
+  create_time: randDate(2025),
+  keyword_status: '回收站',
+}));
+
+/* ===== 分页状态 ===== */
+const PAGE_SIZE = 10;
+const state = {
+  normal: { page:1, filtered: [...normalData], selected: new Set() },
+  recycle: { page:1, filtered: [...recycleData], selected: new Set() },
+};
+
+/* ===== 徽标渲染 ===== */
+function auditBadge(v){
+  const map = {
+    '审核中':        '<span class="badge badge-audit-pending">审核中</span>',
+    '已通过待回填':  '<span class="badge badge-audit-passed">已通过待回填</span>',
+    '已回填发布中':  '<span class="badge badge-audit-filled">已回填发布中</span>',
+    '失效可传':      '<span class="badge badge-audit-invalid">失效可传</span>',
+  };
+  return map[v] || `<span class="badge badge-gray">${v}</span>`;
+}
+function recoveryBadge(v){
+  const map = {
+    '关键词失效不可传': '<span class="badge badge-rec-invalid">失效不可传</span>',
+    '用户删除':         '<span class="badge badge-rec-user">用户删除</span>',
+    '关键词已下线':     '<span class="badge badge-rec-offline">已下线</span>',
+    '关键词过期':       '<span class="badge badge-rec-expired">已过期</span>',
+  };
+  return map[v] || `<span class="badge badge-gray">${v}</span>`;
+}
+function exportBadge(v){
+  const map = {
+    '未导出': '<span class="badge badge-export-none">未导出</span>',
+    '已导出': '<span class="badge badge-export-done">已导出</span>',
+    '已导入': '<span class="badge badge-export-import">已导入</span>',
+  };
+  return map[v] || `<span class="badge badge-gray">${v}</span>`;
+}
+
+/* ===== 渲染正常词库行 ===== */
+function renderNormalRow(row, checked){
+  return `<tr>
+    <td><input type="checkbox" class="row-check" data-tab="normal" data-id="${row.id}" ${checked?'checked':''} onchange="onRowCheck('normal',${row.id},this)"></td>
+    <td class="td-mono">${row.id}</td>
+    <td>${row.project}</td>
+    <td class="td-muted">${row.user_id}</td>
+    <td><strong>${row.keyword}</strong></td>
+    <td>${exportBadge(row.export_status)}</td>
+    <td class="td-muted">${row.export_time||'—'}</td>
+    <td>
+      <select class="inline-select" onchange="editAuditStatus(${row.id},this.value)">
+        ${AUDIT_STATUS_LIST.map(s=>`<option value="${s}" ${s===row.audit_status?'selected':''}>${s}</option>`).join('')}
+      </select>
+    </td>
+    <td class="td-muted">${row.audit_time||'—'}</td>
+    <td class="td-muted">${row.audit_remark||'—'}</td>
+    <td class="td-muted">${row.create_time}</td>
+    <td onclick="event.stopPropagation()">
+      <div class="action-btns">
+        <button class="action-btn del" title="删除" onclick="deleteRow('normal',${row.id})">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+        </button>
+      </div>
+    </td>
+  </tr>`;
+}
+
+/* ===== 渲染回收站行 ===== */
+function renderRecycleRow(row, checked){
+  return `<tr>
+    <td><input type="checkbox" class="row-check" data-tab="recycle" data-id="${row.id}" ${checked?'checked':''} onchange="onRowCheck('recycle',${row.id},this)"></td>
+    <td class="td-mono">${row.id}</td>
+    <td>${row.project}</td>
+    <td class="td-muted">${row.user_id}</td>
+    <td><strong>${row.keyword}</strong></td>
+    <td>${exportBadge(row.export_status)}</td>
+    <td>${recoveryBadge(row.recovery_reason)}</td>
+    <td class="td-muted">${row.audit_time||'—'}</td>
+    <td class="td-muted">${row.audit_remark||'—'}</td>
+    <td class="td-muted">${row.create_time}</td>
+    <td onclick="event.stopPropagation()">
+      <div class="action-btns">
+        <button class="action-btn del" title="删除" onclick="deleteRow('recycle',${row.id})">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+        </button>
+      </div>
+    </td>
+  </tr>`;
+}
+
+/* ===== 渲染表格 + 分页 ===== */
+function renderTable(tab){
+  const s = state[tab];
+  const total = s.filtered.length;
+  const totalPages = Math.max(1, Math.ceil(total/PAGE_SIZE));
+  if(s.page > totalPages) s.page = totalPages;
+  const start = (s.page-1)*PAGE_SIZE;
+  const rows = s.filtered.slice(start, start+PAGE_SIZE);
+  const tbody = document.getElementById(`${tab}-tbody`);
+  if(rows.length===0){
+    tbody.innerHTML = `<tr><td colspan="12" style="text-align:center;padding:40px"><div class="empty-state"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><p>暂无数据</p></div></td></tr>`;
+  } else {
+    tbody.innerHTML = rows.map(r => tab==='normal' ? renderNormalRow(r, s.selected.has(r.id)) : renderRecycleRow(r, s.selected.has(r.id))).join('');
+  }
+  document.getElementById(`${tab}-tbl-count`).textContent = `共 ${total} 条`;
+  renderPagination(tab, totalPages, total, start);
+  // 全选状态
+  const checkAll = document.getElementById(`check-all-${tab}`);
+  if(checkAll){
+    checkAll.checked = rows.length>0 && rows.every(r=>s.selected.has(r.id));
+    checkAll.indeterminate = rows.some(r=>s.selected.has(r.id)) && !checkAll.checked;
+  }
+}
+
+/* ===== 分页渲染 ===== */
+function renderPagination(tab, totalPages, total, start){
+  const s = state[tab];
+  const end = Math.min(start+PAGE_SIZE, total);
+  const pg = document.getElementById(`${tab}-pagination`);
+  let html = `<span class="page-info">第 ${total===0?0:start+1}–${end} 条，共 ${total} 条</span><div class="page-btns">`;
+  html += `<button class="page-btn" onclick="goPage('${tab}',${s.page-1})" ${s.page<=1?'disabled':''}><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>`;
+  const start_p = Math.max(1, s.page-2), end_p = Math.min(totalPages, start_p+4);
+  for(let i=start_p;i<=end_p;i++){
+    html += `<button class="page-btn ${i===s.page?'active':''}" onclick="goPage('${tab}',${i})">${i}</button>`;
+  }
+  html += `<button class="page-btn" onclick="goPage('${tab}',${s.page+1})" ${s.page>=totalPages?'disabled':''}><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>`;
+  html += `</div>`;
+  pg.innerHTML = html;
+}
+
+function goPage(tab, p){
+  const totalPages = Math.ceil(state[tab].filtered.length/PAGE_SIZE);
+  if(p<1||p>totalPages) return;
+  state[tab].page = p;
+  renderTable(tab);
+}
+
+/* ===== 过滤 ===== */
+function filterTable(tab){
+  const kw = (document.getElementById(`${tab}-kw-search`)?.value||'').trim().toLowerCase();
+  const proj = document.getElementById(`${tab}-proj-filter`)?.value||'';
+  const source = tab==='normal' ? normalData : recycleData;
+  state[tab].filtered = source.filter(r=>{
+    if(kw && !r.keyword.toLowerCase().includes(kw)) return false;
+    if(proj && r.project!==proj) return false;
+    if(tab==='normal'){
+      const af = document.getElementById('normal-audit-filter').value;
+      const ef = document.getElementById('normal-export-filter').value;
+      if(af && r.audit_status!==af) return false;
+      if(ef && r.export_status!==ef) return false;
+    }
+    if(tab==='recycle'){
+      const rf = document.getElementById('recycle-reason-filter').value;
+      if(rf && r.recovery_reason!==rf) return false;
+    }
+    return true;
+  });
+  state[tab].page = 1;
+  state[tab].selected.clear();
+  updateBatchBar(tab);
+  renderTable(tab);
+}
+
+/* ===== 编辑审核状态（正常词库）===== */
+function editAuditStatus(id, val){
+  const row = normalData.find(r=>r.id===id);
+  if(row){ row.audit_status=val; showToast(`审核状态已更新为「${val}」`,'success'); filterTable('normal'); }
+}
+
+/* ===== 删除 ===== */
+function deleteRow(tab, id){
+  const arr = tab==='normal' ? normalData : recycleData;
+  const idx = arr.findIndex(r=>r.id===id);
+  if(idx>-1){ arr.splice(idx,1); filterTable(tab); showToast('已删除','success'); }
+}
+
+/* ===== 选择 ===== */
+function toggleAllCheck(tab, el){
+  const s = state[tab];
+  const start = (s.page-1)*PAGE_SIZE;
+  const rows = s.filtered.slice(start, start+PAGE_SIZE);
+  rows.forEach(r=>{ el.checked ? s.selected.add(r.id) : s.selected.delete(r.id); });
+  updateBatchBar(tab);
+  renderTable(tab);
+}
+function onRowCheck(tab, id, el){
+  el.checked ? state[tab].selected.add(id) : state[tab].selected.delete(id);
+  updateBatchBar(tab);
+  // 更新全选框
+  const s = state[tab];
+  const start = (s.page-1)*PAGE_SIZE;
+  const rows = s.filtered.slice(start, start+PAGE_SIZE);
+  const checkAll = document.getElementById(`check-all-${tab}`);
+  if(checkAll){
+    checkAll.checked = rows.length>0 && rows.every(r=>s.selected.has(r.id));
+    checkAll.indeterminate = rows.some(r=>s.selected.has(r.id)) && !checkAll.checked;
+  }
+}
+function updateBatchBar(tab){
+  const cnt = state[tab].selected.size;
+  const bar = document.getElementById(`batch-bar-${tab}`);
+  bar.classList.toggle('show', cnt>0);
+  document.getElementById(`batch-sel-count-${tab}`).textContent = cnt;
+}
+function clearSelection(tab){
+  state[tab].selected.clear();
+  updateBatchBar(tab);
+  renderTable(tab);
+}
+function batchDelete(tab){
+  const arr = tab==='normal' ? normalData : recycleData;
+  state[tab].selected.forEach(id=>{ const idx=arr.findIndex(r=>r.id===id); if(idx>-1) arr.splice(idx,1); });
+  state[tab].selected.clear();
+  updateBatchBar(tab);
+  filterTable(tab);
+  showToast('批量删除成功','success');
+}
+
+/* ===== 导入 ===== */
+function doImport(type){
+  const map = {source:'源数据导入',invalid:'导入失效词',offline:'导入下线词'};
+  closeDropdowns();
+  showToast(`已触发「${map[type]}」，请选择文件上传`,'info');
+}
+
+/* ===== 导出 ===== */
+function exportData(tab){
+  showToast('导出任务已创建，稍后可在导出记录中下载','info');
+}
+
+/* ===== 下拉菜单 ===== */
+function toggleDropdown(id){
+  const m = document.getElementById(id);
+  m.classList.toggle('show');
+}
+function closeDropdowns(){
+  document.querySelectorAll('.dropdown-menu').forEach(m=>m.classList.remove('show'));
+}
+document.addEventListener('click', e=>{
+  if(!e.target.closest('.dropdown-wrap')) closeDropdowns();
+});
+
+/* ===== Tab 切换 ===== */
+function switchTab(tab, btn){
+  document.querySelectorAll('.kw-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('pane-normal').style.display = tab==='normal' ? '' : 'none';
+  document.getElementById('pane-recycle').style.display = tab==='recycle' ? '' : 'none';
+}
+
+/* ===== Toast ===== */
+function showToast(msg, type='info'){
+  const icons = {
+    success:`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`,
+    error:  `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`,
+    info:   `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#0891b2" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>`,
+    warning:`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/></svg>`,
+  };
+  const c = document.getElementById('toastContainer');
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.innerHTML = `<span>${icons[type]||''}</span><span class="toast-msg">${msg}</span><button class="toast-close" onclick="this.parentElement.remove()">×</button>`;
+  c.appendChild(t);
+  setTimeout(()=>{ t.style.transition='all .25s ease';t.style.opacity='0';t.style.transform='translateX(60px)';setTimeout(()=>t.remove(),260); }, 2600);
+}
+
+/* ===== 主题切换 ===== */
+function toggleTheme(){
+  const cur = document.documentElement.getAttribute('data-theme');
+  const next = cur==='dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('theme', next);
+}
+
+/* ===== 初始化 ===== */
+filterTable('normal');
+filterTable('recycle');
+</script>
+</body>
+</html>

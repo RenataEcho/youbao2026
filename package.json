@@ -1,0 +1,11 @@
+{
+  "name": "youbao2026",
+  "private": true,
+  "description": "仓库根目录便捷脚本，实际前端工程在 admin/",
+  "scripts": {
+    "dev": "npm run dev --prefix admin",
+    "dev:fresh": "npm run dev:fresh --prefix admin",
+    "build": "npm run build --prefix admin",
+    "preview": "npm run preview --prefix admin"
+  }
+}

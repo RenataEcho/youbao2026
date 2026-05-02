@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>右豹管理后台 · 兑换记录</title>
+  <script>(function(){var s=localStorage.getItem('theme'),p=window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',s||p);})();</script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --primary: #2563eb; --primary-hover: #1d4ed8; --primary-active: #1e40af;
+      --primary-light: #eff6ff; --primary-border: #bfdbfe;
+      --success: #16a34a; --success-bg: #f0fdf4; --success-border: #bbf7d0;
+      --warning: #d97706; --warning-bg: #fffbeb; --warning-border: #fde68a;
+      --danger: #dc2626; --danger-bg: #fef2f2; --danger-border: #fca5a5;
+      --info: #0891b2; --info-bg: #ecfeff; --info-border: #a5f3fc;
+      --bg: #f0f4f8; --surface: #ffffff; --surface-hover: #f8fafc;
+      --border: #e8edf3; --border-hover: #c8d5e2;
+      --text-primary: #18222f; --text-secondary: #4a5568;
+      --text-muted: #9aa5b4; --text-disabled: #c8d5e2;
+      --shadow-sm: 0 1px 4px rgba(30,40,60,0.06);
+      --shadow: 0 2px 10px rgba(30,40,60,0.08);
+      --shadow-lg: 0 8px 28px rgba(30,40,60,0.11);
+      --radius-xs: 4px; --radius-sm: 7px; --radius: 10px;
+      --radius-lg: 14px; --radius-xl: 20px;
+      --transition: all 0.16s ease; --transition-slow: all 0.28s ease;
+      --topnav-h: 54px; --sidebar-w: 196px;
+      --topnav-bg: linear-gradient(135deg, #dbeafe 0%, #ede9fe 40%, #e0f2fe 100%);
+      --topnav-text: #3b4d6b; --topnav-text-active: #1e3a8a;
+      --topnav-hover-bg: rgba(99,102,241,0.09); --topnav-active-bg: rgba(99,102,241,0.13);
+      --topnav-border: rgba(148,163,196,0.25);
+      --sidebar-bg: rgba(240,244,255,0.92); --sidebar-border: rgba(148,163,196,0.22);
+    }
+    [data-theme="dark"] {
+      --bg: #0f172a; --surface: #1e293b; --surface-hover: #273348;
+      --border: #334155; --border-hover: #475569;
+      --text-primary: #f1f5f9; --text-secondary: #94a3b8;
+      --text-muted: #475569; --text-disabled: #334155;
+      --shadow-sm: 0 1px 4px rgba(0,0,0,0.3); --shadow: 0 2px 10px rgba(0,0,0,0.35);
+      --shadow-lg: 0 8px 28px rgba(0,0,0,0.45);
+      --topnav-bg: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0c1a2e 100%);
+      --topnav-text: rgba(203,213,225,0.85); --topnav-text-active: #f1f5f9;
+      --topnav-hover-bg: rgba(255,255,255,0.08); --topnav-active-bg: rgba(255,255,255,0.13);
+      --topnav-border: rgba(255,255,255,0.10);
+      --sidebar-bg: rgba(15,23,42,0.97); --sidebar-border: rgba(255,255,255,0.07);
+    }
+    html, body { height:100%; }
+    body { font-family:'PingFang SC','Microsoft YaHei','Segoe UI',-apple-system,sans-serif;font-size:13px;color:var(--text-primary);background:#f0f4f8;transition:background 0.2s,color 0.2s; }
+    [data-theme="dark"] body { background:#0f172a; }
+
+    /* TopNav */
+    .topnav { position:fixed;top:0;left:0;right:0;height:var(--topnav-h);z-index:300;display:flex;align-items:center;background:var(--topnav-bg);backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);border-bottom:1px solid var(--topnav-border);box-shadow:0 2px 16px rgba(99,102,241,0.10); }
+    .topnav-logo { display:flex;align-items:center;gap:9px;padding:0 18px;height:100%;flex-shrink:0;text-decoration:none;border-right:1px solid var(--topnav-border); }
+    .logo-icon { width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#6366f1,#2563eb);border:1px solid rgba(255,255,255,0.5);display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0;box-shadow:0 2px 8px rgba(99,102,241,0.30); }
+    .logo-name { font-size:15px;font-weight:700;color:var(--topnav-text-active);white-space:nowrap; }
+    .primary-nav { display:flex;align-items:stretch;flex:1;height:100%;overflow-x:auto;overflow-y:hidden;padding:0 6px;scrollbar-width:none; }
+    .primary-nav::-webkit-scrollbar { display:none; }
+    .pnav-item { display:flex;align-items:center;gap:6px;padding:0 14px;height:100%;font-size:13px;font-weight:500;color:var(--topnav-text);cursor:pointer;white-space:nowrap;border:none;background:none;font-family:inherit;position:relative;transition:color .15s,background .15s;flex-shrink:0; }
+    .pnav-item:hover { color:var(--topnav-text-active);background:var(--topnav-hover-bg); }
+    .pnav-item.active { color:var(--topnav-text-active);background:var(--topnav-active-bg);font-weight:600; }
+    .pnav-item.active::after { content:'';position:absolute;bottom:0;left:10px;right:10px;height:2px;border-radius:2px 2px 0 0;background:#4f46e5; }
+    [data-theme="dark"] .pnav-item.active::after { background:rgba(255,255,255,0.85); }
+    .topnav-actions { display:flex;align-items:center;gap:4px;flex-shrink:0;padding:0 12px;border-left:1px solid var(--topnav-border); }
+    .nav-icon-btn { width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:none;border:none;cursor:pointer;color:var(--topnav-text);transition:var(--transition);position:relative; }
+    .nav-icon-btn:hover { background:var(--topnav-hover-bg);color:var(--topnav-text-active); }
+    .badge-dot { position:absolute;top:6px;right:6px;width:7px;height:7px;border-radius:50%;background:#f87171;border:1.5px solid transparent; }
+    .nav-user { display:flex;align-items:center;gap:7px;padding:4px 10px;border-radius:8px;cursor:pointer;transition:var(--transition);position:relative; }
+    .nav-user:hover { background:var(--topnav-hover-bg); }
+    .user-avatar { width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#2563eb);border:1.5px solid rgba(255,255,255,0.65);display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700;flex-shrink:0; }
+    .user-name { font-size:13px;font-weight:600;color:var(--topnav-text-active); }
+    .user-role { font-size:10px;color:var(--topnav-text); }
+    .dropdown { position:absolute;top:calc(100% + 8px);right:0;min-width:160px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-lg);padding:4px;z-index:1000;display:none; }
+    .dropdown.show { display:block;animation:fadeDown 0.15s ease; }
+    @keyframes fadeDown { from{opacity:0;transform:translateY(-6px)} to{opacity:1;transform:translateY(0)} }
+    .dropdown-item { display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:6px;font-size:13px;color:var(--text-secondary);cursor:pointer;transition:var(--transition);border:none;background:none;width:100%;font-family:inherit; }
+    .dropdown-item:hover { background:var(--surface-hover);color:var(--text-primary); }
+    .dropdown-item.danger:hover { background:var(--danger-bg);color:var(--danger); }
+    .dropdown-divider { height:1px;background:var(--border);margin:4px 0; }
+    .icon-sun { display:none; }
+    [data-theme="dark"] .icon-moon { display:none; }
+    [data-theme="dark"] .icon-sun { display:block; }
+
+    /* Layout */
+    .layout { display:flex;margin-top:var(--topnav-h);min-height:calc(100vh - var(--topnav-h)); }
+
+    /* Sidebar */
+    .sidebar { width:var(--sidebar-w);flex-shrink:0;position:fixed;top:var(--topnav-h);bottom:0;left:0;z-index:200;display:flex;flex-direction:column;background:var(--sidebar-bg);backdrop-filter:blur(20px) saturate(160%);-webkit-backdrop-filter:blur(20px) saturate(160%);border-right:1px solid var(--sidebar-border);box-shadow:2px 0 12px rgba(99,102,241,0.07);transition:width 0.22s ease;overflow:hidden; }
+    [data-theme="dark"] .sidebar { background:var(--sidebar-bg);box-shadow:2px 0 12px rgba(0,0,0,0.3); }
+    .sidebar.collapsed { width:52px; }
+    .sidebar-header { display:flex;align-items:center;gap:8px;padding:14px 14px 10px;border-bottom:1px solid var(--sidebar-border);flex-shrink:0;min-height:48px; }
+    .sidebar-module-icon { width:22px;height:22px;border-radius:5px;background:rgba(99,102,241,0.12);display:flex;align-items:center;justify-content:center;color:#4f46e5;flex-shrink:0; }
+    [data-theme="dark"] .sidebar-module-icon { background:rgba(99,102,241,0.22);color:#a5b4fc; }
+    .sidebar-module-name { font-size:13px;font-weight:700;color:#1e3a8a;white-space:nowrap;overflow:hidden;transition:opacity 0.18s; }
+    [data-theme="dark"] .sidebar-module-name { color:#e2e8f0; }
+    .sidebar.collapsed .sidebar-module-name { opacity:0;pointer-events:none; }
+    .sidebar.collapsed .sidebar-header { justify-content:center; }
+    .sidebar-scroll { flex:1;overflow-y:auto;overflow-x:hidden;padding:8px 0; }
+    .sidebar-scroll::-webkit-scrollbar { width:3px; }
+    .sidebar-scroll::-webkit-scrollbar-thumb { background:var(--border);border-radius:2px; }
+    .nav-group-label { font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;padding:12px 16px 4px;white-space:nowrap;overflow:hidden;transition:opacity 0.18s; }
+    .sidebar.collapsed .nav-group-label { opacity:0;pointer-events:none;height:0;padding:0;overflow:hidden; }
+    .nav-item { display:flex;align-items:center;gap:8px;padding:0 10px 0 12px;height:40px;font-size:13px;font-weight:500;color:#4a5680;cursor:pointer;transition:var(--transition);position:relative;white-space:nowrap;border:none;background:none;width:calc(100% - 16px);margin:1px 8px;font-family:inherit;overflow:hidden;border-radius:8px;text-align:left; }
+    [data-theme="dark"] .nav-item { color:rgba(203,213,225,0.75); }
+    .nav-item:hover { color:#1e3a8a;background:rgba(99,102,241,0.09); }
+    [data-theme="dark"] .nav-item:hover { color:#c7d2fe;background:rgba(99,102,241,0.15); }
+    .nav-item.active { color:#2563eb;background:rgba(37,99,235,0.12);font-weight:600; }
+    .nav-item.active::before { content:'';position:absolute;left:0;top:7px;bottom:7px;width:3px;border-radius:0 2px 2px 0;background:#2563eb; }
+    [data-theme="dark"] .nav-item.active { color:#93c5fd;background:rgba(37,99,235,0.22); }
+    [data-theme="dark"] .nav-item.active::before { background:#60a5fa; }
+    .nav-icon { flex-shrink:0;width:20px;height:20px;display:flex;align-items:center;justify-content:center;color:inherit; }
+    .nav-text { flex:1;transition:opacity 0.18s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:left; }
+    .sidebar.collapsed .nav-text { opacity:0;pointer-events:none; }
+    .sidebar-footer { padding:8px 10px;border-top:1px solid var(--sidebar-border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0; }
+    .sidebar-version { font-size:10px;color:var(--text-muted);transition:opacity 0.18s; }
+    .sidebar.collapsed .sidebar-version { opacity:0; }
+    .sidebar-toggle { width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;background:none;border:1px solid var(--border);cursor:pointer;color:var(--text-muted);transition:var(--transition);flex-shrink:0; }
+    .sidebar-toggle:hover { color:var(--primary);border-color:var(--primary-border); }
+
+    /* Main */
+    .main { flex:1;margin-left:var(--sidebar-w);min-height:calc(100vh - var(--topnav-h));transition:margin-left 0.22s; }
+    .main.collapsed { margin-left:52px; }
+    .breadcrumb-bar { display:flex;align-items:center;gap:6px;padding:10px 20px 0;font-size:12px;color:var(--text-muted); }
+    .breadcrumb-bar a { color:var(--text-secondary);text-decoration:none;transition:var(--transition); }
+    .breadcrumb-bar a:hover { color:var(--primary); }
+    .bc-sep { opacity:0.5; }
+    .bc-cur { color:var(--text-primary);font-weight:500; }
+    .page-content { padding:10px 20px 24px; }
+    .page-header { display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px; }
+    .page-header-left h1 { font-size:19px;font-weight:700;color:var(--text-primary); }
+    .page-header-left p { font-size:12px;color:var(--text-muted);margin-top:3px; }
+
+    /* Glass card */
+    .glass-card { background:rgba(255,255,255,0.72);backdrop-filter:blur(16px) saturate(180%);-webkit-backdrop-filter:blur(16px) saturate(180%);border:1px solid rgba(255,255,255,0.55);box-shadow:0 8px 32px rgba(30,40,80,0.10),inset 0 1px 0 rgba(255,255,255,0.8);border-radius:var(--radius-lg); }
+    [data-theme="dark"] .glass-card { background:rgba(30,41,59,0.65);backdrop-filter:blur(16px) saturate(160%);border:1px solid rgba(255,255,255,0.08);box-shadow:0 8px 32px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.05); }
+
+    /* Filter */
+    .filter-card { padding:16px 18px;margin-bottom:14px; }
+    .filter-grid { display:grid;grid-template-columns:repeat(4,minmax(0,200px));gap:10px; }
+    .filter-extra { display:none;grid-template-columns:repeat(4,minmax(0,200px));gap:10px;margin-top:10px; }
+    .filter-extra.show { display:grid;animation:filterSlideDown 0.2s ease; }
+    @keyframes filterSlideDown { from{opacity:0;transform:translateY(-6px)} to{opacity:1;transform:translateY(0)} }
+    .filter-footer { display:flex;align-items:center;justify-content:space-between;margin-top:14px;padding-top:14px;border-top:1px solid var(--border); }
+    .filter-expand-btn { font-size:12px;color:var(--primary);background:none;border:none;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:4px;padding:0; }
+    .filter-expand-btn svg { transition:transform 0.2s ease; }
+    .filter-actions { display:flex;gap:8px; }
+    .form-group-filter { display:flex;flex-direction:column;gap:5px; }
+    .form-label-sm { font-size:12px;color:var(--text-secondary);font-weight:500; }
+    .form-input-sm { width:100%;height:30px;padding:0 9px;font-size:12px;font-family:inherit;color:var(--text-primary);background:var(--surface);border:1px solid var(--border);border-radius:6px;outline:none;transition:var(--transition); }
+    .form-input-sm:focus { border-color:var(--primary);box-shadow:0 0 0 3px rgba(37,99,235,0.10); }
+    .form-input-sm::placeholder { color:var(--text-muted); }
+    .form-select-sm { appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%239aa5b4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;padding-right:26px;cursor:pointer; }
+    .form-input-range { display:flex;align-items:center;gap:6px; }
+    .form-input-range .form-input-sm { flex:1;min-width:0; }
+    .form-input-range span { color:var(--text-muted);font-size:12px;flex-shrink:0; }
+
+    /* Table */
+    .table-card { overflow:hidden; }
+    .table-header { display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border); }
+    .table-title { font-size:14px;font-weight:600;color:var(--text-primary);display:flex;align-items:center;gap:8px; }
+    .table-count { font-size:12px;font-weight:400;color:var(--text-muted); }
+    .table-header-right { display:flex;align-items:center;gap:8px; }
+    .table-wrap { overflow-x:auto; }
+    table { width:100%;border-collapse:collapse;min-width:700px; }
+    thead th { background:var(--surface-hover);font-size:12px;font-weight:600;color:var(--text-secondary);letter-spacing:0.5px;padding:10px 12px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap; }
+    [data-theme="dark"] thead th { background:rgba(39,51,72,0.8); }
+    tbody tr { border-bottom:1px solid var(--border);transition:var(--transition);cursor:default; }
+    tbody tr:last-child { border-bottom:none; }
+    tbody tr:hover { background:rgba(37,99,235,0.04);box-shadow:inset 3px 0 0 var(--primary); }
+    tbody td { padding:10px 12px;font-size:13px;color:var(--text-primary);vertical-align:middle; }
+    .td-mono { font-family:'SFMono-Regular','Consolas','Monaco',monospace;font-size:12px; }
+    .col-fixed-right { position:sticky;right:0;background:var(--surface);z-index:1; }
+
+    /* Btn */
+    .btn { display:inline-flex;align-items:center;gap:5px;height:34px;padding:0 16px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;font-family:inherit;cursor:pointer;transition:var(--transition);border:1px solid transparent;white-space:nowrap; }
+    .btn:active { transform:translateY(1px); }
+    .btn-primary { background:var(--primary);color:#fff;border-color:var(--primary); }
+    .btn-primary:hover { background:var(--primary-hover); }
+    .btn-default { background:var(--surface);color:var(--text-primary);border-color:var(--border); }
+    .btn-default:hover { border-color:var(--border-hover);background:var(--surface-hover); }
+    .btn-sm { height:30px;padding:0 12px;font-size:12px; }
+
+    /* Tag / Badge */
+    .tag { display:inline-flex;align-items:center;padding:2px 8px;border-radius:var(--radius-xs);font-size:11px;font-weight:600;white-space:nowrap; }
+    .tag-blue { background:#eff6ff;color:#2563eb; }
+    .tag-purple { background:#faf5ff;color:#7c3aed; }
+    .tag-pink { background:#fdf2f8;color:#be185d; }
+    .tag-amber { background:#fffbeb;color:#92400e; }
+    .tag-gray { background:#f1f5f9;color:#64748b; }
+    [data-theme="dark"] .tag-blue { background:rgba(37,99,235,0.18);color:#93c5fd; }
+    [data-theme="dark"] .tag-purple { background:rgba(124,58,237,0.18);color:#c4b5fd; }
+    [data-theme="dark"] .tag-pink { background:rgba(190,24,93,0.18);color:#f9a8d4; }
+    [data-theme="dark"] .tag-amber { background:rgba(217,119,6,0.18);color:#fcd34d; }
+    [data-theme="dark"] .tag-gray { background:rgba(100,116,139,0.18);color:#94a3b8; }
+
+    /* Pagination */
+    .pagination-bar { display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-top:1px solid var(--border); }
+    .pagination-info { font-size:12px;color:var(--text-muted); }
+    .pagination-info b { color:var(--text-primary); }
+    .pagination-controls { display:flex;align-items:center;gap:4px; }
+    .page-btn { min-width:30px;height:30px;padding:0 8px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);font-size:12px;font-family:inherit;color:var(--text-secondary);cursor:pointer;transition:var(--transition);display:flex;align-items:center;justify-content:center; }
+    .page-btn:hover { border-color:var(--primary);color:var(--primary); }
+    .page-btn.active { background:var(--primary);color:#fff;border-color:var(--primary); }
+    .page-btn:disabled { opacity:0.4;cursor:not-allowed; }
+    .pagination-right { display:flex;align-items:center;gap:8px; }
+    .page-size-select { height:30px;padding:0 28px 0 10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);font-size:12px;font-family:inherit;color:var(--text-secondary);cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%239aa5b4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 7px center; }
+
+    /* Table empty */
+    .table-empty { display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;gap:12px; }
+    .table-empty svg { color:var(--text-disabled); }
+    .table-empty-text { font-size:14px;font-weight:500;color:var(--text-muted); }
+    .table-empty-sub { font-size:12px;color:var(--text-disabled); }
+
+    /* Toast */
+    .toast-container { position:fixed;top:66px;right:22px;z-index:9998;display:flex;flex-direction:column;gap:8px;pointer-events:none; }
+    .toast { background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-lg);padding:12px 16px 12px 14px;min-width:200px;max-width:360px;display:flex;align-items:flex-start;gap:10px;pointer-events:auto;animation:toastIn 0.28s ease;border-left:4px solid var(--success); }
+    .toast.error { border-left-color:var(--danger); }
+    .toast.warn { border-left-color:var(--warning); }
+    .toast.info { border-left-color:var(--info); }
+    @keyframes toastIn { from{opacity:0;transform:translateX(60px)} to{opacity:1;transform:translateX(0)} }
+    .toast-out { animation:toastOut 0.28s ease forwards; }
+    @keyframes toastOut { to{opacity:0;transform:translateX(120%)} }
+    .toast-content { flex:1; }
+    .toast-title { font-size:13px;font-weight:600;color:var(--text-primary); }
+    .toast-msg { font-size:12px;color:var(--text-secondary);margin-top:2px; }
+
+    @media (max-width:1200px) { .filter-grid,.filter-extra { grid-template-columns:repeat(3,minmax(0,200px)); } }
+    @media (max-width:900px)  { .filter-grid,.filter-extra { grid-template-columns:repeat(2,minmax(0,200px)); } }
+    @media (max-width:640px)  { .sidebar{display:none;} .main{margin-left:0!important;} .filter-grid,.filter-extra{grid-template-columns:repeat(2,1fr);} }
+    @media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration:0.01ms!important;transition-duration:0.01ms!important; } }
+  </style>
+</head>
+<body>
+
+<!-- TopNav -->
+<nav class="topnav">
+  <a class="topnav-logo" href="index.html">
+    <div class="logo-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+    <span class="logo-name">右豹管理后台</span>
+  </a>
+  <div class="primary-nav">
+    <button class="pnav-item" onclick="location.href='index.html'">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      工作台
+    </button>
+    <button class="pnav-item active">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+      用户
+    </button>
+    <button class="pnav-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>项目</button>
+    <button class="pnav-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>数据</button>
+    <button class="pnav-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/></svg>运营</button>
+    <button class="pnav-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>系统</button>
+  </div>
+  <div class="topnav-actions">
+    <button class="nav-icon-btn" title="通知">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <span class="badge-dot"></span>
+    </button>
+    <button class="nav-icon-btn" title="切换主题" onclick="toggleTheme()">
+      <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+    </button>
+    <div class="nav-user" onclick="toggleDropdown()">
+      <div class="user-avatar">管</div>
+      <div><div class="user-name">超级管理员</div><div class="user-role">Admin</div></div>
+      <div class="dropdown" id="userDropdown">
+        <button class="dropdown-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>个人资料</button>
+        <div class="dropdown-divider"></div>
+        <button class="dropdown-item danger"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>退出登录</button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div class="layout">
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-module-icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
+      <span class="sidebar-module-name">用户域</span>
+    </div>
+    <div class="sidebar-scroll">
+      <div class="nav-group-label">用户管理</div>
+      <button class="nav-item" onclick="location.href='user.html'">
+        <span class="nav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></span>
+        <span class="nav-text">用户列表</span>
+      </button>
+      <button class="nav-item" onclick="location.href='realname-company.html'">
+        <span class="nav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span>
+        <span class="nav-text">实名信息</span>
+      </button>
+      <button class="nav-item" onclick="location.href='media-account.html'">
+        <span class="nav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></span>
+        <span class="nav-text">媒体账号</span>
+      </button>
+      <button class="nav-item" onclick="location.href='withdrawal-account.html'">
+        <span class="nav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></span>
+        <span class="nav-text">提现账户</span>
+      </button>
+      <button class="nav-item" onclick="location.href='blacklist.html'">
+        <span class="nav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
+        <span class="nav-text">黑名单</span>
+      </button>
+      <button class="nav-item" onclick="location.href='user-gift-word.html'">
+        <span class="nav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 12V22H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/></svg></span>
+        <span class="nav-text">赠词记录</span>
+      </button>
+      <button class="nav-item active">
+        <span class="nav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 14l6-6"/><path d="M9 8h.01M15 14h.01"/><rect x="3" y="3" width="18" height="18" rx="2"/></svg></span>
+        <span class="nav-text">兑换记录</span>
+      </button>
+      <div class="nav-group-label">用户资金</div>
+      <button class="nav-item" onclick="location.href='user-wallet.html'">
+        <span class="nav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span>
+        <span class="nav-text">用户钱包</span>
+      </button>
+      <button class="nav-item" onclick="location.href='dividend-detail.html'">
+        <span class="nav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg></span>
+        <span class="nav-text">分红明细</span>
+      </button>
+      <button class="nav-item" onclick="location.href='reward-detail.html'">
+        <span class="nav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg></span>
+        <span class="nav-text">奖励明细</span>
+      </button>
+      <button class="nav-item" onclick="location.href='withdrawal-record.html'">
+        <span class="nav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/></svg></span>
+        <span class="nav-text">提现记录</span>
+      </button>
+      <div class="nav-group-label">用户通知</div>
+      <button class="nav-item" onclick="location.href='wechat-notify.html'">
+        <span class="nav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
+        <span class="nav-text">微信通知</span>
+      </button>
+      <button class="nav-item" onclick="location.href='inbox-notify.html'">
+        <span class="nav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></span>
+        <span class="nav-text">站内信通知</span>
+      </button>
+      <div class="nav-group-label">用户体系</div>
+      <button class="nav-item" onclick="location.href='user-level.html'">
+        <span class="nav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
+        <span class="nav-text">用户等级</span>
+      </button>
+      <button class="nav-item" onclick="location.href='user-rank.html'">
+        <span class="nav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></span>
+        <span class="nav-text">用户段位</span>
+      </button>
+      <button class="nav-item" onclick="location.href='medal-config.html'">
+        <span class="nav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg></span>
+        <span class="nav-text">勋章配置</span>
+      </button>
+      <button class="nav-item" onclick="location.href='level-log.html'">
+        <span class="nav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span>
+        <span class="nav-text">用户等级日志</span>
+      </button>
+      <div class="nav-group-label">团长体系</div>
+      <button class="nav-item" onclick="location.href='captain-level.html'">
+        <span class="nav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg></span>
+        <span class="nav-text">团长等级配置</span>
+      </button>
+      <button class="nav-item" onclick="location.href='commission-ratio.html'">
+        <span class="nav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg></span>
+        <span class="nav-text">分销比例配置</span>
+      </button>
+      <button class="nav-item" onclick="location.href='captain-log.html'">
+        <span class="nav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></span>
+        <span class="nav-text">团长身份日志</span>
+      </button>
+    </div>
+    <div class="sidebar-footer">
+      <span class="sidebar-version">v1.4.0</span>
+      <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()" title="收起/展开">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main" id="mainContent">
+    <div class="breadcrumb-bar">
+      <a href="index.html">首页</a>
+      <span class="bc-sep">/</span>
+      <a href="user.html">用户管理</a>
+      <span class="bc-sep">/</span>
+      <span class="bc-cur">兑换记录</span>
+    </div>
+
+    <div class="page-content">
+      <div class="page-header">
+        <div class="page-header-left">
+          <h1>兑换记录</h1>
+          <p>记录用户使用兑换码的操作历史</p>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-default btn-sm" onclick="exportExcel()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            导出 Excel
+          </button>
+        </div>
+      </div>
+
+      <!-- 筛选区 -->
+      <div class="glass-card filter-card">
+        <div class="filter-grid">
+          <div class="form-group-filter">
+            <label class="form-label-sm">用户ID</label>
+            <input class="form-input-sm" id="fUserId" placeholder="输入用户ID">
+          </div>
+          <div class="form-group-filter">
+            <label class="form-label-sm">兑换码</label>
+            <input class="form-input-sm" id="fCode" placeholder="输入兑换码">
+          </div>
+          <div class="form-group-filter">
+            <label class="form-label-sm">兑换码类型</label>
+            <select class="form-input-sm form-select-sm" id="fCodeType">
+              <option value="">全部类型</option>
+              <option>D1G会员</option>
+              <option>超萌会员</option>
+              <option>素人KOC</option>
+            </select>
+          </div>
+          <div class="form-group-filter">
+            <label class="form-label-sm">用户身份</label>
+            <select class="form-input-sm form-select-sm" id="fRole">
+              <option value="">全部身份</option>
+              <option>创作者</option>
+            </select>
+          </div>
+        </div>
+        <div class="filter-extra" id="filterExtra">
+          <div class="form-group-filter">
+            <label class="form-label-sm">兑换时间</label>
+            <div class="form-input-range">
+              <input class="form-input-sm" type="date" id="fDateStart">
+              <span>至</span>
+              <input class="form-input-sm" type="date" id="fDateEnd">
+            </div>
+          </div>
+        </div>
+        <div class="filter-footer">
+          <button class="filter-expand-btn" id="filterExpandBtn" onclick="toggleFilter()">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" id="filterArrow"><polyline points="6 9 12 15 18 9"/></svg>
+            <span id="filterExpandLabel">展开更多</span>
+          </button>
+          <div class="filter-actions">
+            <button class="btn btn-default btn-sm" onclick="resetFilter()">重置</button>
+            <button class="btn btn-primary btn-sm" onclick="doSearch()">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              查询
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 表格 -->
+      <div class="glass-card table-card">
+        <div class="table-header">
+          <div class="table-title">
+            兑换记录列表
+            <span class="table-count" id="tableCount">共 0 条</span>
+          </div>
+          <div class="table-header-right">
+            <span style="font-size:12px;color:var(--text-muted);">每页</span>
+            <select class="page-size-select">
+              <option>10</option><option selected>20</option><option>50</option>
+            </select>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:50px;">序号</th>
+                <th style="min-width:120px;">用户ID</th>
+                <th style="min-width:100px;">用户身份</th>
+                <th style="min-width:110px;">兑换码</th>
+                <th style="min-width:120px;">兑换码类型</th>
+                <th style="min-width:170px;">兑换时间</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+          </table>
+        </div>
+        <div class="table-empty" id="tableEmpty" style="display:none;">
+          <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/></svg>
+          <div class="table-empty-text">暂无数据</div>
+          <div class="table-empty-sub">调整筛选条件后重新查询</div>
+        </div>
+        <div class="pagination-bar">
+          <div class="pagination-info">共 <b id="totalCount">0</b> 条，第 <b>1</b>/<b id="totalPage">1</b> 页</div>
+          <div class="pagination-controls">
+            <button class="page-btn" disabled>«</button>
+            <button class="page-btn" disabled>‹</button>
+            <button class="page-btn active">1</button>
+            <button class="page-btn">2</button>
+            <button class="page-btn">3</button>
+            <button class="page-btn">›</button>
+            <button class="page-btn">»</button>
+          </div>
+          <div class="pagination-right">
+            <span style="font-size:12px;color:var(--text-muted);">每页</span>
+            <select class="page-size-select">
+              <option>10</option><option selected>20</option><option>50</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+// Mock 数据
+const mockData = [
+  {id:1,userId:'U10001234',role:'创作者',code:'ABC123',codeType:'D1G会员',time:'2026-04-28 10:22:15'},
+  {id:2,userId:'U10002345',role:'创作者',code:'DEF456',codeType:'超萌会员',time:'2026-04-27 16:05:33'},
+  {id:3,userId:'U10003456',role:'创作者',code:'GHI789',codeType:'素人KOC',time:'2026-04-26 14:30:00'},
+  {id:4,userId:'U10004567',role:'创作者',code:'JKL012',codeType:'D1G会员',time:'2026-04-25 09:15:00'},
+  {id:5,userId:'U10005678',role:'创作者',code:'MNO345',codeType:'超萌会员',time:'2026-04-24 11:20:00'},
+  {id:6,userId:'U10006789',role:'创作者',code:'PQR678',codeType:'D1G会员',time:'2026-04-23 15:45:00'},
+  {id:7,userId:'U10007890',role:'创作者',code:'STU901',codeType:'素人KOC',time:'2026-04-22 08:30:00'},
+  {id:8,userId:'U10008901',role:'创作者',code:'VWX234',codeType:'超萌会员',time:'2026-04-21 17:10:00'},
+  {id:9,userId:'U10009012',role:'创作者',code:'YZA567',codeType:'D1G会员',time:'2026-04-20 12:00:00'},
+  {id:10,userId:'U10010123',role:'创作者',code:'BCD890',codeType:'超萌会员',time:'2026-04-19 09:55:00'},
+  {id:11,userId:'U10011234',role:'创作者',code:'EFG123',codeType:'素人KOC',time:'2026-04-18 14:20:00'},
+  {id:12,userId:'U10012345',role:'创作者',code:'HIJ456',codeType:'D1G会员',time:'2026-04-17 11:35:00'},
+  {id:13,userId:'U10013456',role:'创作者',code:'KLM789',codeType:'超萌会员',time:'2026-04-16 16:40:00'},
+  {id:14,userId:'U10014567',role:'创作者',code:'NOP012',codeType:'D1G会员',time:'2026-04-15 10:15:00'},
+  {id:15,userId:'U10015678',role:'创作者',code:'QRS345',codeType:'素人KOC',time:'2026-04-14 13:50:00'},
+];
+
+const codeTypeTagMap = {
+  'D1G会员': 'tag-purple',
+  '超萌会员': 'tag-pink',
+  '素人KOC': 'tag-amber',
+};
+
+function renderTable(data) {
+  const tbody = document.getElementById('tableBody');
+  document.getElementById('tableCount').textContent = '共 ' + data.length + ' 条';
+  document.getElementById('totalCount').textContent = data.length;
+  if (!data.length) {
+    tbody.innerHTML = '';
+    document.getElementById('tableEmpty').style.display = 'flex';
+    return;
+  }
+  document.getElementById('tableEmpty').style.display = 'none';
+  tbody.innerHTML = data.map(row => `
+    <tr>
+      <td style="color:var(--text-muted);font-size:12px;">${row.id}</td>
+      <td class="td-mono">${row.userId}</td>
+      <td><span class="tag tag-blue">${row.role}</span></td>
+      <td class="td-mono">${row.code}</td>
+      <td><span class="tag ${codeTypeTagMap[row.codeType]||'tag-gray'}">${row.codeType}</span></td>
+      <td class="td-mono" style="color:var(--text-muted);font-size:12px;">${row.time}</td>
+    </tr>
+  `).join('');
+}
+
+let filterExpanded = false;
+function toggleFilter() {
+  filterExpanded = !filterExpanded;
+  document.getElementById('filterExtra').classList.toggle('show', filterExpanded);
+  document.getElementById('filterExpandLabel').textContent = filterExpanded ? '收起' : '展开更多';
+  document.getElementById('filterArrow').style.transform = filterExpanded ? 'rotate(180deg)' : '';
+}
+function resetFilter() {
+  ['fUserId','fCode','fCodeType','fRole','fDateStart','fDateEnd'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  showToast('筛选条件已重置', 'info');
+}
+function doSearch() {
+  renderTable(mockData);
+  showToast('查询成功，共 ' + mockData.length + ' 条数据', 'success');
+}
+function exportExcel() {
+  showToast('正在导出 Excel...', 'info');
+  setTimeout(() => showToast('导出成功：兑换记录_20260428.xlsx', 'success'), 1200);
+}
+
+// Theme / Sidebar / Toast
+function toggleTheme() {
+  const t = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', t);
+  localStorage.setItem('theme', t);
+}
+function toggleDropdown() {
+  document.getElementById('userDropdown').classList.toggle('show');
+}
+document.addEventListener('click', e => {
+  if (!e.target.closest('.nav-user')) document.getElementById('userDropdown').classList.remove('show');
+});
+let sidebarCollapsed = false;
+function toggleSidebar() {
+  sidebarCollapsed = !sidebarCollapsed;
+  document.getElementById('sidebar').classList.toggle('collapsed', sidebarCollapsed);
+  document.getElementById('mainContent').classList.toggle('collapsed', sidebarCollapsed);
+}
+function showToast(msg, type='success') {
+  const c = document.getElementById('toastContainer');
+  const t = document.createElement('div');
+  t.className = 'toast' + (type!=='success'?' '+type:'');
+  t.innerHTML = `<div class="toast-content"><div class="toast-title">${msg}</div></div><button onclick="this.parentElement.remove()" style="background:none;border:none;cursor:pointer;color:var(--text-muted);padding:0;margin-left:8px;font-size:14px;">×</button>`;
+  c.appendChild(t);
+  setTimeout(() => { t.classList.add('toast-out'); setTimeout(() => t.remove(), 300); }, 2500);
+}
+
+// Init
+renderTable(mockData);
+</script>
+</body>
+</html>

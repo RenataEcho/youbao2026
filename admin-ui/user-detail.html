@@ -1,0 +1,1071 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>右豹管理后台 · 用户详情</title>
+  <script>(function(){var s=localStorage.getItem('theme'),p=window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',s||p);})();</script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --primary: #2563eb; --primary-hover: #1d4ed8; --primary-active: #1e40af;
+      --primary-light: #eff6ff; --primary-border: #bfdbfe;
+      --success: #16a34a; --success-bg: #f0fdf4; --success-border: #bbf7d0;
+      --warning: #d97706; --warning-bg: #fffbeb; --warning-border: #fde68a;
+      --danger: #dc2626; --danger-bg: #fef2f2; --danger-border: #fca5a5;
+      --info: #0891b2; --info-bg: #ecfeff; --info-border: #a5f3fc;
+      --bg: #f0f4f8; --surface: #ffffff; --surface-hover: #f8fafc;
+      --border: #e8edf3; --border-hover: #c8d5e2;
+      --text-primary: #18222f; --text-secondary: #4a5568;
+      --text-muted: #9aa5b4; --text-disabled: #c8d5e2;
+      --shadow-sm: 0 1px 4px rgba(30,40,60,0.06);
+      --shadow: 0 2px 10px rgba(30,40,60,0.08);
+      --shadow-lg: 0 8px 28px rgba(30,40,60,0.11);
+      --shadow-xl: 0 16px 48px rgba(30,40,60,0.14);
+      --radius-xs: 4px; --radius-sm: 7px; --radius: 10px;
+      --radius-lg: 14px; --radius-xl: 20px;
+      --transition: all 0.16s ease; --transition-slow: all 0.28s ease;
+      --topnav-h: 54px; --sidebar-w: 196px;
+      --topnav-bg: linear-gradient(135deg, #dbeafe 0%, #ede9fe 40%, #e0f2fe 100%);
+      --topnav-text: #3b4d6b; --topnav-text-active: #1e3a8a;
+      --topnav-hover-bg: rgba(99,102,241,0.09);
+      --topnav-active-bg: rgba(99,102,241,0.13);
+      --topnav-border: rgba(148,163,196,0.25);
+      --sidebar-bg: rgba(240,244,255,0.92);
+      --sidebar-border: rgba(148,163,196,0.22);
+    }
+    [data-theme="dark"] {
+      --bg: #0f172a; --surface: #1e293b; --surface-hover: #273348;
+      --border: #334155; --border-hover: #475569;
+      --text-primary: #f1f5f9; --text-secondary: #94a3b8;
+      --text-muted: #475569; --text-disabled: #334155;
+      --shadow-sm: 0 1px 4px rgba(0,0,0,0.3); --shadow: 0 2px 10px rgba(0,0,0,0.35);
+      --shadow-lg: 0 8px 28px rgba(0,0,0,0.45); --shadow-xl: 0 16px 48px rgba(0,0,0,0.55);
+      --topnav-bg: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0c1a2e 100%);
+      --topnav-text: rgba(203,213,225,0.85); --topnav-text-active: #f1f5f9;
+      --topnav-hover-bg: rgba(255,255,255,0.08); --topnav-active-bg: rgba(255,255,255,0.13);
+      --topnav-border: rgba(255,255,255,0.10);
+      --sidebar-bg: rgba(15,23,42,0.97); --sidebar-border: rgba(255,255,255,0.07);
+    }
+    html, body { height: 100%; }
+    body { font-family: 'PingFang SC','Microsoft YaHei','Segoe UI',-apple-system,sans-serif; font-size: 13px; color: var(--text-primary); background: var(--bg); transition: background 0.2s, color 0.2s; }
+    [data-theme="dark"] body { background: #0f172a; }
+
+    /* ===== TopNav ===== */
+    .topnav { position: fixed; top: 0; left: 0; right: 0; height: var(--topnav-h); z-index: 300; display: flex; align-items: center; background: var(--topnav-bg); backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%); border-bottom: 1px solid var(--topnav-border); box-shadow: 0 2px 16px rgba(99,102,241,0.10); }
+    .topnav-logo { display: flex; align-items: center; gap: 9px; padding: 0 18px; height: 100%; flex-shrink: 0; text-decoration: none; border-right: 1px solid var(--topnav-border); }
+    .logo-icon { width: 30px; height: 30px; border-radius: 8px; background: linear-gradient(135deg,#6366f1,#2563eb); border: 1px solid rgba(255,255,255,0.5); display: flex; align-items: center; justify-content: center; color: #fff; flex-shrink: 0; box-shadow: 0 2px 8px rgba(99,102,241,0.30); }
+    .logo-name { font-size: 15px; font-weight: 700; color: var(--topnav-text-active); white-space: nowrap; }
+    .primary-nav { display: flex; align-items: stretch; flex: 1; height: 100%; overflow-x: auto; overflow-y: hidden; padding: 0 6px; scrollbar-width: none; }
+    .primary-nav::-webkit-scrollbar { display: none; }
+    .pnav-item { display: flex; align-items: center; gap: 6px; padding: 0 14px; height: 100%; font-size: 13px; font-weight: 500; color: var(--topnav-text); cursor: pointer; white-space: nowrap; border: none; background: none; font-family: inherit; position: relative; transition: color .15s, background .15s; flex-shrink: 0; }
+    .pnav-item:hover { color: var(--topnav-text-active); background: var(--topnav-hover-bg); }
+    .pnav-item.active { color: var(--topnav-text-active); background: var(--topnav-active-bg); font-weight: 600; }
+    .pnav-item.active::after { content: ''; position: absolute; bottom: 0; left: 10px; right: 10px; height: 2px; border-radius: 2px 2px 0 0; background: #4f46e5; }
+    [data-theme="dark"] .pnav-item.active::after { background: rgba(255,255,255,0.85); }
+    .topnav-actions { display: flex; align-items: center; gap: 4px; flex-shrink: 0; padding: 0 12px; border-left: 1px solid var(--topnav-border); }
+    .nav-icon-btn { width: 34px; height: 34px; border-radius: 8px; display: flex; align-items: center; justify-content: center; background: none; border: none; cursor: pointer; color: var(--topnav-text); transition: var(--transition); position: relative; }
+    .nav-icon-btn:hover { background: var(--topnav-hover-bg); color: var(--topnav-text-active); }
+    .badge-dot { position: absolute; top: 6px; right: 6px; width: 7px; height: 7px; border-radius: 50%; background: #f87171; border: 1.5px solid transparent; }
+    .nav-user { display: flex; align-items: center; gap: 7px; padding: 4px 10px; border-radius: 8px; cursor: pointer; transition: var(--transition); position: relative; }
+    .nav-user:hover { background: var(--topnav-hover-bg); }
+    .user-avatar { width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg,#6366f1,#2563eb); border: 1.5px solid rgba(255,255,255,0.65); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 11px; font-weight: 700; flex-shrink: 0; }
+    .user-name { font-size: 13px; font-weight: 600; color: var(--topnav-text-active); }
+    .user-role { font-size: 10px; color: var(--topnav-text); }
+    .dropdown { position: absolute; top: calc(100% + 8px); right: 0; min-width: 160px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-lg); padding: 4px; z-index: 1000; display: none; }
+    .dropdown.show { display: block; animation: fadeDown .15s ease; }
+    @keyframes fadeDown { from{opacity:0;transform:translateY(-6px)} to{opacity:1;transform:translateY(0)} }
+    .dropdown-item { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 6px; font-size: 13px; color: var(--text-secondary); cursor: pointer; transition: var(--transition); border: none; background: none; width: 100%; font-family: inherit; }
+    .dropdown-item:hover { background: var(--surface-hover); color: var(--text-primary); }
+    .dropdown-item.danger:hover { background: var(--danger-bg); color: var(--danger); }
+    .dropdown-divider { height: 1px; background: var(--border); margin: 4px 0; }
+    .icon-sun { display: none; }
+    [data-theme="dark"] .icon-moon { display: none; }
+    [data-theme="dark"] .icon-sun { display: block; }
+
+    /* ===== Sidebar ===== */
+    .layout { display: flex; margin-top: var(--topnav-h); min-height: calc(100vh - var(--topnav-h)); }
+    .sidebar { width: var(--sidebar-w); flex-shrink: 0; position: fixed; top: var(--topnav-h); bottom: 0; left: 0; z-index: 200; display: flex; flex-direction: column; background: var(--sidebar-bg); backdrop-filter: blur(20px) saturate(160%); -webkit-backdrop-filter: blur(20px) saturate(160%); border-right: 1px solid var(--sidebar-border); box-shadow: 2px 0 12px rgba(99,102,241,0.07); transition: width 0.22s ease; overflow: hidden; }
+    [data-theme="dark"] .sidebar { background: var(--sidebar-bg); border-right-color: var(--sidebar-border); box-shadow: 2px 0 12px rgba(0,0,0,0.3); }
+    .sidebar.collapsed { width: 52px; }
+    .sidebar-header { display: flex; align-items: center; gap: 8px; padding: 14px 14px 10px; border-bottom: 1px solid var(--sidebar-border); flex-shrink: 0; min-height: 48px; }
+    .sidebar-module-icon { width: 22px; height: 22px; border-radius: 5px; background: rgba(99,102,241,0.12); display: flex; align-items: center; justify-content: center; color: #4f46e5; flex-shrink: 0; }
+    [data-theme="dark"] .sidebar-module-icon { background: rgba(99,102,241,0.22); color: #a5b4fc; }
+    .sidebar-module-name { font-size: 13px; font-weight: 700; color: #1e3a8a; white-space: nowrap; overflow: hidden; transition: opacity 0.18s; }
+    [data-theme="dark"] .sidebar-module-name { color: #e2e8f0; }
+    .sidebar.collapsed .sidebar-module-name { opacity: 0; pointer-events: none; }
+    .sidebar.collapsed .sidebar-header { justify-content: center; }
+    .sidebar-scroll { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 8px 0; }
+    .sidebar-scroll::-webkit-scrollbar { width: 3px; }
+    .sidebar-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+    .nav-group-label { padding: 14px 22px 4px; font-size: 10.5px; font-weight: 700; color: #8a9abf; text-transform: uppercase; letter-spacing: 0.8px; white-space: nowrap; overflow: hidden; transition: opacity 0.18s, height 0.18s; line-height: 1; }
+    [data-theme="dark"] .nav-group-label { color: #475569; }
+    .sidebar.collapsed .nav-group-label { opacity: 0; pointer-events: none; height: 0; padding: 0; overflow: hidden; }
+    .nav-item { display: flex; align-items: center; gap: 8px; padding: 0 10px 0 12px; height: 40px; font-size: 13px; font-weight: 500; color: #4a5680; cursor: pointer; transition: var(--transition); position: relative; white-space: nowrap; border: none; background: none; width: calc(100% - 16px); margin: 1px 8px; font-family: inherit; overflow: hidden; border-radius: 8px; text-align: left; }
+    [data-theme="dark"] .nav-item { color: rgba(203,213,225,0.75); }
+    .nav-item:hover { color: #1e3a8a; background: rgba(99,102,241,0.09); }
+    [data-theme="dark"] .nav-item:hover { color: #c7d2fe; background: rgba(99,102,241,0.15); }
+    .nav-item.active { color: #2563eb; background: rgba(37,99,235,0.12); font-weight: 600; }
+    .nav-item.active::before { content: ''; position: absolute; left: 0; top: 7px; bottom: 7px; width: 3px; border-radius: 0 2px 2px 0; background: #2563eb; }
+    [data-theme="dark"] .nav-item.active { color: #93c5fd; background: rgba(37,99,235,0.22); }
+    [data-theme="dark"] .nav-item.active::before { background: #60a5fa; }
+    .nav-icon { flex-shrink: 0; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; color: inherit; }
+    .nav-text { flex: 1; transition: opacity 0.18s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left; }
+    .sidebar.collapsed .nav-text { opacity: 0; pointer-events: none; }
+    .sidebar-footer { padding: 8px 10px; border-top: 1px solid var(--sidebar-border); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+    .sidebar-version { font-size: 10px; color: var(--text-muted); transition: opacity 0.18s; }
+    .sidebar.collapsed .sidebar-version { opacity: 0; }
+    .sidebar-toggle { width: 26px; height: 26px; border-radius: 6px; display: flex; align-items: center; justify-content: center; background: none; border: 1px solid var(--border); cursor: pointer; color: var(--text-muted); transition: var(--transition); flex-shrink: 0; }
+    .sidebar-toggle:hover { color: var(--primary); border-color: var(--primary-border); }
+
+    /* ===== Main ===== */
+    .main { flex: 1; margin-left: var(--sidebar-w); min-height: calc(100vh - var(--topnav-h)); transition: margin-left 0.22s; }
+    .main.collapsed { margin-left: 52px; }
+
+    /* ===== 面包屑 ===== */
+    .breadcrumb-bar { display: flex; align-items: center; gap: 6px; padding: 10px 24px 0; font-size: 12px; color: var(--text-muted); }
+    .breadcrumb-bar a { color: var(--text-secondary); text-decoration: none; transition: var(--transition); }
+    .breadcrumb-bar a:hover { color: var(--primary); }
+    .bc-sep { opacity: 0.5; }
+    .bc-cur { color: var(--text-primary); font-weight: 500; }
+
+    /* ===== 页面内容区 ===== */
+    .page-content { padding: 14px 24px 40px; max-width: 1400px; }
+
+    /* ===== Page Header ===== */
+    .page-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 20px; gap: 16px; }
+    .page-header-left { display: flex; align-items: center; gap: 14px; }
+    .back-btn { display: flex; align-items: center; gap: 6px; height: 34px; padding: 0 12px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--surface); color: var(--text-secondary); font-size: 13px; font-family: inherit; cursor: pointer; transition: var(--transition); white-space: nowrap; flex-shrink: 0; }
+    .back-btn:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
+    .user-hero { display: flex; align-items: center; gap: 12px; }
+    .user-av-lg { width: 46px; height: 46px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; color: #fff; flex-shrink: 0; box-shadow: 0 2px 10px rgba(37,99,235,0.25); }
+    .user-hero-info .user-hero-name { font-size: 19px; font-weight: 700; color: var(--text-primary); }
+    .user-hero-info .user-hero-sub { font-size: 12px; color: var(--text-muted); margin-top: 3px; font-family: monospace; }
+    .page-header-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+
+    /* ===== Tab ===== */
+    .detail-tabs { display: flex; gap: 0; border-bottom: 2px solid var(--border); margin-bottom: 20px; }
+    .detail-tab { padding: 10px 20px; font-size: 13px; font-weight: 500; color: var(--text-muted); cursor: pointer; border: none; background: none; font-family: inherit; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: var(--transition); white-space: nowrap; }
+    .detail-tab:hover { color: var(--text-primary); }
+    .detail-tab.active { color: var(--primary); border-bottom-color: var(--primary); font-weight: 600; }
+
+    /* ===== 玻璃卡片 ===== */
+    .glass-card { background: rgba(255,255,255,0.72); backdrop-filter: blur(16px) saturate(180%); -webkit-backdrop-filter: blur(16px) saturate(180%); border: 1px solid rgba(255,255,255,0.55); box-shadow: 0 8px 32px rgba(30,40,80,0.10), inset 0 1px 0 rgba(255,255,255,0.8); border-radius: var(--radius-lg); }
+    [data-theme="dark"] .glass-card { background: rgba(30,41,59,0.65); backdrop-filter: blur(16px) saturate(160%); border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05); }
+
+    /* ===== 分组卡片 ===== */
+    .section-card { padding: 20px 24px; margin-bottom: 16px; }
+    .section-card:last-child { margin-bottom: 0; }
+    .section-title { font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 7px; }
+    .section-dot { width: 4px; height: 14px; border-radius: 2px; background: var(--primary); flex-shrink: 0; }
+
+    /* ===== 字段网格 ===== */
+    .field-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px 24px; }
+    .field-grid-2 { grid-template-columns: repeat(2, 1fr); }
+    @media (max-width: 1100px) { .field-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 700px) { .field-grid { grid-template-columns: 1fr; } }
+    .field-item { display: flex; flex-direction: column; gap: 5px; }
+    .field-item.span2 { grid-column: span 2; }
+    .field-item.span3 { grid-column: span 3; }
+    .field-label { font-size: 11px; color: var(--text-muted); font-weight: 500; display: flex; align-items: center; gap: 4px; }
+    .field-label .req { color: var(--danger); }
+    .field-value { font-size: 13px; color: var(--text-primary); word-break: break-all; line-height: 1.5; }
+    .field-value.mono { font-family: 'SFMono-Regular','Consolas','Monaco',monospace; font-size: 12px; }
+    .field-value.muted { color: var(--text-muted); }
+
+    /* 编辑态输入框 */
+    .field-input { width: 100%; height: 34px; padding: 0 10px; font-size: 13px; font-family: inherit; color: var(--text-primary); background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); outline: none; transition: var(--transition); display: none; }
+    .field-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37,99,235,0.12); }
+    [data-theme="dark"] .field-input { background: var(--surface-hover); }
+    .field-select { appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239aa5b4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 8px center; padding-right: 28px; cursor: pointer; }
+
+    /* ===== Tag / Badge ===== */
+    .tag { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: var(--radius-xs); font-size: 11px; font-weight: 600; white-space: nowrap; }
+    .tag-blue { background: #eff6ff; color: #2563eb; }
+    .tag-green { background: #f0fdf4; color: #16a34a; }
+    .tag-amber { background: #fffbeb; color: #92400e; }
+    .tag-purple { background: #faf5ff; color: #7c3aed; }
+    .tag-gray { background: #f1f5f9; color: #64748b; }
+    .tag-red { background: #fef2f2; color: #dc2626; }
+    [data-theme="dark"] .tag-blue { background: rgba(37,99,235,0.18); color: #93c5fd; }
+    [data-theme="dark"] .tag-green { background: rgba(22,163,74,0.18); color: #86efac; }
+    [data-theme="dark"] .tag-amber { background: rgba(217,119,6,0.18); color: #fcd34d; }
+    [data-theme="dark"] .tag-purple { background: rgba(124,58,237,0.18); color: #c4b5fd; }
+    [data-theme="dark"] .tag-gray { background: rgba(100,116,139,0.18); color: #94a3b8; }
+    [data-theme="dark"] .tag-red { background: rgba(220,38,38,0.18); color: #fca5a5; }
+    .badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px; border-radius: var(--radius-xs); font-size: 11px; font-weight: 600; white-space: nowrap; }
+    .badge::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+    .badge-success { background: var(--success-bg); color: var(--success); }
+    .badge-warning { background: var(--warning-bg); color: var(--warning); }
+    .badge-danger { background: var(--danger-bg); color: var(--danger); }
+    .badge-gray { background: var(--surface-hover); color: var(--text-muted); }
+    .badge-info { background: var(--info-bg); color: var(--info); }
+    .badge-primary { background: var(--primary-light); color: var(--primary); }
+    [data-theme="dark"] .badge-success { background: rgba(22,163,74,0.15); }
+    [data-theme="dark"] .badge-warning { background: rgba(217,119,6,0.15); }
+    [data-theme="dark"] .badge-danger { background: rgba(220,38,38,0.15); }
+    [data-theme="dark"] .badge-gray { background: rgba(100,116,139,0.15); }
+    [data-theme="dark"] .badge-primary { background: rgba(37,99,235,0.15); }
+    [data-theme="dark"] .badge-info    { background: rgba(8,145,178,0.15); }
+
+    /* ===== 按钮 ===== */
+    .btn { display: inline-flex; align-items: center; gap: 5px; height: 34px; padding: 0 16px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 500; font-family: inherit; cursor: pointer; transition: var(--transition); border: 1px solid transparent; white-space: nowrap; }
+    .btn:active { transform: translateY(1px); }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+    .btn-primary { background: var(--primary); color: #fff; border-color: var(--primary); }
+    .btn-primary:hover { background: var(--primary-hover); border-color: var(--primary-hover); }
+    .btn-default { background: var(--surface); color: var(--text-primary); border-color: var(--border); }
+    .btn-default:hover { border-color: var(--border-hover); background: var(--surface-hover); }
+    .btn-danger { background: var(--danger); color: #fff; border-color: var(--danger); }
+    .btn-danger:hover { background: #b91c1c; }
+    .btn-ghost { background: transparent; color: var(--text-secondary); border-color: transparent; }
+    .btn-ghost:hover { background: var(--surface-hover); }
+    .btn-sm { height: 30px; padding: 0 12px; font-size: 12px; }
+
+    /* ===== 统计卡片 ===== */
+    .stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 16px; }
+    @media (max-width: 900px) { .stat-row { grid-template-columns: 1fr 1fr; } }
+    .stat-card { padding: 16px 20px; border-radius: var(--radius-lg); display: flex; flex-direction: column; gap: 6px; }
+    .stat-label { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+    .stat-value { font-size: 22px; font-weight: 700; line-height: 1.2; }
+    .stat-sub { font-size: 11px; color: var(--text-muted); }
+
+    /* ===== 表格 ===== */
+    .data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .data-table thead th { background: var(--surface-hover); font-size: 12px; font-weight: 600; color: var(--text-secondary); letter-spacing: 0.5px; padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
+    [data-theme="dark"] .data-table thead th { background: rgba(39,51,72,0.8); }
+    .data-table tbody tr { border-bottom: 1px solid var(--border); transition: var(--transition); }
+    .data-table tbody tr:last-child { border-bottom: none; }
+    .data-table tbody tr:hover { background: rgba(37,99,235,0.04); }
+    .data-table tbody td { padding: 11px 12px; vertical-align: middle; }
+    .td-mono { font-family: 'SFMono-Regular','Consolas','Monaco',monospace; font-size: 12px; }
+    .td-muted { color: var(--text-muted); font-size: 12px; }
+
+    /* ===== 分页 ===== */
+    .pagination { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-top: 1px solid var(--border); }
+    .page-info { font-size: 12px; color: var(--text-muted); }
+    .page-info span { color: var(--text-primary); font-weight: 600; }
+    .page-btns { display: flex; align-items: center; gap: 4px; }
+    .page-btn { width: 30px; height: 30px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 13px; cursor: pointer; border: 1px solid var(--border); background: var(--surface); color: var(--text-secondary); transition: var(--transition); font-family: inherit; }
+    .page-btn:hover:not(:disabled) { border-color: var(--primary); color: var(--primary); }
+    .page-btn.active { background: var(--primary); border-color: var(--primary); color: #fff; font-weight: 600; }
+    .page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .page-size { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-muted); }
+    .page-size select { height: 30px; padding: 0 24px 0 8px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--surface); color: var(--text-primary); font-size: 12px; font-family: inherit; cursor: pointer; outline: none; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%239aa5b4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 6px center; }
+
+    /* ===== Toast ===== */
+    .toast-container { position: fixed; top: 66px; right: 22px; z-index: 9998; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
+    .toast { min-width: 200px; max-width: 360px; padding: 12px 14px 12px 16px; background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow-lg); border-left: 3px solid; display: flex; align-items: flex-start; gap: 8px; font-size: 13px; pointer-events: all; animation: toastIn .28s ease; }
+    @keyframes toastIn { from{opacity:0;transform:translateX(80px)} to{opacity:1;transform:translateX(0)} }
+    .toast.success { border-left-color: var(--success); }
+    .toast.error { border-left-color: var(--danger); }
+    .toast.info { border-left-color: var(--info); }
+    .toast.warning { border-left-color: var(--warning); }
+    .toast-msg { flex: 1; color: var(--text-primary); line-height: 1.5; }
+    .toast-close { flex-shrink: 0; background: none; border: none; cursor: pointer; color: var(--text-muted); padding: 0; font-size: 14px; transition: var(--transition); }
+    .toast-close:hover { color: var(--text-primary); }
+
+    /* ===== 弹窗 ===== */
+    .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 400; opacity: 0; pointer-events: none; transition: opacity 0.22s ease; }
+    .overlay.show { opacity: 1; pointer-events: all; }
+    .modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%) scale(0.95); width: 460px; max-width: calc(100vw - 32px); background: var(--surface); border-radius: var(--radius-lg); z-index: 401; box-shadow: var(--shadow-xl); opacity: 0; pointer-events: none; transition: all 0.22s ease-out; }
+    .modal.show { opacity: 1; pointer-events: all; transform: translate(-50%,-50%) scale(1); }
+    .modal-lg { width: 560px; }
+    .modal-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--border); }
+    .modal-title { font-size: 15px; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 7px; }
+    .modal-close { width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; background: none; border: none; cursor: pointer; color: var(--text-muted); transition: var(--transition); }
+    .modal-close:hover { background: var(--surface-hover); }
+    .modal-body { padding: 20px; }
+    .modal-footer { display: flex; align-items: center; justify-content: flex-end; gap: 10px; padding: 14px 20px; border-top: 1px solid var(--border); }
+
+    /* ===== 内联编辑保存栏 ===== */
+    .edit-action-bar { position: fixed; bottom: 0; left: var(--sidebar-w); right: 0; background: var(--surface); border-top: 1px solid var(--border); padding: 12px 24px; display: flex; align-items: center; justify-content: flex-end; gap: 10px; z-index: 100; box-shadow: 0 -4px 20px rgba(0,0,0,0.07); transform: translateY(100%); transition: transform 0.22s ease-out; }
+    .edit-action-bar.show { transform: translateY(0); }
+    .main.collapsed ~ .edit-action-bar { left: 52px; }
+    [data-theme="dark"] .edit-action-bar { background: var(--surface); border-top-color: var(--border); }
+
+    /* ===== 联系方式组 ===== */
+    .contact-group { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; background: var(--surface-hover); border-radius: var(--radius-sm); border: 1px solid var(--border); }
+    .contact-group-edit { display: flex; align-items: center; gap: 8px; padding: 10px; background: var(--surface-hover); border-radius: var(--radius-sm); border: 1px solid var(--border); }
+
+    /* ===== 身份 Tag 行 ===== */
+    .identity-row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+
+    /* ===== 空态 ===== */
+    .empty-state { padding: 48px 20px; text-align: center; }
+    .empty-state svg { opacity: 0.25; }
+    .empty-title { font-size: 14px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; margin-top: 12px; }
+    .empty-desc { font-size: 12px; color: var(--text-muted); }
+
+    /* col-action sticky */
+    .col-action { position:sticky;right:0;background:var(--surface);box-shadow:-2px 0 6px rgba(0,0,0,0.04);white-space:nowrap; }
+    [data-theme="dark"] .col-action { background:var(--surface); }
+    tbody tr:hover .col-action { background:rgba(240,246,255,1); }
+    [data-theme="dark"] tbody tr:hover .col-action { background:rgba(30,50,90,1); }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration:0.01ms !important; transition-duration:0.01ms !important; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===== TopNav ===== -->
+<header class="topnav">
+  <a href="user.html" class="topnav-logo">
+    <div class="logo-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+    <span class="logo-name">右豹后台</span>
+  </a>
+  <nav class="primary-nav">
+    <button class="pnav-item" onclick="location.href='index.html'">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>工作台
+    </button>
+    <button class="pnav-item active">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>用户
+    </button>
+    <button class="pnav-item">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>项目
+    </button>
+    <button class="pnav-item">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>数据
+    </button>
+    <button class="pnav-item">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8.56 2.75c4.37 6.03 6.02 9.42 8.03 17.72m2.54-15.38c-3.72 4.35-8.94 5.66-16.88 5.85m19.5 1.9c-3.5-.93-6.63-.82-8.94 0-2.58.92-5.01 2.86-7.44 6.32"/></svg>运营
+    </button>
+    <button class="pnav-item">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>系统
+    </button>
+  </nav>
+  <div class="topnav-actions">
+    <button class="nav-icon-btn" onclick="toggleTheme()" title="切换主题">
+      <svg class="icon-moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      <svg class="icon-sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+    </button>
+    <button class="nav-icon-btn" title="通知">
+      <div class="badge-dot"></div>
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+    </button>
+    <div class="nav-user" onclick="this.querySelector('.dropdown').classList.toggle('show')">
+      <div class="user-avatar">超</div>
+      <div style="display:flex;flex-direction:column"><span class="user-name">超级管理员</span><span class="user-role">Super Admin</span></div>
+      <div class="dropdown">
+        <button class="dropdown-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>个人资料</button>
+        <div class="dropdown-divider"></div>
+        <button class="dropdown-item danger" onclick="location.href='login.html'"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>退出登录</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ===== Layout ===== -->
+<div class="layout">
+
+<!-- ===== Sidebar ===== -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-module-icon">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    </div>
+    <span class="sidebar-module-name">用户</span>
+  </div>
+  <div class="sidebar-scroll">
+    <div class="nav-group-label">用户管理</div>
+    <button class="nav-item active" onclick="location.href='user.html'">
+      <span class="nav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></span>
+      <span class="nav-text">用户列表</span>
+    </button>
+    <button class="nav-item" onclick="location.href='realname-company.html'">
+      <span class="nav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="14" y2="14"/></svg></span>
+      <span class="nav-text">实名信息</span>
+    </button>
+    <button class="nav-item" onclick="location.href='media-account.html'">
+      <span class="nav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/></svg></span>
+      <span class="nav-text">媒体账号</span>
+    </button>
+    <button class="nav-item" onclick="location.href='withdrawal-account.html'">
+      <span class="nav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></span>
+      <span class="nav-text">提现账户</span>
+    </button>
+    <button class="nav-item" onclick="location.href='blacklist.html'">
+      <span class="nav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
+      <span class="nav-text">黑名单</span>
+    </button>
+    <button class="nav-item" onclick="location.href='user-gift-word.html'">
+      <span class="nav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12V22H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/></svg></span>
+      <span class="nav-text">赠词记录</span>
+    </button>
+    <button class="nav-item" onclick="location.href='user-redeem.html'">
+      <span class="nav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14l6-6"/><rect x="3" y="3" width="18" height="18" rx="2"/></svg></span>
+      <span class="nav-text">兑换记录</span>
+    </button>
+    <div class="nav-group-label">用户资金</div>
+    <button class="nav-item" onclick="location.href='user-wallet.html'">
+      <span class="nav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span>
+      <span class="nav-text">用户钱包</span>
+    </button>
+    <button class="nav-item" onclick="location.href='dividend-detail.html'">
+      <span class="nav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/></svg></span>
+      <span class="nav-text">分红明细</span>
+    </button>
+    <button class="nav-item" onclick="location.href='reward-detail.html'">
+      <span class="nav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg></span>
+      <span class="nav-text">奖励明细</span>
+    </button>
+    <button class="nav-item" onclick="location.href='withdrawal-record.html'">
+      <span class="nav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span>
+      <span class="nav-text">提现记录</span>
+    </button>
+    <div class="nav-group-label">用户通知</div>
+    <button class="nav-item" onclick="location.href='wechat-notify.html'">
+      <span class="nav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
+      <span class="nav-text">微信通知</span>
+    </button>
+    <button class="nav-item" onclick="location.href='inbox-notify.html'">
+      <span class="nav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/></svg></span>
+      <span class="nav-text">站内信通知</span>
+    </button>
+    <div class="nav-group-label">用户体系</div>
+    <button class="nav-item" onclick="location.href='user-level.html'">
+      <span class="nav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
+      <span class="nav-text">用户等级</span>
+    </button>
+    <button class="nav-item" onclick="location.href='user-rank.html'">
+      <span class="nav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></span>
+      <span class="nav-text">用户段位</span>
+    </button>
+    <button class="nav-item" onclick="location.href='medal-config.html'">
+      <span class="nav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg></span>
+      <span class="nav-text">勋章配置</span>
+    </button>
+    <button class="nav-item" onclick="location.href='level-log.html'">
+      <span class="nav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span>
+      <span class="nav-text">用户等级日志</span>
+    </button>
+    <div class="nav-group-label">团长体系</div>
+    <button class="nav-item" onclick="location.href='captain-level.html'">
+      <span class="nav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></span>
+      <span class="nav-text">团长等级配置</span>
+    </button>
+    <button class="nav-item" onclick="location.href='commission-ratio.html'">
+      <span class="nav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg></span>
+      <span class="nav-text">分销比例配置</span>
+    </button>
+    <button class="nav-item" onclick="location.href='captain-log.html'">
+      <span class="nav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></span>
+      <span class="nav-text">团长身份日志</span>
+    </button>
+  </div>
+  <div class="sidebar-footer">
+    <span class="sidebar-version">v1.4.0</span>
+    <button class="sidebar-toggle" onclick="toggleSidebar()" title="折叠侧边栏">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="toggle-icon"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+  </div>
+</aside>
+
+<!-- ===== Main Content ===== -->
+<main class="main" id="main">
+
+  <!-- 面包屑 -->
+  <div class="breadcrumb-bar">
+    <a href="user.html">用户</a>
+    <span class="bc-sep">/</span>
+    <a href="user.html">用户列表</a>
+    <span class="bc-sep">/</span>
+    <span class="bc-cur" id="bc-name">用户详情</span>
+  </div>
+
+  <div class="page-content">
+
+    <!-- Page Header -->
+    <div class="page-header">
+      <div class="page-header-left">
+        <button class="back-btn" onclick="history.back()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          返回列表
+        </button>
+        <div class="user-hero">
+          <div class="user-av-lg" id="page-avatar" style="background:linear-gradient(135deg,#2563eb,#7c3aed)">创</div>
+          <div class="user-hero-info">
+            <div class="user-hero-name" id="page-username">创意视觉工作室</div>
+            <div class="user-hero-sub" id="page-userid">UID: U10024 · 注册于 2026-01-05 09:22</div>
+          </div>
+        </div>
+      </div>
+      <div class="page-header-right">
+        <button class="btn btn-default" id="edit-btn" onclick="enterEditMode()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 1 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          编辑
+        </button>
+        <button class="btn btn-default" onclick="showToast('跳转至提现记录','info')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+          提现记录
+        </button>
+        <button class="btn btn-default" onclick="showToast('跳转至收益统计','info')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          收益统计
+        </button>
+      </div>
+    </div>
+
+    <!-- Tab 导航 -->
+    <div class="detail-tabs">
+      <button class="detail-tab active" id="tab-basic" onclick="switchTab('basic',this)">基础信息</button>
+      <button class="detail-tab" id="tab-finance" onclick="switchTab('finance',this)">资金信息</button>
+      <button class="detail-tab" id="tab-log" onclick="switchTab('log',this)">操作日志</button>
+    </div>
+
+    <!-- ========== Tab：基础信息 ========== -->
+    <div id="pane-basic">
+
+      <!-- 分组：用户信息 -->
+      <div class="glass-card section-card">
+        <div class="section-title"><div class="section-dot"></div>用户信息</div>
+        <div class="field-grid">
+          <div class="field-item">
+            <div class="field-label">用户ID</div>
+            <div class="field-value mono" id="fv-id">U10024</div>
+          </div>
+          <div class="field-item">
+            <div class="field-label">昵称 <span class="req">*</span></div>
+            <div class="field-value" id="fv-name">创意视觉工作室</div>
+            <input class="field-input" id="fi-name" value="创意视觉工作室">
+          </div>
+          <div class="field-item">
+            <div class="field-label">手机号 <span class="req">*</span></div>
+            <div class="field-value mono" id="fv-mobile">138****8888</div>
+            <input class="field-input" id="fi-mobile" value="13812348888">
+          </div>
+          <div class="field-item">
+            <div class="field-label">性别</div>
+            <div class="field-value" id="fv-gender">女</div>
+            <select class="field-input field-select" id="fi-gender">
+              <option>女</option><option>男</option><option>未知</option>
+            </select>
+          </div>
+          <div class="field-item">
+            <div class="field-label">地址</div>
+            <div class="field-value" id="fv-addr">中国.广东.深圳</div>
+            <input class="field-input" id="fi-addr" value="中国.广东.深圳" placeholder="省.市.区">
+          </div>
+          <div class="field-item">
+            <div class="field-label">是否禁用</div>
+            <div class="field-value" id="fv-disabled"><span class="badge badge-gray">否</span></div>
+            <select class="field-input field-select" id="fi-disabled">
+              <option>否</option><option>是</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- 分组：当前身份 -->
+      <div class="glass-card section-card">
+        <div class="section-title"><div class="section-dot"></div>当前身份</div>
+        <div class="identity-row" id="fv-identities">
+          <span class="tag tag-blue">创作者.V2</span>
+          <span class="tag tag-green">团长.V2</span>
+          <span class="tag tag-purple">导师</span>
+        </div>
+      </div>
+
+      <!-- 分组：账号状态 -->
+      <div class="glass-card section-card">
+        <div class="section-title"><div class="section-dot"></div>账号状态</div>
+        <div class="field-grid">
+          <div class="field-item">
+            <div class="field-label">账号状态</div>
+            <div class="field-value"><span class="badge badge-success">正常</span></div>
+          </div>
+          <div class="field-item">
+            <div class="field-label">实名状态</div>
+            <div class="field-value"><span class="badge badge-success">已实名</span> <span class="tag tag-green" style="font-size:10px">个人</span></div>
+          </div>
+          <div class="field-item">
+            <div class="field-label">注册渠道</div>
+            <div class="field-value"><span class="tag tag-gray">小程序</span></div>
+          </div>
+          <div class="field-item">
+            <div class="field-label">虚拟用户</div>
+            <div class="field-value">否</div>
+          </div>
+          <div class="field-item">
+            <div class="field-label">注册时间</div>
+            <div class="field-value">2026-01-05 09:22:10</div>
+          </div>
+          <div class="field-item">
+            <div class="field-label">最近登录时间</div>
+            <div class="field-value">2026-04-27 18:30:22</div>
+          </div>
+          <div class="field-item">
+            <div class="field-label">最近登录IP</div>
+            <div class="field-value mono">120.234.56.78</div>
+          </div>
+          <div class="field-item">
+            <div class="field-label">注销/删除时间</div>
+            <div class="field-value muted">—</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 分组：邀请信息 -->
+      <div class="glass-card section-card">
+        <div class="section-title"><div class="section-dot"></div>邀请信息</div>
+        <div class="field-grid">
+          <div class="field-item">
+            <div class="field-label">邀请码</div>
+            <div class="field-value" id="fv-invcode"><span class="mono">A1B2C3</span><span style="color:var(--text-muted)">（8888）</span></div>
+            <input class="field-input" id="fi-invcode" value="8888" placeholder="后台配置邀请码（可为空）">
+          </div>
+          <div class="field-item">
+            <div class="field-label">邀请人ID</div>
+            <div class="field-value mono" id="fv-inviter">U10005</div>
+            <input class="field-input" id="fi-inviter" value="U10005">
+          </div>
+        </div>
+      </div>
+
+      <!-- 分组：联系方式 -->
+      <div class="glass-card section-card">
+        <div class="section-title"><div class="section-dot"></div>联系方式</div>
+        <!-- 只读态 -->
+        <div id="contact-view-area">
+          <button class="btn btn-default btn-sm" onclick="showContactModal()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            查看联系方式（2组）
+          </button>
+        </div>
+        <!-- 编辑态 -->
+        <div id="contact-edit-area" style="display:none">
+          <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px">最多 5 组，每组：微信号 + 微信二维码</div>
+          <div style="display:flex;flex-direction:column;gap:8px" id="contact-edit-list">
+            <div class="contact-group-edit">
+              <input class="field-input" style="display:block;flex:1;margin:0" placeholder="微信号" value="wx_user123">
+              <div style="width:46px;height:46px;background:var(--border);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--text-muted);cursor:pointer;flex-shrink:0" onclick="showToast('点击上传二维码','info')">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+              </div>
+              <button class="btn btn-ghost btn-sm" onclick="this.closest('.contact-group-edit').remove();showToast('已删除','info')">删除</button>
+            </div>
+            <div class="contact-group-edit">
+              <input class="field-input" style="display:block;flex:1;margin:0" placeholder="微信号" value="wx_biz_456">
+              <div style="width:46px;height:46px;background:var(--border);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--text-muted);cursor:pointer;flex-shrink:0" onclick="showToast('点击上传二维码','info')">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+              </div>
+              <button class="btn btn-ghost btn-sm" onclick="this.closest('.contact-group-edit').remove();showToast('已删除','info')">删除</button>
+            </div>
+          </div>
+          <button class="btn btn-ghost btn-sm" style="margin-top:10px" onclick="addContactGroup()">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            添加一组
+          </button>
+        </div>
+      </div>
+
+    </div><!-- /pane-basic -->
+
+    <!-- ========== Tab：资金信息 ========== -->
+    <div id="pane-finance" style="display:none">
+
+      <!-- 统计概览 -->
+      <div class="stat-row">
+        <div class="glass-card stat-card">
+          <div class="stat-label">当前余额</div>
+          <div class="stat-value" style="color:var(--primary)">¥ 4,280.00</div>
+          <div class="stat-sub">可提现金额</div>
+        </div>
+        <div class="glass-card stat-card">
+          <div class="stat-label">累计提现</div>
+          <div class="stat-value" style="color:var(--success)">¥ 12,480.50</div>
+          <div class="stat-sub">历史累计</div>
+        </div>
+        <div class="glass-card stat-card">
+          <div class="stat-label">冻结金额</div>
+          <div class="stat-value" style="color:var(--warning)">¥ 0.00</div>
+          <div class="stat-sub">审核中</div>
+        </div>
+      </div>
+
+      <!-- 提现记录 -->
+      <div class="glass-card section-card">
+        <div class="section-title"><div class="section-dot"></div>提现记录</div>
+        <div style="overflow-x:auto">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>提现单号</th>
+                <th>提现金额</th>
+                <th>提现账户</th>
+                <th>状态</th>
+                <th>申请时间</th>
+                <th>到账时间</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="td-mono">WD20260427001234</td>
+                <td style="font-weight:600;color:var(--success)">¥ 2,800.00</td>
+                <td class="td-muted">招商银行 **** 5678</td>
+                <td><span class="badge badge-success">已到账</span></td>
+                <td class="td-muted">2026-04-20 10:12</td>
+                <td class="td-muted">2026-04-20 18:30</td>
+              </tr>
+              <tr>
+                <td class="td-mono">WD20260410008876</td>
+                <td style="font-weight:600;color:var(--success)">¥ 1,500.00</td>
+                <td class="td-muted">招商银行 **** 5678</td>
+                <td><span class="badge badge-success">已到账</span></td>
+                <td class="td-muted">2026-04-10 09:05</td>
+                <td class="td-muted">2026-04-10 17:00</td>
+              </tr>
+              <tr>
+                <td class="td-mono">WD20260328003321</td>
+                <td style="font-weight:600;color:var(--success)">¥ 5,000.00</td>
+                <td class="td-muted">支付宝 138****8888</td>
+                <td><span class="badge badge-success">已到账</span></td>
+                <td class="td-muted">2026-03-28 14:22</td>
+                <td class="td-muted">2026-03-28 16:45</td>
+              </tr>
+              <tr>
+                <td class="td-mono">WD20260310001122</td>
+                <td style="font-weight:600;color:var(--warning)">¥ 3,180.50</td>
+                <td class="td-muted">招商银行 **** 5678</td>
+                <td><span class="badge badge-warning">审核中</span></td>
+                <td class="td-muted">2026-03-10 11:40</td>
+                <td class="td-muted">—</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="pagination">
+          <span class="page-info">共 <span>12</span> 条，第 <span>1</span>/<span>1</span> 页</span>
+          <div class="page-btns">
+            <button class="page-btn" disabled>«</button>
+            <button class="page-btn" disabled>‹</button>
+            <button class="page-btn active">1</button>
+            <button class="page-btn" disabled>›</button>
+            <button class="page-btn" disabled>»</button>
+          </div>
+          <div class="page-size">每页 <select><option>20</option><option>50</option></select> 条</div>
+        </div>
+      </div>
+
+    </div><!-- /pane-finance -->
+
+    <!-- ========== Tab：操作日志 ========== -->
+    <div id="pane-log" style="display:none">
+      <div class="glass-card section-card">
+        <div class="section-title"><div class="section-dot"></div>操作日志</div>
+        <div style="overflow-x:auto">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>操作时间</th>
+                <th>操作人</th>
+                <th>操作类型</th>
+                <th>操作内容</th>
+                <th>操作IP</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="td-muted" style="white-space:nowrap">2026-04-27 10:12:33</td>
+                <td>张管理员</td>
+                <td><span class="tag tag-blue">编辑信息</span></td>
+                <td style="color:var(--text-secondary)">修改昵称为「创意视觉工作室」</td>
+                <td class="td-mono td-muted">192.168.1.100</td>
+              </tr>
+              <tr>
+                <td class="td-muted" style="white-space:nowrap">2026-04-15 14:30:05</td>
+                <td>李运营</td>
+                <td><span class="tag tag-amber">状态变更</span></td>
+                <td style="color:var(--text-secondary)">账号状态：封禁 → 正常，备注：申诉通过</td>
+                <td class="td-mono td-muted">10.0.1.55</td>
+              </tr>
+              <tr>
+                <td class="td-muted" style="white-space:nowrap">2026-03-10 09:05:18</td>
+                <td>系统自动</td>
+                <td><span class="tag tag-green">身份升级</span></td>
+                <td style="color:var(--text-secondary)">个人身份：创作者.V1 → 创作者.V2（达标自动升级）</td>
+                <td class="td-muted">—</td>
+              </tr>
+              <tr>
+                <td class="td-muted" style="white-space:nowrap">2026-02-20 16:22:01</td>
+                <td>王财务</td>
+                <td><span class="tag tag-purple">提现审核</span></td>
+                <td style="color:var(--text-secondary)">审核通过提现申请 WD20260328003321，金额 ¥5,000.00</td>
+                <td class="td-mono td-muted">10.0.2.88</td>
+              </tr>
+              <tr>
+                <td class="td-muted" style="white-space:nowrap">2026-01-05 09:22:10</td>
+                <td>系统自动</td>
+                <td><span class="tag tag-gray">注册</span></td>
+                <td style="color:var(--text-secondary)">用户注册，来源：小程序，邀请人：U10005</td>
+                <td class="td-muted">—</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="pagination">
+          <span class="page-info">共 <span>28</span> 条，第 <span>1</span>/<span>2</span> 页</span>
+          <div class="page-btns">
+            <button class="page-btn" disabled>«</button>
+            <button class="page-btn" disabled>‹</button>
+            <button class="page-btn active">1</button>
+            <button class="page-btn" onclick="showToast('跳转第2页','info')">2</button>
+            <button class="page-btn" onclick="showToast('跳转第2页','info')">›</button>
+            <button class="page-btn" onclick="showToast('跳转末页','info')">»</button>
+          </div>
+          <div class="page-size">每页 <select><option>20</option><option>50</option></select> 条</div>
+        </div>
+      </div>
+    </div><!-- /pane-log -->
+
+  </div><!-- /page-content -->
+</main>
+</div><!-- /layout -->
+
+<!-- ===== 内联编辑保存栏 ===== -->
+<div class="edit-action-bar" id="edit-action-bar">
+  <span style="flex:1;font-size:13px;color:var(--text-secondary)">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--warning)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    编辑模式中，修改完成后请保存
+  </span>
+  <button class="btn btn-ghost" onclick="cancelEdit()">取消</button>
+  <button class="btn btn-primary" onclick="saveEdit()">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+    保存修改
+  </button>
+</div>
+
+<!-- ===== 联系方式弹窗 ===== -->
+<div class="overlay" id="contact-overlay" onclick="closeContactModal()"></div>
+<div class="modal" id="contact-modal">
+  <div class="modal-header">
+    <span class="modal-title">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      联系方式
+    </span>
+    <button class="modal-close" onclick="closeContactModal()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="modal-body" style="display:flex;flex-direction:column;gap:10px">
+    <div class="contact-group">
+      <div>
+        <div style="font-size:11px;color:var(--text-muted);margin-bottom:3px">第 1 组</div>
+        <div style="font-size:13px;font-weight:600">wx_user123</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="width:52px;height:52px;background:var(--surface-hover);border:1px solid var(--border);border-radius:6px;display:flex;align-items:center;justify-content:center">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+        </div>
+        <button class="btn btn-default btn-sm" onclick="showToast('查看二维码大图','info')">查看</button>
+      </div>
+    </div>
+    <div class="contact-group">
+      <div>
+        <div style="font-size:11px;color:var(--text-muted);margin-bottom:3px">第 2 组</div>
+        <div style="font-size:13px;font-weight:600">wx_biz_456</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="width:52px;height:52px;background:var(--surface-hover);border:1px solid var(--border);border-radius:6px;display:flex;align-items:center;justify-content:center">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+        </div>
+        <button class="btn btn-default btn-sm" onclick="showToast('查看二维码大图','info')">查看</button>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-ghost" onclick="closeContactModal()">关闭</button>
+  </div>
+</div>
+
+<!-- ===== Toast ===== -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+  // ===== 主题初始化 =====
+  (function() {
+    const saved = localStorage.getItem('theme');
+    const prefer = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    const theme = saved || prefer;
+    document.documentElement.setAttribute('data-theme', theme);
+    updateThemeIcon(theme);
+  })();
+  function toggleTheme() {
+    const cur = document.documentElement.getAttribute('data-theme');
+    const next = cur === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('theme', next);
+    updateThemeIcon(next);
+  }
+  function updateThemeIcon(theme) {
+    const moon = document.querySelector('.icon-moon');
+    const sun = document.querySelector('.icon-sun');
+    if (moon) moon.style.display = theme === 'dark' ? 'none' : '';
+    if (sun) sun.style.display = theme === 'dark' ? '' : 'none';
+  }
+
+  // ===== 侧边栏折叠 =====
+  let sidebarCollapsed = false;
+  function updateNavTooltips(collapsed) {
+    document.querySelectorAll('.nav-item').forEach(btn => {
+      const txt = btn.querySelector('.nav-text');
+      btn.title = collapsed && txt ? txt.textContent.trim() : '';
+    });
+  }
+  function toggleSidebar() {
+    sidebarCollapsed = !sidebarCollapsed;
+    const sidebar = document.getElementById('sidebar');
+    const main = document.getElementById('main');
+    const bar = document.getElementById('edit-action-bar');
+    const icon = document.getElementById('toggle-icon');
+    sidebar.classList.toggle('collapsed', sidebarCollapsed);
+    main.classList.toggle('collapsed', sidebarCollapsed);
+    if (bar) bar.style.left = sidebarCollapsed ? '52px' : 'var(--sidebar-w)';
+    if (icon) icon.innerHTML = sidebarCollapsed
+      ? '<polyline points="9 18 15 12 9 6"/>'
+      : '<polyline points="15 18 9 12 15 6"/>';
+    updateNavTooltips(sidebarCollapsed);
+  }
+
+  // ===== Tab 切换 =====
+  function switchTab(tab, btn) {
+    ['basic','finance','log'].forEach(t => {
+      const p = document.getElementById('pane-' + t);
+      if (p) p.style.display = t === tab ? '' : 'none';
+    });
+    document.querySelectorAll('.detail-tab').forEach(b => b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+    // 切换 Tab 时如在编辑模式，先退出
+    if (isEditing && tab !== 'basic') {
+      cancelEdit(true);
+    }
+  }
+
+  // ===== Inline Edit =====
+  let isEditing = false;
+  function enterEditMode() {
+    isEditing = true;
+    // 切换到基础信息 Tab
+    switchTab('basic', document.getElementById('tab-basic'));
+    // 显示编辑字段，隐藏只读值
+    document.querySelectorAll('.field-input').forEach(el => el.style.display = '');
+    document.querySelectorAll('[id^="fv-"]').forEach(el => el.style.display = 'none');
+    // 显示联系方式编辑区
+    document.getElementById('contact-view-area').style.display = 'none';
+    document.getElementById('contact-edit-area').style.display = '';
+    // 显示底部操作栏
+    document.getElementById('edit-action-bar').classList.add('show');
+    // 编辑按钮变灰
+    document.getElementById('edit-btn').disabled = true;
+  }
+
+  function cancelEdit(silent) {
+    isEditing = false;
+    document.querySelectorAll('.field-input').forEach(el => el.style.display = 'none');
+    document.querySelectorAll('[id^="fv-"]').forEach(el => el.style.display = '');
+    document.getElementById('contact-view-area').style.display = '';
+    document.getElementById('contact-edit-area').style.display = 'none';
+    document.getElementById('edit-action-bar').classList.remove('show');
+    document.getElementById('edit-btn').disabled = false;
+    if (!silent) showToast('已取消编辑', 'info');
+  }
+
+  function saveEdit() {
+    // 简单校验：昵称不为空
+    const name = document.getElementById('fi-name').value.trim();
+    const mobile = document.getElementById('fi-mobile').value.trim();
+    if (!name) { showToast('昵称不能为空', 'error'); document.getElementById('fi-name').focus(); return; }
+    if (!mobile) { showToast('手机号不能为空', 'error'); document.getElementById('fi-mobile').focus(); return; }
+    // 同步到只读显示
+    document.getElementById('fv-name').textContent = name;
+    document.getElementById('fv-mobile').textContent = mobile.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2');
+    document.getElementById('page-username').textContent = name;
+    document.getElementById('bc-name').textContent = name;
+    const invcode = document.getElementById('fi-invcode').value.trim();
+    const inviter = document.getElementById('fi-inviter').value.trim();
+    if (invcode) {
+      document.getElementById('fv-invcode').innerHTML = `<span class="mono">A1B2C3</span><span style="color:var(--text-muted)">（${invcode}）</span>`;
+    }
+    document.getElementById('fv-inviter').textContent = inviter || '—';
+    cancelEdit(true);
+    showToast('保存成功', 'success');
+  }
+
+  // ===== 联系方式弹窗 =====
+  function showContactModal() {
+    document.getElementById('contact-overlay').classList.add('show');
+    document.getElementById('contact-modal').classList.add('show');
+  }
+  function closeContactModal() {
+    document.getElementById('contact-overlay').classList.remove('show');
+    document.getElementById('contact-modal').classList.remove('show');
+  }
+
+  // ===== 添加联系方式组 =====
+  function addContactGroup() {
+    const list = document.getElementById('contact-edit-list');
+    const count = list.children.length;
+    if (count >= 5) { showToast('最多添加 5 组联系方式', 'error'); return; }
+    const div = document.createElement('div');
+    div.className = 'contact-group-edit';
+    div.innerHTML = `
+      <input class="field-input" style="display:block;flex:1;margin:0" placeholder="微信号">
+      <div style="width:46px;height:46px;background:var(--border);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--text-muted);cursor:pointer;flex-shrink:0" onclick="showToast('点击上传二维码','info')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="this.closest('.contact-group-edit').remove();showToast('已删除','info')">删除</button>`;
+    list.appendChild(div);
+    // 同步显示输入框样式
+    div.querySelectorAll('.field-input').forEach(el => el.style.display = 'block');
+  }
+
+  // ===== ESC 键处理 =====
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      if (document.getElementById('contact-modal').classList.contains('show')) {
+        closeContactModal(); return;
+      }
+      if (isEditing) { cancelEdit(); return; }
+    }
+  });
+
+  // ===== Toast =====
+  function showToast(msg, type = 'info') {
+    const icons = {
+      success: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
+      error:   '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
+      info:    '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--info)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>',
+      warning: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--warning)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+    };
+    const t = document.createElement('div');
+    t.className = `toast ${type}`;
+    t.innerHTML = `<span style="flex-shrink:0;margin-top:1px">${icons[type]||icons.info}</span><span class="toast-msg">${msg}</span><button class="toast-close" onclick="this.parentElement.remove()">×</button>`;
+    document.getElementById('toastContainer').appendChild(t);
+    setTimeout(() => { t.style.transition = 'all .28s ease'; t.style.opacity = '0'; t.style.transform = 'translateX(120%)'; setTimeout(() => t.remove(), 300); }, 2500);
+  }
+
+  // ===== URL 参数读取（模拟从列表页跳转带 id） =====
+  (function initPage() {
+    const params = new URLSearchParams(location.search);
+    const uid = params.get('id') || 'U10024';
+    const mockData = {
+      'U10024': { name:'创意视觉工作室', avatar:'创', avatarColor:'linear-gradient(135deg,#2563eb,#7c3aed)', reg:'2026-01-05 09:22' },
+      'U10085': { name:'李华达人', avatar:'李', avatarColor:'linear-gradient(135deg,#16a34a,#0891b2)', reg:'2026-01-18 14:07' },
+      'U10126': { name:'赵小星', avatar:'赵', avatarColor:'linear-gradient(135deg,#d97706,#dc2626)', reg:'2026-02-03 10:30' },
+      'V00001': { name:'虚拟用户_001', avatar:'虚', avatarColor:'linear-gradient(135deg,#f59e0b,#d97706)', reg:'2026-04-01 00:00' },
+    };
+    const d = mockData[uid] || mockData['U10024'];
+    document.getElementById('page-avatar').textContent = d.avatar;
+    document.getElementById('page-avatar').style.background = d.avatarColor;
+    document.getElementById('page-username').textContent = d.name;
+    document.getElementById('page-userid').textContent = `UID: ${uid} · 注册于 ${d.reg}`;
+    document.getElementById('bc-name').textContent = d.name;
+    document.getElementById('fv-id').textContent = uid;
+    document.getElementById('fi-name').value = d.name;
+    document.getElementById('fv-name').textContent = d.name;
+    document.title = `右豹管理后台 · ${d.name}`;
+  })();
+</script>
+</body>
+</html>

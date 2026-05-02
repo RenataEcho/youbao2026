@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>右豹管理后台 · 团长身份日志</title>
+  <script>(function(){var s=localStorage.getItem('theme'),p=window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',s||p);})();</script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --primary: #2563eb; --primary-hover: #1d4ed8; --primary-active: #1e40af;
+      --primary-light: #eff6ff; --primary-border: #bfdbfe;
+      --success: #16a34a; --success-bg: #f0fdf4; --success-border: #bbf7d0;
+      --warning: #d97706; --warning-bg: #fffbeb; --warning-border: #fde68a;
+      --danger: #dc2626; --danger-bg: #fef2f2; --danger-border: #fca5a5;
+      --info: #0891b2; --info-bg: #ecfeff; --info-border: #a5f3fc;
+      --bg: #f0f4f8; --surface: #ffffff; --surface-hover: #f8fafc;
+      --border: #e8edf3; --border-hover: #c8d5e2;
+      --text-primary: #18222f; --text-secondary: #4a5568;
+      --text-muted: #9aa5b4; --text-disabled: #c8d5e2;
+      --shadow-sm: 0 1px 4px rgba(30,40,60,0.06); --shadow: 0 2px 10px rgba(30,40,60,0.08);
+      --shadow-lg: 0 8px 28px rgba(30,40,60,0.11); --shadow-xl: 0 16px 48px rgba(30,40,60,0.14);
+      --radius-xs: 4px; --radius-sm: 7px; --radius: 10px; --radius-lg: 14px;
+      --transition: all 0.16s ease;
+      --topnav-h: 54px; --sidebar-w: 196px;
+      --topnav-bg: linear-gradient(135deg, #dbeafe 0%, #ede9fe 40%, #e0f2fe 100%);
+      --topnav-text: #3b4d6b; --topnav-text-active: #1e3a8a;
+      --topnav-hover-bg: rgba(99,102,241,0.09); --topnav-active-bg: rgba(99,102,241,0.13);
+      --topnav-border: rgba(148,163,196,0.25);
+      --sidebar-bg: rgba(240,244,255,0.92); --sidebar-border: rgba(148,163,196,0.22);
+    }
+    [data-theme="dark"] {
+      --bg: #0f172a; --surface: #1e293b; --surface-hover: #273348;
+      --border: #334155; --border-hover: #475569;
+      --text-primary: #f1f5f9; --text-secondary: #94a3b8; --text-muted: #475569; --text-disabled: #334155;
+      --shadow-sm: 0 1px 4px rgba(0,0,0,0.3); --shadow: 0 2px 10px rgba(0,0,0,0.35);
+      --shadow-lg: 0 8px 28px rgba(0,0,0,0.45); --shadow-xl: 0 16px 48px rgba(0,0,0,0.55);
+      --topnav-bg: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0c1a2e 100%);
+      --topnav-text: rgba(203,213,225,0.85); --topnav-text-active: #f1f5f9;
+      --topnav-hover-bg: rgba(255,255,255,0.08); --topnav-active-bg: rgba(255,255,255,0.13);
+      --topnav-border: rgba(255,255,255,0.10);
+      --sidebar-bg: rgba(15,23,42,0.97); --sidebar-border: rgba(255,255,255,0.07);
+    }
+    html, body { height:100%; }
+    body { font-family:'PingFang SC','Microsoft YaHei','Segoe UI',-apple-system,sans-serif;font-size:13px;color:var(--text-primary);background:#f0f4f8;transition:background 0.2s,color 0.2s; }
+    [data-theme="dark"] body { background:#0f172a; }
+
+    /* TopNav */
+    .topnav { position:fixed;top:0;left:0;right:0;height:var(--topnav-h);z-index:300;display:flex;align-items:center;background:var(--topnav-bg);backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);border-bottom:1px solid var(--topnav-border);box-shadow:0 2px 16px rgba(99,102,241,0.10); }
+    .topnav-logo { display:flex;align-items:center;gap:9px;padding:0 18px;height:100%;flex-shrink:0;text-decoration:none;border-right:1px solid var(--topnav-border); }
+    .logo-icon { width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#6366f1,#2563eb);display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0; }
+    .logo-name { font-size:15px;font-weight:700;color:var(--topnav-text-active);white-space:nowrap; }
+    .primary-nav { display:flex;align-items:stretch;flex:1;height:100%;overflow-x:auto;overflow-y:hidden;padding:0 6px;scrollbar-width:none; }
+    .pnav-item { display:flex;align-items:center;gap:6px;padding:0 14px;height:100%;font-size:13px;font-weight:500;color:var(--topnav-text);cursor:pointer;white-space:nowrap;border:none;background:none;font-family:inherit;position:relative;transition:color .15s,background .15s; }
+    .pnav-item:hover { color:var(--topnav-text-active);background:var(--topnav-hover-bg); }
+    .pnav-item.active { color:var(--topnav-text-active);background:var(--topnav-active-bg);font-weight:600; }
+    .pnav-item.active::after { content:'';position:absolute;bottom:0;left:10px;right:10px;height:2px;border-radius:2px 2px 0 0;background:#4f46e5; }
+    .topnav-actions { display:flex;align-items:center;gap:4px;flex-shrink:0;padding:0 12px;border-left:1px solid var(--topnav-border); }
+    .nav-icon-btn { width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:none;border:none;cursor:pointer;color:var(--topnav-text);transition:var(--transition);position:relative; }
+    .nav-icon-btn:hover { background:var(--topnav-hover-bg);color:var(--topnav-text-active); }
+    .badge-dot { position:absolute;top:6px;right:6px;width:7px;height:7px;border-radius:50%;background:#f87171; }
+    .nav-user { display:flex;align-items:center;gap:7px;padding:4px 10px;border-radius:8px;cursor:pointer;transition:var(--transition);position:relative; }
+    .nav-user:hover { background:var(--topnav-hover-bg); }
+    .user-avatar { width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#2563eb);display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700; }
+    .user-name { font-size:13px;font-weight:600;color:var(--topnav-text-active); }
+    .user-role { font-size:10px;color:var(--topnav-text); }
+    .dropdown { position:absolute;top:calc(100% + 8px);right:0;min-width:160px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-lg);padding:4px;z-index:1000;display:none; }
+    .dropdown.show { display:block;animation:fadeDown 0.15s ease; }
+    @keyframes fadeDown { from{opacity:0;transform:translateY(-6px)} to{opacity:1;transform:translateY(0)} }
+    .dropdown-item { display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:6px;font-size:13px;color:var(--text-secondary);cursor:pointer;transition:var(--transition);border:none;background:none;width:100%;font-family:inherit; }
+    .dropdown-item:hover { background:var(--surface-hover);color:var(--text-primary); }
+    .dropdown-item.danger:hover { background:var(--danger-bg);color:var(--danger); }
+    .dropdown-divider { height:1px;background:var(--border);margin:4px 0; }
+    .icon-sun { display:none; }
+    [data-theme="dark"] .icon-moon { display:none; }
+    [data-theme="dark"] .icon-sun { display:block; }
+
+    /* Layout */
+    .layout { display:flex;margin-top:var(--topnav-h);min-height:calc(100vh - var(--topnav-h)); }
+
+    /* Sidebar */
+    .sidebar { width:var(--sidebar-w);flex-shrink:0;position:fixed;top:var(--topnav-h);bottom:0;left:0;z-index:200;display:flex;flex-direction:column;background:var(--sidebar-bg);backdrop-filter:blur(20px) saturate(160%);border-right:1px solid var(--sidebar-border);box-shadow:2px 0 12px rgba(99,102,241,0.07);transition:width 0.22s ease;overflow:hidden; }
+    [data-theme="dark"] .sidebar { box-shadow:2px 0 12px rgba(0,0,0,0.3); }
+    .sidebar.collapsed { width:52px; }
+    .sidebar-header { display:flex;align-items:center;gap:8px;padding:14px 14px 10px;border-bottom:1px solid var(--sidebar-border);flex-shrink:0;min-height:48px; }
+    .sidebar-module-icon { width:22px;height:22px;border-radius:5px;background:rgba(99,102,241,0.12);display:flex;align-items:center;justify-content:center;color:#4f46e5;flex-shrink:0; }
+    .sidebar-module-name { font-size:13px;font-weight:700;color:#1e3a8a;white-space:nowrap;overflow:hidden;transition:opacity 0.18s; }
+    [data-theme="dark"] .sidebar-module-name { color:#e2e8f0; }
+    .sidebar.collapsed .sidebar-module-name { opacity:0;pointer-events:none; }
+    .sidebar.collapsed .sidebar-header { justify-content:center; }
+    .sidebar-scroll { flex:1;overflow-y:auto;overflow-x:hidden;padding:8px 0; }
+    .sidebar-scroll::-webkit-scrollbar { width:3px; }
+    .sidebar-scroll::-webkit-scrollbar-thumb { background:var(--border);border-radius:2px; }
+    .nav-group-label { font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;padding:12px 16px 4px;white-space:nowrap;overflow:hidden;transition:opacity 0.18s; }
+    .sidebar.collapsed .nav-group-label { opacity:0;pointer-events:none;height:0;padding:0;overflow:hidden; }
+    .nav-item { display:flex;align-items:center;gap:8px;padding:0 10px 0 12px;height:40px;font-size:13px;font-weight:500;color:#4a5680;cursor:pointer;transition:var(--transition);position:relative;white-space:nowrap;border:none;background:none;width:calc(100% - 16px);margin:1px 8px;font-family:inherit;overflow:hidden;border-radius:8px;text-align:left; }
+    [data-theme="dark"] .nav-item { color:rgba(203,213,225,0.75); }
+    .nav-item:hover { color:#1e3a8a;background:rgba(99,102,241,0.09); }
+    .nav-item.active { color:#2563eb;background:rgba(37,99,235,0.12);font-weight:600; }
+    .nav-item.active::before { content:'';position:absolute;left:0;top:7px;bottom:7px;width:3px;border-radius:0 2px 2px 0;background:#2563eb; }
+    [data-theme="dark"] .nav-item.active { color:#93c5fd;background:rgba(37,99,235,0.22); }
+    .nav-icon { flex-shrink:0;width:20px;height:20px;display:flex;align-items:center;justify-content:center;color:inherit; }
+    .nav-text { flex:1;transition:opacity 0.18s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+    .sidebar.collapsed .nav-text { opacity:0;pointer-events:none; }
+    .sidebar-footer { padding:8px 10px;border-top:1px solid var(--sidebar-border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0; }
+    .sidebar-version { font-size:10px;color:var(--text-muted);transition:opacity 0.18s; }
+    .sidebar.collapsed .sidebar-version { opacity:0; }
+    .sidebar-toggle { width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;background:none;border:1px solid var(--border);cursor:pointer;color:var(--text-muted);transition:var(--transition);flex-shrink:0; }
+    .sidebar-toggle:hover { color:var(--primary);border-color:var(--primary-border); }
+
+    /* Main */
+    .main { flex:1;margin-left:var(--sidebar-w);min-height:calc(100vh - var(--topnav-h));transition:margin-left 0.22s; }
+    .main.collapsed { margin-left:52px; }
+    .breadcrumb-bar { display:flex;align-items:center;gap:6px;padding:10px 20px 0;font-size:12px;color:var(--text-muted); }
+    .breadcrumb-bar a { color:var(--text-secondary);text-decoration:none;transition:var(--transition); }
+    .breadcrumb-bar a:hover { color:var(--primary); }
+    .bc-sep { opacity:0.5; }
+    .bc-cur { color:var(--text-primary);font-weight:500; }
+    .page-content { padding:10px 20px 24px; }
+    .page-header { display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px; }
+    .page-header-left h1 { font-size:19px;font-weight:700;color:var(--text-primary); }
+    .page-header-left p { font-size:12px;color:var(--text-muted);margin-top:3px; }
+
+    /* Glass card */
+    .glass-card { background:rgba(255,255,255,0.72);backdrop-filter:blur(16px) saturate(180%);-webkit-backdrop-filter:blur(16px) saturate(180%);border:1px solid rgba(255,255,255,0.55);box-shadow:0 8px 32px rgba(30,40,80,0.10),inset 0 1px 0 rgba(255,255,255,0.8);border-radius:var(--radius-lg); }
+    [data-theme="dark"] .glass-card { background:rgba(30,41,59,0.65);backdrop-filter:blur(16px) saturate(160%);border:1px solid rgba(255,255,255,0.08);box-shadow:0 8px 32px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.05); }
+
+    /* Filter */
+    .filter-card { padding:16px 18px;margin-bottom:14px; }
+    .filter-grid { display:grid;grid-template-columns:repeat(4,minmax(0,200px));gap:10px; }
+    .filter-extra { display:none;grid-template-columns:repeat(4,minmax(0,200px));gap:10px;margin-top:10px; }
+    .filter-extra.show { display:grid;animation:filterSlideDown 0.2s ease; }
+    @keyframes filterSlideDown { from{opacity:0;transform:translateY(-6px)} to{opacity:1;transform:translateY(0)} }
+    .filter-footer { display:flex;align-items:center;justify-content:space-between;margin-top:14px;padding-top:14px;border-top:1px solid var(--border); }
+    .filter-expand-btn { font-size:12px;color:var(--primary);background:none;border:none;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:4px;padding:0; }
+    .filter-expand-btn svg { transition:transform 0.2s ease; }
+    .filter-actions { display:flex;gap:8px; }
+    .form-group-filter { display:flex;flex-direction:column;gap:5px; }
+    .form-label-sm { font-size:12px;color:var(--text-secondary);font-weight:500; }
+    .form-input-sm { width:100%;height:30px;padding:0 9px;font-size:12px;font-family:inherit;color:var(--text-primary);background:var(--surface);border:1px solid var(--border);border-radius:6px;outline:none;transition:var(--transition); }
+    .form-input-sm:focus { border-color:var(--primary);box-shadow:0 0 0 3px rgba(37,99,235,0.10); }
+    .form-input-sm::placeholder { color:var(--text-muted); }
+    .form-select-sm { appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%239aa5b4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;padding-right:26px;cursor:pointer; }
+    .form-input-range { display:flex;align-items:center;gap:6px; }
+    .form-input-range .form-input-sm { flex:1;min-width:0; }
+    .form-input-range span { color:var(--text-muted);font-size:12px;flex-shrink:0; }
+
+    /* Table */
+    .table-card { overflow:hidden; }
+    .table-header { display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:8px; }
+    .table-title { font-size:14px;font-weight:600;color:var(--text-primary);display:flex;align-items:center;gap:8px; }
+    .table-count { font-size:12px;font-weight:400;color:var(--text-muted); }
+    .table-header-left { display:flex;align-items:center;gap:10px;flex-wrap:wrap; }
+    .table-header-right { display:flex;align-items:center;gap:8px; }
+    .bulk-bar { display:none;align-items:center;gap:8px; }
+    .bulk-bar.show { display:flex;animation:fadeIn 0.2s ease; }
+    .bulk-count { font-size:13px;color:var(--text-primary); }
+    .bulk-count b { color:var(--primary);font-weight:700; }
+    @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+    .table-wrap { overflow-x:auto; }
+    table { width:100%;border-collapse:collapse;min-width:900px; }
+    thead th { background:var(--surface-hover);font-size:12px;font-weight:600;color:var(--text-secondary);letter-spacing:0.5px;padding:10px 12px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap; }
+    [data-theme="dark"] thead th { background:rgba(39,51,72,0.8); }
+    tbody tr { border-bottom:1px solid var(--border);transition:var(--transition); }
+    tbody tr:last-child { border-bottom:none; }
+    tbody tr:hover { background:rgba(37,99,235,0.04);box-shadow:inset 3px 0 0 var(--primary); }
+    tbody tr.selected { background:rgba(37,99,235,0.06);box-shadow:inset 3px 0 0 var(--primary); }
+    tbody td { padding:10px 12px;font-size:13px;color:var(--text-primary);vertical-align:middle; }
+    .td-mono { font-family:'SFMono-Regular','Consolas','Monaco',monospace;font-size:12px; }
+    .col-fixed-right { position:sticky;right:0;background:var(--surface);z-index:1; }
+    tbody tr:hover .col-fixed-right { background:rgba(241,247,255,1); }
+    [data-theme="dark"] tbody tr:hover .col-fixed-right { background:#202d40; }
+
+    /* Btn */
+    .btn { display:inline-flex;align-items:center;gap:5px;height:34px;padding:0 16px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;font-family:inherit;cursor:pointer;transition:var(--transition);border:1px solid transparent;white-space:nowrap; }
+    .btn:active { transform:translateY(1px); }
+    .btn:disabled { opacity:0.45;cursor:not-allowed;transform:none; }
+    .btn-primary { background:var(--primary);color:#fff;border-color:var(--primary); }
+    .btn-primary:hover { background:var(--primary-hover); }
+    .btn-default { background:var(--surface);color:var(--text-primary);border-color:var(--border); }
+    .btn-default:hover { border-color:var(--border-hover);background:var(--surface-hover); }
+    .btn-danger { background:var(--danger);color:#fff;border-color:var(--danger); }
+    .btn-danger:hover { background:#b91c1c; }
+    .btn-ghost { background:transparent;color:var(--text-secondary);border-color:transparent; }
+    .btn-ghost:hover { background:var(--surface-hover); }
+    .btn-sm { height:30px;padding:0 12px;font-size:12px; }
+
+    /* Action btns */
+    .action-btns { display:flex;align-items:center;gap:2px; }
+    .action-btn { width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;background:transparent;border:none;cursor:pointer;transition:background .15s,color .15s;flex-shrink:0; }
+    .action-btn.view    { color:var(--success); }
+    .action-btn.edit    { color:var(--primary); }
+    .action-btn.delete  { color:var(--danger);  }
+    .action-btn.log     { color:var(--primary); }
+    .action-btn.approve { color:var(--success); }
+    .action-btn.reject  { color:var(--danger); }
+    .action-btn.view:hover    { background:var(--success-bg); color:#15803d; }
+    .action-btn.edit:hover    { background:var(--primary-light); color:var(--primary-hover); }
+    .action-btn.delete:hover  { background:var(--danger-bg); color:#b91c1c; }
+    .action-btn.log:hover     { background:var(--primary-light); color:var(--primary-hover); }
+    .action-btn.approve:hover { background:var(--success-bg); color:#15803d; }
+    .action-btn.reject:hover  { background:var(--danger-bg); color:#b91c1c; }
+    .action-btn:disabled,.action-btn[disabled] { opacity:.35;cursor:not-allowed;pointer-events:none; }
+
+    /* Tag / Badge */
+    .tag { display:inline-flex;align-items:center;padding:2px 8px;border-radius:var(--radius-xs);font-size:11px;font-weight:600;white-space:nowrap; }
+    .tag-blue { background:#eff6ff;color:#2563eb; }
+    .tag-green { background:#f0fdf4;color:#16a34a; }
+    .tag-amber { background:#fffbeb;color:#92400e; }
+    .tag-purple { background:#faf5ff;color:#7c3aed; }
+    .tag-gray { background:#f1f5f9;color:#64748b; }
+    .tag-gold { background:#fefce8;color:#b45309; }
+    [data-theme="dark"] .tag-blue { background:rgba(37,99,235,0.18);color:#93c5fd; }
+    [data-theme="dark"] .tag-green { background:rgba(22,163,74,0.18);color:#86efac; }
+    [data-theme="dark"] .tag-amber { background:rgba(217,119,6,0.18);color:#fcd34d; }
+    [data-theme="dark"] .tag-purple { background:rgba(124,58,237,0.18);color:#c4b5fd; }
+    [data-theme="dark"] .tag-gray { background:rgba(100,116,139,0.18);color:#94a3b8; }
+    [data-theme="dark"] .tag-gold { background:rgba(180,83,9,0.18);color:#fcd34d; }
+
+    .badge { display:inline-flex;align-items:center;gap:5px;padding:3px 8px;border-radius:var(--radius-xs);font-size:11px;font-weight:600;white-space:nowrap; }
+    .badge::before { content:'';width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0; }
+    .badge-green { background:var(--success-bg);color:var(--success); }
+    .badge-amber { background:var(--warning-bg);color:var(--warning); }
+    .badge-amber.bold { font-weight:800; }
+    .badge-gray { background:#f1f5f9;color:#64748b; }
+    .badge-red { background:var(--danger-bg);color:var(--danger); }
+    [data-theme="dark"] .badge-green { background:rgba(22,163,74,0.15); }
+    [data-theme="dark"] .badge-amber { background:rgba(217,119,6,0.15); }
+    [data-theme="dark"] .badge-gray { background:rgba(100,116,139,0.15); }
+    [data-theme="dark"] .badge-red { background:rgba(220,38,38,0.15); }
+
+    /* Pagination */
+    .pagination-bar { display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-top:1px solid var(--border); }
+    .pagination-info { font-size:12px;color:var(--text-muted); }
+    .pagination-info b { color:var(--text-primary); }
+    .pagination-controls { display:flex;align-items:center;gap:4px; }
+    .page-btn { min-width:30px;height:30px;padding:0 8px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);font-size:12px;font-family:inherit;color:var(--text-secondary);cursor:pointer;transition:var(--transition);display:flex;align-items:center;justify-content:center; }
+    .page-btn:hover { border-color:var(--primary);color:var(--primary); }
+    .page-btn.active { background:var(--primary);color:#fff;border-color:var(--primary); }
+    .page-btn:disabled { opacity:0.4;cursor:not-allowed; }
+    .pagination-right { display:flex;align-items:center;gap:8px; }
+    .page-size-select { height:30px;padding:0 28px 0 10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);font-size:12px;font-family:inherit;color:var(--text-secondary);cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%239aa5b4' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 7px center; }
+
+    /* Table empty */
+    .table-empty { display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;gap:12px; }
+    .table-empty svg { color:var(--text-disabled); }
+    .table-empty-text { font-size:14px;font-weight:500;color:var(--text-muted); }
+    .table-empty-sub { font-size:12px;color:var(--text-disabled); }
+
+    /* Modal */
+    .modal-mask { position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:800;display:none;align-items:center;justify-content:center; }
+    .modal-mask.show { display:flex;animation:maskIn 0.22s ease; }
+    @keyframes maskIn { from{opacity:0} to{opacity:1} }
+    .modal { background:var(--surface);border-radius:var(--radius-lg);box-shadow:var(--shadow-xl);display:flex;flex-direction:column;max-height:85vh;animation:modalIn 0.22s ease; }
+    @keyframes modalIn { from{opacity:0;transform:scale(0.95)} to{opacity:1;transform:scale(1)} }
+    .modal-sm { width:420px; }
+    .modal-md { width:520px; }
+    .modal-lg { width:640px; }
+    .modal-header { display:flex;align-items:center;justify-content:space-between;padding:18px 20px 14px;border-bottom:1px solid var(--border); }
+    .modal-title { font-size:15px;font-weight:600;color:var(--text-primary); }
+    .modal-close { width:28px;height:28px;border-radius:6px;background:none;border:none;cursor:pointer;color:var(--text-muted);display:flex;align-items:center;justify-content:center;transition:var(--transition); }
+    .modal-close:hover { background:var(--surface-hover); }
+    .modal-body { padding:20px;overflow-y:auto;flex:1; }
+    .modal-footer { padding:14px 20px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:flex-end;gap:8px; }
+    .modal-icon { width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 14px; }
+    .modal-icon-danger { background:var(--danger-bg); }
+    .modal-icon-success { background:var(--success-bg); }
+    .modal-text-center { text-align:center; }
+    .modal-desc { font-size:13px;color:var(--text-secondary);line-height:1.6;margin-top:4px; }
+
+    /* Form */
+    .form-group { display:flex;flex-direction:column;gap:6px;margin-bottom:14px; }
+    .form-label { font-size:12.5px;font-weight:500;color:var(--text-secondary); }
+    .required { color:var(--danger);margin-left:2px; }
+    .form-input { width:100%;height:34px;padding:0 10px;font-size:13px;font-family:inherit;color:var(--text-primary);background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);outline:none;transition:var(--transition); }
+    .form-input:focus { border-color:var(--primary);box-shadow:0 0 0 3px rgba(37,99,235,0.12); }
+    .form-select { width:100%;height:34px;padding:0 28px 0 10px;font-size:13px;font-family:inherit;color:var(--text-primary);background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);outline:none;transition:var(--transition);appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%239aa5b4' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center; }
+    .form-select:focus { border-color:var(--primary);box-shadow:0 0 0 3px rgba(37,99,235,0.12); }
+    .form-textarea { width:100%;padding:10px;font-size:13px;font-family:inherit;color:var(--text-primary);background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);outline:none;transition:var(--transition);resize:vertical;min-height:90px; }
+    .form-textarea:focus { border-color:var(--primary);box-shadow:0 0 0 3px rgba(37,99,235,0.12); }
+    .form-error { font-size:11px;color:var(--danger);margin-top:2px;display:none; }
+    .form-hint { font-size:11px;color:var(--text-muted);margin-top:2px; }
+    .form-row { display:grid;grid-template-columns:1fr 1fr;gap:12px; }
+
+    /* Drawer */
+    .drawer-mask { position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:699;display:none; }
+    .drawer-mask.show { display:block; }
+    .drawer { position:fixed;top:0;right:0;height:100vh;z-index:700;width:520px;background:var(--surface);box-shadow:var(--shadow-xl);display:flex;flex-direction:column;transform:translateX(100%);transition:transform 0.28s cubic-bezier(0.4,0,0.2,1); }
+    .drawer.show { transform:translateX(0); }
+    .drawer-header { display:flex;align-items:center;justify-content:space-between;padding:18px 20px 14px;border-bottom:1px solid var(--border);flex-shrink:0; }
+    .drawer-title { font-size:15px;font-weight:600;color:var(--text-primary); }
+    .drawer-close { width:28px;height:28px;border-radius:6px;background:none;border:none;cursor:pointer;color:var(--text-muted);display:flex;align-items:center;justify-content:center;transition:var(--transition); }
+    .drawer-body { flex:1;overflow-y:auto;padding:16px 20px; }
+    .log-table { width:100%;border-collapse:collapse;font-size:12.5px; }
+    .log-table th { background:var(--surface-hover);padding:8px 10px;font-size:11.5px;font-weight:600;color:var(--text-secondary);text-align:left;border-bottom:1px solid var(--border);white-space:nowrap; }
+    .log-table td { padding:9px 10px;border-bottom:1px solid var(--border);color:var(--text-primary);vertical-align:middle; }
+    .log-table tr:last-child td { border-bottom:none; }
+
+    /* Toast */
+    .toast-container { position:fixed;top:66px;right:22px;z-index:9998;display:flex;flex-direction:column;gap:8px;pointer-events:none; }
+    .toast { background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-lg);padding:12px 16px 12px 14px;min-width:200px;max-width:360px;display:flex;align-items:flex-start;gap:10px;pointer-events:auto;animation:toastIn 0.28s ease;border-left:4px solid var(--success); }
+    .toast.error { border-left-color:var(--danger); }
+    .toast.warn { border-left-color:var(--warning); }
+    .toast.info { border-left-color:var(--info); }
+    @keyframes toastIn { from{opacity:0;transform:translateX(60px)} to{opacity:1;transform:translateX(0)} }
+    .toast-out { animation:toastOut 0.28s ease forwards; }
+    @keyframes toastOut { to{opacity:0;transform:translateX(120%)} }
+    .toast-content { flex:1; }
+    .toast-title { font-size:13px;font-weight:600;color:var(--text-primary); }
+    input[type="checkbox"] { width:15px;height:15px;accent-color:var(--primary);cursor:pointer; }
+
+    @media (max-width:1200px) { .filter-grid,.filter-extra { grid-template-columns:repeat(3,minmax(0,200px)); } }
+    @media (max-width:900px)  { .filter-grid,.filter-extra { grid-template-columns:repeat(2,minmax(0,200px)); } }
+    @media (max-width:640px)  { .sidebar{display:none;} .main{margin-left:0!important;} .filter-grid,.filter-extra{grid-template-columns:repeat(2,1fr);} }
+  </style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a class="topnav-logo" href="index.html">
+    <div class="logo-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+    <span class="logo-name">右豹管理后台</span>
+  </a>
+  <div class="primary-nav">
+    <button class="pnav-item" onclick="location.href='index.html'"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>工作台</button>
+    <button class="pnav-item active"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>用户</button>
+    <button class="pnav-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>项目</button>
+    <button class="pnav-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>数据</button>
+    <button class="pnav-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/></svg>运营</button>
+    <button class="pnav-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4"/></svg>系统</button>
+  </div>
+  <div class="topnav-actions">
+    <button class="nav-icon-btn" title="通知"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="badge-dot"></span></button>
+    <button class="nav-icon-btn" title="切换主题" onclick="toggleTheme()">
+      <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/></svg>
+    </button>
+    <div class="nav-user" onclick="toggleDropdown()">
+      <div class="user-avatar">管</div>
+      <div><div class="user-name">超级管理员</div><div class="user-role">Admin</div></div>
+      <div class="dropdown" id="userDropdown">
+        <button class="dropdown-item">个人资料</button>
+        <div class="dropdown-divider"></div>
+        <button class="dropdown-item danger">退出登录</button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div class="layout">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-module-icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
+      <span class="sidebar-module-name">用户域</span>
+    </div>
+    <div class="sidebar-scroll">
+      <div class="nav-group-label">用户管理</div>
+      <button class="nav-item" onclick="location.href='user.html'"><span class="nav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></span><span class="nav-text">用户列表</span></button>
+      <button class="nav-item" onclick="location.href='realname-company.html'"><span class="nav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span><span class="nav-text">实名信息</span></button>
+      <button class="nav-item" onclick="location.href='media-account.html'"><span class="nav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/></svg></span><span class="nav-text">媒体账号</span></button>
+      <button class="nav-item" onclick="location.href='withdrawal-account.html'"><span class="nav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></span><span class="nav-text">提现账户</span></button>
+      <button class="nav-item" onclick="location.href='blacklist.html'"><span class="nav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg></span><span class="nav-text">黑名单</span></button>
+      <button class="nav-item" onclick="location.href='user-gift-word.html'"><span class="nav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 12V22H4V12"/><path d="M22 7H2v5h20V7z"/></svg></span><span class="nav-text">赠词记录</span></button>
+      <button class="nav-item" onclick="location.href='user-redeem.html'"><span class="nav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 14l6-6"/><rect x="3" y="3" width="18" height="18" rx="2"/></svg></span><span class="nav-text">兑换记录</span></button>
+      <div class="nav-group-label">用户资金</div>
+      <button class="nav-item" onclick="location.href='user-wallet.html'"><span class="nav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span><span class="nav-text">用户钱包</span></button>
+      <button class="nav-item" onclick="location.href='dividend-detail.html'"><span class="nav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/></svg></span><span class="nav-text">分红明细</span></button>
+      <button class="nav-item" onclick="location.href='reward-detail.html'"><span class="nav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg></span><span class="nav-text">奖励明细</span></button>
+      <button class="nav-item" onclick="location.href='withdrawal-record.html'"><span class="nav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span><span class="nav-text">提现记录</span></button>
+      <div class="nav-group-label">用户通知</div>
+      <button class="nav-item" onclick="location.href='wechat-notify.html'"><span class="nav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span><span class="nav-text">微信通知</span></button>
+      <button class="nav-item" onclick="location.href='inbox-notify.html'"><span class="nav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/></svg></span><span class="nav-text">站内信通知</span></button>
+      <div class="nav-group-label">用户体系</div>
+      <button class="nav-item" onclick="location.href='user-level.html'"><span class="nav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span><span class="nav-text">用户等级</span></button>
+      <button class="nav-item" onclick="location.href='user-rank.html'"><span class="nav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></span><span class="nav-text">用户段位</span></button>
+      <button class="nav-item" onclick="location.href='medal-config.html'"><span class="nav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg></span><span class="nav-text">勋章配置</span></button>
+      <button class="nav-item" onclick="location.href='level-log.html'"><span class="nav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span><span class="nav-text">用户等级日志</span></button>
+      <div class="nav-group-label">团长体系</div>
+      <button class="nav-item" onclick="location.href='captain-level.html'"><span class="nav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></span><span class="nav-text">团长等级配置</span></button>
+      <button class="nav-item" onclick="location.href='commission-ratio.html'"><span class="nav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg></span><span class="nav-text">分销比例配置</span></button>
+      <button class="nav-item active"><span class="nav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></span><span class="nav-text">团长身份日志</span></button>
+    </div>
+    <div class="sidebar-footer">
+      <span class="sidebar-version">v1.4.0</span>
+      <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()" title="收起/展开">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+    </div>
+  </aside>
+
+  <main class="main" id="mainContent">
+    <div class="breadcrumb-bar">
+      <a href="index.html">首页</a><span class="bc-sep">/</span>
+      <a href="captain-level.html">团长体系</a><span class="bc-sep">/</span>
+      <span class="bc-cur">团长身份日志</span>
+    </div>
+
+    <div class="page-content">
+      <div class="page-header">
+        <div class="page-header-left">
+          <h1>团长身份日志
+            <span id="pendingBadge" style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:4px;font-size:12px;font-weight:700;background:var(--warning-bg);color:var(--warning);margin-left:10px;vertical-align:middle;">
+              待审核 <span id="pendingCount">3</span> 条
+            </span>
+          </h1>
+          <p>记录团长等级变更的完整历史，审核涉及等级变更记录</p>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-default btn-sm" id="batchApproveBtn" onclick="openBatchApproveModal()" disabled>批量通过</button>
+          <button class="btn btn-default btn-sm" id="batchRejectBtn" onclick="openBatchRejectModal()" disabled>批量驳回</button>
+          <button class="btn btn-primary btn-sm" onclick="openAddModal()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            新增
+          </button>
+        </div>
+      </div>
+
+      <!-- 筛选区 -->
+      <div class="glass-card filter-card">
+        <div class="filter-grid">
+          <div class="form-group-filter">
+            <label class="form-label-sm">用户ID</label>
+            <input class="form-input-sm" id="fUserId" placeholder="精确输入用户ID">
+          </div>
+          <div class="form-group-filter">
+            <label class="form-label-sm">变更前团长等级</label>
+            <select class="form-input-sm form-select-sm" id="fFromLevel">
+              <option value="">全部等级</option>
+              <option>LV1</option><option>LV2</option><option>LV3</option><option>LV4</option><option>LV5</option>
+            </select>
+          </div>
+          <div class="form-group-filter">
+            <label class="form-label-sm">变更后团长等级</label>
+            <select class="form-input-sm form-select-sm" id="fToLevel">
+              <option value="">全部等级</option>
+              <option>LV1</option><option>LV2</option><option>LV3</option><option>LV4</option><option>LV5</option>
+            </select>
+          </div>
+          <div class="form-group-filter">
+            <label class="form-label-sm">审核状态</label>
+            <select class="form-input-sm form-select-sm" id="fAudit">
+              <option value="">全部状态</option>
+              <option>系统通过</option><option>待审核</option><option>审核通过</option><option>审核驳回</option>
+            </select>
+          </div>
+        </div>
+        <div class="filter-extra" id="filterExtra">
+          <div class="form-group-filter">
+            <label class="form-label-sm">变更类型</label>
+            <select class="form-input-sm form-select-sm" id="fChangeType">
+              <option value="">全部类型</option>
+              <option>系统升级</option><option>后台调整</option>
+            </select>
+          </div>
+          <div class="form-group-filter">
+            <label class="form-label-sm">创建时间</label>
+            <div class="form-input-range">
+              <input class="form-input-sm" type="date" id="fDateStart">
+              <span>至</span>
+              <input class="form-input-sm" type="date" id="fDateEnd">
+            </div>
+          </div>
+        </div>
+        <div class="filter-footer">
+          <button class="filter-expand-btn" id="filterExpandBtn" onclick="toggleFilter()">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" id="filterArrow"><polyline points="6 9 12 15 18 9"/></svg>
+            <span id="filterExpandLabel">展开更多</span>
+          </button>
+          <div class="filter-actions">
+            <button class="btn btn-default btn-sm" onclick="resetFilter()">重置</button>
+            <button class="btn btn-primary btn-sm" onclick="doSearch()">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              查询
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 表格 -->
+      <div class="glass-card table-card">
+        <div class="table-header">
+          <div class="table-title">
+            团长身份日志列表
+            <span class="table-count" id="tableCount">共 0 条</span>
+          </div>
+          <div class="table-header-right" id="tableHeaderRight">
+            <span style="font-size:12px;color:var(--text-muted);">每页</span>
+            <select class="page-size-select"><option>10</option><option selected>20</option><option>50</option></select>
+          </div>
+          <div class="bulk-bar" id="bulkBar">
+            <span class="bulk-count">已选 <b id="bulkNum">0</b> 项</span>
+            <button class="btn btn-default btn-sm" onclick="openBatchApproveModal()">批量通过</button>
+            <button class="btn btn-default btn-sm" onclick="openBatchRejectModal()">批量驳回</button>
+            <button class="btn btn-ghost btn-sm" onclick="clearSelection()">取消</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:36px;"><input type="checkbox" id="selectAll" onchange="toggleSelectAll(this)"></th>
+                <th style="min-width:120px;">用户ID</th>
+                <th style="min-width:200px;">等级变更</th>
+                <th style="min-width:100px;">变更类型</th>
+                <th style="min-width:110px;">审核状态</th>
+                <th style="min-width:160px;">审核信息</th>
+                <th style="min-width:130px;" class="col-fixed-right">操作</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+          </table>
+        </div>
+        <div class="table-empty" id="tableEmpty" style="display:none;">
+          <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
+          <div class="table-empty-text">暂无数据</div>
+          <div class="table-empty-sub">调整筛选条件后重新查询</div>
+        </div>
+        <div class="pagination-bar">
+          <div class="pagination-info">共 <b id="totalCount">0</b> 条，第 <b>1</b>/<b>1</b> 页</div>
+          <div class="pagination-controls">
+            <button class="page-btn" disabled>«</button>
+            <button class="page-btn" disabled>‹</button>
+            <button class="page-btn active">1</button>
+            <button class="page-btn">›</button>
+            <button class="page-btn">»</button>
+          </div>
+          <div class="pagination-right">
+            <span style="font-size:12px;color:var(--text-muted);">每页</span>
+            <select class="page-size-select"><option>10</option><option selected>20</option><option>50</option></select>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- 审核通过确认弹窗 -->
+<div class="modal-mask" id="approveModal" onclick="handleMaskClick(event,'approveModal')">
+  <div class="modal modal-sm">
+    <div class="modal-header"><span class="modal-title">确认审核通过</span><button class="modal-close" onclick="closeModal('approveModal')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+    <div class="modal-body">
+      <div class="modal-icon modal-icon-success"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></div>
+      <div class="modal-text-center"><div style="font-size:15px;font-weight:600;color:var(--text-primary);">确认审核通过该等级变更申请？</div><div class="modal-desc">等级变更将立即生效。</div></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-default" onclick="closeModal('approveModal')">取消</button><button class="btn btn-primary" onclick="confirmApprove()">确认通过</button></div>
+  </div>
+</div>
+
+<!-- 审核驳回弹窗 -->
+<div class="modal-mask" id="rejectModal" onclick="handleMaskClick(event,'rejectModal')">
+  <div class="modal modal-sm">
+    <div class="modal-header"><span class="modal-title">审核驳回</span><button class="modal-close" onclick="closeModal('rejectModal')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">驳回原因<span class="required">*</span></label>
+        <textarea class="form-textarea" id="rejectReason" placeholder="请填写驳回原因（必填）"></textarea>
+        <div class="form-error" id="rejectError">请填写驳回原因</div>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-default" onclick="closeModal('rejectModal')">取消</button><button class="btn btn-danger" onclick="confirmReject()">确认驳回</button></div>
+  </div>
+</div>
+
+<!-- 批量通过确认弹窗 -->
+<div class="modal-mask" id="batchApproveModal" onclick="handleMaskClick(event,'batchApproveModal')">
+  <div class="modal modal-sm">
+    <div class="modal-header"><span class="modal-title">批量审核通过</span><button class="modal-close" onclick="closeModal('batchApproveModal')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+    <div class="modal-body">
+      <div class="modal-icon modal-icon-success"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></div>
+      <div class="modal-text-center"><div style="font-size:15px;font-weight:600;color:var(--text-primary);">确认批量审核通过已选 <b id="batchApproveNum">0</b> 条记录？</div><div class="modal-desc">仅「待审核」状态的记录会生效，等级变更将立即生效。</div></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-default" onclick="closeModal('batchApproveModal')">取消</button><button class="btn btn-primary" onclick="confirmBatchApprove()">确认通过</button></div>
+  </div>
+</div>
+
+<!-- 批量驳回弹窗 -->
+<div class="modal-mask" id="batchRejectModal" onclick="handleMaskClick(event,'batchRejectModal')">
+  <div class="modal modal-md">
+    <div class="modal-header"><span class="modal-title">批量审核驳回</span><button class="modal-close" onclick="closeModal('batchRejectModal')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">统一驳回原因<span class="required">*</span></label>
+        <textarea class="form-textarea" id="batchRejectReason" placeholder="请填写统一驳回原因（必填）"></textarea>
+        <div class="form-error" id="batchRejectError">请填写驳回原因</div>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-default" onclick="closeModal('batchRejectModal')">取消</button><button class="btn btn-danger" onclick="confirmBatchReject()">确认驳回</button></div>
+  </div>
+</div>
+
+<!-- 编辑弹窗 -->
+<div class="modal-mask" id="editModal" onclick="handleMaskClick(event,'editModal')">
+  <div class="modal modal-md">
+    <div class="modal-header"><span class="modal-title">编辑等级变更</span><button class="modal-close" onclick="closeModal('editModal')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">用户ID</label>
+          <input class="form-input" id="editUserId" readonly style="background:var(--surface-hover);color:var(--text-muted);">
+        </div>
+        <div class="form-group">
+          <label class="form-label">变更前团长等级</label>
+          <input class="form-input" id="editFromLevel" readonly style="background:var(--surface-hover);color:var(--text-muted);">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">变更后团长等级<span class="required">*</span></label>
+        <select class="form-select" id="editToLevel">
+          <option value="">请选择等级</option>
+          <option>LV1</option><option>LV2</option><option>LV3</option><option>LV4</option><option>LV5</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-default" onclick="closeModal('editModal')">取消</button><button class="btn btn-primary" onclick="confirmEdit()">保存</button></div>
+  </div>
+</div>
+
+<!-- 新增弹窗 -->
+<div class="modal-mask" id="addModal" onclick="handleMaskClick(event,'addModal')">
+  <div class="modal modal-lg">
+    <div class="modal-header"><span class="modal-title">新增团长等级变更</span><button class="modal-close" onclick="closeModal('addModal')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">用户ID<span class="required">*</span></label>
+        <input class="form-input" id="addUserId" placeholder="输入用户ID，失焦后自动带出当前等级" onblur="fetchUserLevel()">
+        <div class="form-hint">输入用户ID后，系统自动查询当前团长等级</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">变更前团长等级</label>
+        <input class="form-input" id="addFromLevel" readonly placeholder="自动带出" style="background:var(--surface-hover);color:var(--text-muted);">
+      </div>
+      <div class="form-group">
+        <label class="form-label">变更后团长等级<span class="required">*</span></label>
+        <select class="form-select" id="addToLevel">
+          <option value="">请选择等级</option>
+          <option>LV1</option><option>LV2</option><option>LV3</option><option>LV4</option><option>LV5</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-default" onclick="closeModal('addModal')">取消</button><button class="btn btn-primary" onclick="confirmAdd()">提交</button></div>
+  </div>
+</div>
+
+<!-- 操作日志抽屉 -->
+<div class="drawer-mask" id="logDrawerMask" onclick="closeLogDrawer()"></div>
+<div class="drawer" id="logDrawer">
+  <div class="drawer-header">
+    <span class="drawer-title">操作日志</span>
+    <button class="drawer-close" onclick="closeLogDrawer()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+  </div>
+  <div class="drawer-body">
+    <table class="log-table">
+      <thead><tr><th>操作时间</th><th>操作人</th><th>操作内容</th><th>操作时间</th></tr></thead>
+      <tbody>
+        <tr><td class="td-mono" style="font-size:12px;">2026-04-28 10:22</td><td>张三（运营）</td><td><span class="tag tag-green">审核通过</span></td><td style="font-size:12px;color:var(--text-muted);">2026-04-28 10:22:15</td></tr>
+        <tr><td class="td-mono" style="font-size:12px;">2026-04-27 16:05</td><td>系统</td><td><span class="tag tag-blue">系统提交</span></td><td style="font-size:12px;color:var(--text-muted);">2026-04-27 16:05:33</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+const mockData = [
+  {id:1,userId:'U10001234',fromLevel:'LV1',toLevel:'LV2',changeType:'系统升级',auditStatus:'系统通过',auditor:'系统',auditTime:'2026-04-28 10:00:00'},
+  {id:2,userId:'U10002345',fromLevel:'LV2',toLevel:'LV3',changeType:'后台调整',auditStatus:'待审核',auditor:'',auditTime:''},
+  {id:3,userId:'U10003456',fromLevel:'LV1',toLevel:'LV2',changeType:'系统升级',auditStatus:'审核通过',auditor:'张三',auditTime:'2026-04-27 14:30:00'},
+  {id:4,userId:'U10004567',fromLevel:'LV3',toLevel:'LV4',changeType:'后台调整',auditStatus:'待审核',auditor:'',auditTime:''},
+  {id:5,userId:'U10005678',fromLevel:'LV2',toLevel:'LV3',changeType:'系统升级',auditStatus:'审核驳回',auditor:'李四',auditTime:'2026-04-26 11:20:00'},
+  {id:6,userId:'U10006789',fromLevel:'LV1',toLevel:'LV2',changeType:'后台调整',auditStatus:'系统通过',auditor:'系统',auditTime:'2026-04-25 09:15:00'},
+  {id:7,userId:'U10007890',fromLevel:'LV4',toLevel:'LV5',changeType:'系统升级',auditStatus:'待审核',auditor:'',auditTime:''},
+  {id:8,userId:'U10008901',fromLevel:'LV2',toLevel:'LV3',changeType:'后台调整',auditStatus:'审核通过',auditor:'王五',auditTime:'2026-04-24 16:40:00'},
+  {id:9,userId:'U10009012',fromLevel:'LV3',toLevel:'LV4',changeType:'系统升级',auditStatus:'系统通过',auditor:'系统',auditTime:'2026-04-23 08:30:00'},
+  {id:10,userId:'U10010123',fromLevel:'LV1',toLevel:'LV2',changeType:'后台调整',auditStatus:'审核驳回',auditor:'赵六',auditTime:'2026-04-22 15:50:00'},
+  {id:11,userId:'U10011234',fromLevel:'LV2',toLevel:'LV3',changeType:'系统升级',auditStatus:'审核通过',auditor:'张三',auditTime:'2026-04-21 12:10:00'},
+  {id:12,userId:'U10012345',fromLevel:'LV3',toLevel:'LV4',changeType:'后台调整',auditStatus:'系统通过',auditor:'系统',auditTime:'2026-04-20 10:20:00'},
+  {id:13,userId:'U10013456',fromLevel:'LV1',toLevel:'LV2',changeType:'系统升级',auditStatus:'审核通过',auditor:'李四',auditTime:'2026-04-19 14:05:00'},
+  {id:14,userId:'U10014567',fromLevel:'LV2',toLevel:'LV3',changeType:'后台调整',auditStatus:'待审核',auditor:'',auditTime:''},
+  {id:15,userId:'U10015678',fromLevel:'LV4',toLevel:'LV5',changeType:'系统升级',auditStatus:'审核通过',auditor:'王五',auditTime:'2026-04-18 09:45:00'},
+];
+
+const levelTagMap = {
+  'LV1':'<span class="tag tag-gold" style="background:#fef9c3;color:#854d0e;">LV1</span>',
+  'LV2':'<span class="tag tag-gold" style="background:#fef3c7;color:#92400e;">LV2</span>',
+  'LV3':'<span class="tag tag-amber">LV3</span>',
+  'LV4':'<span class="tag tag-amber" style="background:#ffedd5;color:#9a3412;">LV4</span>',
+  'LV5':'<span class="tag tag-amber" style="background:#fed7aa;color:#7c2d12;">LV5</span>',
+};
+const auditBadgeMap = {
+  '系统通过': '<span class="badge badge-green">系统通过</span>',
+  '待审核': '<span class="badge badge-amber bold">待审核</span>',
+  '审核通过': '<span class="badge badge-green">审核通过</span>',
+  '审核驳回': '<span class="badge badge-red">审核驳回</span>',
+};
+const changeTypeTagMap = {
+  '系统升级': '<span class="tag tag-blue">系统升级</span>',
+  '后台调整': '<span class="tag tag-amber">后台调整</span>',
+};
+
+let selectedIds = new Set();
+let currentRowId = null;
+
+function renderTable(data) {
+  const tbody = document.getElementById('tableBody');
+  document.getElementById('tableCount').textContent = '共 ' + data.length + ' 条';
+  document.getElementById('totalCount').textContent = data.length;
+  if (!data.length) { tbody.innerHTML=''; document.getElementById('tableEmpty').style.display='flex'; return; }
+  document.getElementById('tableEmpty').style.display = 'none';
+  const pendingCount = data.filter(r => r.auditStatus === '待审核').length;
+  document.getElementById('pendingCount').textContent = pendingCount;
+  tbody.innerHTML = data.map(row => {
+    const isPending = row.auditStatus === '待审核';
+    const canEdit = row.auditStatus === '待审核' || row.auditStatus === '审核驳回';
+    return `
+    <tr class="${selectedIds.has(row.id)?'selected':''}" data-id="${row.id}">
+      <td onclick="event.stopPropagation()"><input type="checkbox" class="row-check" data-id="${row.id}" onchange="toggleRow(this,${row.id})" ${selectedIds.has(row.id)?'checked':''}></td>
+      <td class="td-mono">${row.userId}</td>
+      <td>
+        <div style="display:flex;align-items:center;gap:6px;">
+          ${levelTagMap[row.fromLevel]||row.fromLevel}
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text-muted);flex-shrink:0;"><polyline points="9 18 15 12 9 6"/></svg>
+          ${levelTagMap[row.toLevel]||row.toLevel}
+        </div>
+      </td>
+      <td>${changeTypeTagMap[row.changeType]||row.changeType}</td>
+      <td>${auditBadgeMap[row.auditStatus]||row.auditStatus}</td>
+      <td>
+        ${row.auditor ? `<div style="display:flex;flex-direction:column;gap:2px;"><span style="font-size:12px;font-weight:600;">${row.auditor}</span><span style="font-size:11px;color:var(--text-muted);">${row.auditTime}</span></div>` : '<span style="color:var(--text-muted);">—</span>'}
+      </td>
+      <td class="col-fixed-right" onclick="event.stopPropagation()">
+        <div class="action-btns">
+          <button class="action-btn approve" title="审核通过" ${!isPending?'disabled':''} onclick="openApproveModal(${row.id})">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          </button>
+          <button class="action-btn reject" title="审核驳回" ${!isPending?'disabled':''} onclick="openRejectModal(${row.id})">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+          <button class="action-btn edit" title="编辑" ${!canEdit?'disabled':''} onclick="openEditModal(${row.id})">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
+          <button class="action-btn log" title="操作日志" onclick="openLogDrawer(${row.id})">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/></svg>
+          </button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+// Selection
+function toggleSelectAll(cb) {
+  document.querySelectorAll('.row-check').forEach(c => {
+    c.checked = cb.checked;
+    const id = parseInt(c.dataset.id);
+    cb.checked ? selectedIds.add(id) : selectedIds.delete(id);
+    c.closest('tr').classList.toggle('selected', cb.checked);
+  });
+  updateBulkBar();
+}
+function toggleRow(cb, id) {
+  cb.checked ? selectedIds.add(id) : selectedIds.delete(id);
+  cb.closest('tr').classList.toggle('selected', cb.checked);
+  const checks = document.querySelectorAll('.row-check');
+  const sa = document.getElementById('selectAll');
+  sa.checked = [...checks].every(c=>c.checked);
+  sa.indeterminate = [...checks].some(c=>c.checked) && !sa.checked;
+  updateBulkBar();
+}
+function updateBulkBar() {
+  const n = selectedIds.size;
+  document.getElementById('bulkNum').textContent = n;
+  const show = n > 0;
+  document.getElementById('bulkBar').classList.toggle('show', show);
+  document.getElementById('tableHeaderRight').style.display = show ? 'none' : 'flex';
+  document.getElementById('batchApproveBtn').disabled = !show;
+  document.getElementById('batchRejectBtn').disabled = !show;
+}
+function clearSelection() {
+  selectedIds.clear();
+  document.querySelectorAll('.row-check').forEach(c=>c.checked=false);
+  const sa=document.getElementById('selectAll'); sa.checked=false; sa.indeterminate=false;
+  document.querySelectorAll('tbody tr').forEach(r=>r.classList.remove('selected'));
+  updateBulkBar();
+}
+
+// Filter
+let filterExpanded = false;
+function toggleFilter() {
+  filterExpanded = !filterExpanded;
+  document.getElementById('filterExtra').classList.toggle('show', filterExpanded);
+  document.getElementById('filterExpandLabel').textContent = filterExpanded ? '收起' : '展开更多';
+  document.getElementById('filterArrow').style.transform = filterExpanded ? 'rotate(180deg)' : '';
+}
+function resetFilter() {
+  ['fUserId','fFromLevel','fToLevel','fAudit','fChangeType','fDateStart','fDateEnd'].forEach(id => {
+    const el=document.getElementById(id); if(el) el.value='';
+  });
+  showToast('筛选条件已重置','info');
+}
+function doSearch() { renderTable(mockData); showToast('查询成功，共 '+mockData.length+' 条数据','success'); }
+
+// Modals
+function openApproveModal(id) { currentRowId=id; openModal('approveModal'); }
+function openRejectModal(id) { currentRowId=id; document.getElementById('rejectReason').value=''; document.getElementById('rejectError').style.display='none'; openModal('rejectModal'); }
+function openBatchApproveModal() { document.getElementById('batchApproveNum').textContent=selectedIds.size; openModal('batchApproveModal'); }
+function openBatchRejectModal() { document.getElementById('batchRejectReason').value=''; document.getElementById('batchRejectError').style.display='none'; openModal('batchRejectModal'); }
+function openEditModal(id) {
+  currentRowId=id;
+  const row = mockData.find(r=>r.id===id);
+  if(row) { document.getElementById('editUserId').value=row.userId; document.getElementById('editFromLevel').value=row.fromLevel; document.getElementById('editToLevel').value=''; }
+  openModal('editModal');
+}
+function openAddModal() { document.getElementById('addUserId').value=''; document.getElementById('addFromLevel').value=''; document.getElementById('addToLevel').value=''; openModal('addModal'); }
+function fetchUserLevel() {
+  const uid = document.getElementById('addUserId').value.trim();
+  if(uid) { document.getElementById('addFromLevel').value = 'LV' + Math.ceil(Math.random()*3); }
+}
+function confirmApprove() { closeModal('approveModal'); showToast('审核通过，等级变更已生效','success'); }
+function confirmReject() {
+  const reason = document.getElementById('rejectReason').value.trim();
+  if(!reason) { document.getElementById('rejectError').style.display='block'; return; }
+  closeModal('rejectModal'); showToast('已驳回该等级变更申请','warn');
+}
+function confirmBatchApprove() { closeModal('batchApproveModal'); showToast('批量审核通过成功','success'); clearSelection(); }
+function confirmBatchReject() {
+  const reason = document.getElementById('batchRejectReason').value.trim();
+  if(!reason) { document.getElementById('batchRejectError').style.display='block'; return; }
+  closeModal('batchRejectModal'); showToast('批量驳回成功','warn'); clearSelection();
+}
+function confirmEdit() { closeModal('editModal'); showToast('等级变更已更新','success'); }
+function confirmAdd() { closeModal('addModal'); showToast('等级变更记录已新增','success'); }
+function openModal(id) { document.getElementById(id).classList.add('show'); }
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+function handleMaskClick(e, id) { if(e.target===e.currentTarget) closeModal(id); }
+
+// Drawer
+function openLogDrawer(id) {
+  document.getElementById('logDrawerMask').classList.add('show');
+  document.getElementById('logDrawer').classList.add('show');
+}
+function closeLogDrawer() {
+  document.getElementById('logDrawerMask').classList.remove('show');
+  document.getElementById('logDrawer').classList.remove('show');
+}
+
+// Theme / Sidebar / Toast
+function toggleTheme() {
+  const t=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
+  document.documentElement.setAttribute('data-theme',t); localStorage.setItem('theme',t);
+}
+function toggleDropdown() { document.getElementById('userDropdown').classList.toggle('show'); }
+document.addEventListener('click', e => { if(!e.target.closest('.nav-user')) document.getElementById('userDropdown').classList.remove('show'); });
+let sidebarCollapsed=false;
+function toggleSidebar() {
+  sidebarCollapsed=!sidebarCollapsed;
+  document.getElementById('sidebar').classList.toggle('collapsed',sidebarCollapsed);
+  document.getElementById('mainContent').classList.toggle('collapsed',sidebarCollapsed);
+}
+function showToast(msg,type='success') {
+  const c=document.getElementById('toastContainer');
+  const t=document.createElement('div');
+  t.className='toast'+(type!=='success'?' '+type:'');
+  t.innerHTML=`<div class="toast-content"><div class="toast-title">${msg}</div></div><button onclick="this.parentElement.remove()" style="background:none;border:none;cursor:pointer;color:var(--text-muted);padding:0;margin-left:8px;font-size:14px;">×</button>`;
+  c.appendChild(t);
+  setTimeout(()=>{t.classList.add('toast-out');setTimeout(()=>t.remove(),300);},2500);
+}
+
+renderTable(mockData);
+</script>
+</body>
+</html>

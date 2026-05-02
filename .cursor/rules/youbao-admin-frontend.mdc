@@ -1,0 +1,63 @@
+---
+description: 管理后台须在 Vue 工程中实现；禁止用 HTML 原型承接需求；UI 严格遵循 UIUX.md
+alwaysApply: true
+---
+
+# 右豹管理后台 — 前端实现约定
+
+## 实现载体
+
+- **唯一交付代码库**：`admin/`（Vue + 现有工程结构与路由、组件体系）。
+- **`admin-ui/`**（静态 HTML 原型）**不作为**后续需求的开发与迭代载体：新增功能、字段、菜单、交互**不得在**该目录内实现或同步更新，除非用户明确要求仅修原型。
+
+## 原型规则（规范来源）
+
+- **UI/UX 与交互**：严格对照仓库根目录 **`UIUX.md`**（玻璃拟态、色彩与 CSS 变量、菜单架构、布局、表格/分页/弹窗/表单/Toast 等章节）。
+- **业务与菜单**：与 **`prd-admin.md`** 及路由菜单 **`admin/src/router/menus.ts`** 保持一致；侧栏结构变更时同步更新 `menus.ts` 与对应 Vue 页面。
+- **实现方式**：在 Vue 中复用现有布局、样式变量与组件模式，使视觉与行为与 `UIUX.md` 一致，而非复制 `admin-ui/*.html` 的写法。
+
+## 协作提示
+
+- 用户补充需求时：默认在 **`admin/`** 内改路由、视图与样式；**不把** HTML 原型当作「第一实现」再搬运。
+- 若 `admin-ui` 与 `UIUX.md` 或 Vue 实现不一致，以 **`UIUX.md` + Vue 工程既有模式** 为准。
+
+## 标准页面壳（防筛选区/表头「叠在一起」）
+
+- **有顶栏+侧栏的业务页**（非工作台、非全屏弹层）：整页内容应采用 **`breadcrumb-bar` + `page-content`**；`page-content` 在 `theme.css` 中已为纵向 `flex` + **`gap: 16px`**，其直接子级依次一般为：`page-header`（标题与说明）→ 统计条/子 Tab 壳（可选）→ `bl-filter` / `filter-card` 筛选 → `table-card` 表格。
+- **禁止**在仅有「筛选 + 表格」的页面省略 `page-content` 导致两卡片纵向无节奏；新建列表页应对照 **`UserList.vue` / `RewardDetail.vue` / `UserLevel.vue`** 等已规范页面。
+- **表头多列**（标题 + 条数 + 右侧说明/操作）使用全局 **`.table-header`**；若左右两列在窄宽下易挤，依赖已设的 **`flex-wrap` + `gap`**，勿再叠 `margin-top: -` 等负边距去「对齐」。
+
+## 侧栏与 Flex 滚动（防底部/顶部项裁切、色块假影）
+
+- **`Sidebar.vue`** 中菜单滚动容器（`.sidebar-scroll`）作为侧栏内 **flex 子项** 必须保留 **`min-height: 0`** 与 **`overflow-y: auto`**，否则在部分环境下中间区不能正确收缩，出现**末项被裁切、激活态背景像异常色块**等问题。
+- 为滚动区保留合理 **`padding-bottom`**，避免最后一项贴住底部 `sidebar-footer`。
+- 新增强侧栏布局时，遵循「**顶栏下 fixed 侧栏 + 中间 flex:1 可滚**」的既有实现，不单独写死 `height:100%` 替代 flex 子项收缩。
+
+## 全局样式与组件名（防「仅个别页有样式」）
+
+- **「展开/收起更多筛选」** 一律使用类名 **`ul-expand-btn`**，样式仅在 **`admin/src/assets/theme.css`** 维护，**不得**在单个页面里复制一套 `.ul-expand-btn` 局部样式（易漏页、浏览器默认 `button` 外观）。
+- **子 Tab**（`tab-nav` + `tab-item`）与 **`page-tabs` / `page-tab`** 同视觉时，用 **`glass-card tab-nav-shell`** 包裹，样式以 **`theme.css`** 为准；`tab-item` 需带 **`:class="{ active: ... }"`**，并与 **`role="tab"` / `aria-selected`** 等可访问性属性一致。
+- 子 Tab、筛选、表格的纵向节奏优先靠 **`page-content` 的 gap** 与卡片类 margin 约定，避免侧栏/主区各自魔法数不统一。
+
+## `ul-table` 表格约定
+
+- **数值列**：表头加 **`th-num`**，单元格加 **`td-num`**（金额、人数、订单量等）；不要在各页 scoped 里重复定义 `.td-num`，统一用 **`admin/src/assets/theme.css`**。
+- **整行可点进入详情**：仅在需要行点击的表格上加 **`ul-table--clickable`**；默认表格行 **`cursor: default`**，避免「不可点却显示手型」。
+- **稳定列宽**：列表字段较多或需对齐条形图/操作时，使用 **`ul-table--fixed`**，并配 **`colgroup` / `col`** 约束列宽；操作列可用全局 **`col-action`**。
+- **可排序表头**：使用 **`th-sortable`**（样式在 `theme.css`），点击切换排序时在脚本内维护方向与标记。
+
+## 右侧抽屉 / 弹层（`ul-drawer`）
+
+- 结构统一为：`ul-overlay` + **`ul-drawer`**（`display:flex; flex-direction:column`）内 **`ul-drawer-header`**（左 **`ul-drawer-title`** + 右关闭 **`ul-icon-btn`**）+ **`ul-drawer-body`**（可滚内容区，已含 **`min-height:0`**，勿用纯内联 `flex:1` 替代导致表头被挤换行）。
+- 样式以 **`admin/src/assets/theme.css`** 为准，**禁止**仅把抽屉样式写在其他页面的 **`<style scoped>`** 里而本页只抄类名（另一页未加载时即出现「标题、关闭钮错位」类问题）。
+- 抽屉内表格列与数据字段 **一一对应**，禁止两列绑定同一字段却用不同表头（如「操作时间」与「操作时间（详）」均绑 `time`）。
+
+## 菜单与面包屑
+
+- 侧栏分组名与面包屑中间段应 **`menus.ts` 的分组/域命名一致**（如「用户体系」），避免同一概念多种叫法（如混用未定义的「用户成长」等）。
+- **`menus.ts` 中 `icon`**：同屏多条「日志/列表类」项勿重复用同一抽象图标；需要区分时换用已存在于 **`Sidebar.vue` 的 `ICON_MAP`** 中的 key（如日志类可用 `Notebook` 与 `Document` 区分）。
+
+## 自测提示（不写入代码，供实现后快速验收）
+
+- 用户域长列表：侧栏滚到底、顶，确认**无裁切**；`active` 态无异常条带。
+- 主区：展开「更多筛选」后，**表头不与筛选区视觉重叠**；缩小浏览器宽度，**表头**与 **子 Tab+筛选+表** 仍层次清晰。
