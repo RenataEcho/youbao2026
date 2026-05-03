@@ -10,13 +10,22 @@ import { prdTipSavePlugin } from './vite-plugins/prd-tip-save'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
-export default defineConfig({
+function normalizeBase(v: string | undefined) {
+  if (!v || v === '/') return '/'
+  const withSlash = v.startsWith('/') ? v : `/${v}`
+  return withSlash.endsWith('/') ? withSlash : `${withSlash}/`
+}
+
+export default defineConfig(({ command }) => ({
+  /** GitHub Pages 项目站路径：`/<repo>/`，本地开发为 `/` */
+  base: normalizeBase(process.env.VITE_BASE_PATH),
   plugins: [
     vue(),
     prdTipSavePlugin(__dirname),
     viteMockServe({
       mockPath: 'src/mock',
-      enable: true,
+      /** 仅开发注入 mock，避免打入生产包 */
+      enable: command === 'serve',
       /** 只加载聚合入口，避免对 mock 目录下每个 .ts 单独 bundle（易重复注册路由 / 构建失败） */
       ignore: (file) => path.basename(file) !== 'index.ts',
     }),
@@ -47,4 +56,4 @@ export default defineConfig({
     port: 5180,
     strictPort: true,
   },
-})
+}))
