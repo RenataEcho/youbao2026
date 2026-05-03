@@ -13,13 +13,22 @@
     <div class="page-content">
       <div class="page-header">
         <div>
-          <h1 class="page-title">Banner管理</h1>
+          <div ref="prdTipAnchorRef" class="page-header-title-anchor">
+            <h1 class="page-title">Banner管理</h1>
+          </div>
           <p class="page-desc">各展示位 Banner 与跳转配置；prd-admin §7.1.2（Mock，全量 ≥20 条，默认每页 10 条）。</p>
         </div>
         <button type="button" class="btn btn-primary btn-sm" @click="openDrawer()">新增 Banner</button>
       </div>
 
-      <div class="glass-card ul-filter-card">
+      <PrdTipMarker
+        :anchor-el="prdTipAnchorRef"
+        :tip-id="1"
+        module-name="Banner管理（页头汇总）"
+        :markdown="OPS_TIP_BANNER"
+      />
+
+      <div ref="prdTipFilterRef" class="glass-card ul-filter-card">
         <div class="ul-filter-grid">
           <div class="ul-form-group">
             <label class="ul-label">标题</label>
@@ -84,7 +93,7 @@
                 <th>状态</th>
                 <th>创建人</th>
                 <th>创建时间</th>
-                <th class="col-action" style="text-align: center">操作</th>
+                <th ref="prdTipOpsRef" class="col-action" style="text-align: center">操作</th>
               </tr>
             </thead>
             <tbody>
@@ -153,6 +162,21 @@
           </div>
         </div>
       </div>
+
+      <PrdTipMarker
+        variant="filterCard"
+        :anchor-el="prdTipFilterRef"
+        :tip-id="2"
+        module-name="Banner管理 · 筛选区"
+        :markdown="OPS_TIP_BANNER_FILTER"
+      />
+      <PrdTipMarker
+        variant="opsHeader"
+        :anchor-el="prdTipOpsRef"
+        :tip-id="3"
+        module-name="Banner管理 · 操作列"
+        :markdown="OPS_TIP_BANNER_OPS"
+      />
     </div>
 
     <div class="ul-overlay" :class="{ show: dw }" @click.self="dw = false" />
@@ -246,7 +270,13 @@
 </template>
 
 <script setup lang="ts">
+import PrdTipMarker from '@/components/prd/PrdTipMarker.vue'
 import { useEscCloseStack } from '@/composables/useEscCloseStack'
+import {
+  OPS_TIP_BANNER,
+  OPS_TIP_BANNER_FILTER,
+  OPS_TIP_BANNER_OPS,
+} from '@/prd-tips/opsDomainTips'
 import { computed, ref, watch } from 'vue'
 import { useSimpleToast } from './useOpsToast'
 
@@ -281,6 +311,9 @@ function genBanners(n: number): Row[] {
 
 const { toasts, toast, removeToast } = useSimpleToast()
 const filters = ref({ title: '', page: '', status: '' })
+const prdTipAnchorRef = ref<HTMLElement | null>(null)
+const prdTipFilterRef = ref<HTMLElement | null>(null)
+const prdTipOpsRef = ref<HTMLElement | null>(null)
 const data = ref(genBanners(22))
 
 const filtered = computed(() =>

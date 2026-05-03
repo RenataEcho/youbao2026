@@ -12,13 +12,15 @@
     <div class="page-content">
       <div class="page-header">
         <div>
-          <h1 class="page-title">用户管理</h1>
+          <div ref="prdTipAnchorRef" class="page-header-title-anchor">
+            <h1 class="page-title">用户管理</h1>
+          </div>
           <p class="page-desc">管理平台所有注册用户信息</p>
         </div>
       </div>
 
       <!-- 筛选区 -->
-      <div class="glass-card ul-filter-card">
+      <div ref="prdTipFilterRef" class="glass-card ul-filter-card">
         <div class="ul-filter-grid">
           <div class="ul-form-group">
             <label class="ul-label">用户ID</label>
@@ -174,7 +176,7 @@
                     <svg width="7" height="4" viewBox="0 0 8 5" style="transform:rotate(180deg)"><path d="M4 0L8 5H0z" :fill="sortField==='regTime'&&sortOrder==='desc'?'#2563eb':'currentColor'"/></svg>
                   </span>
                 </th>
-                <th class="col-action" style="text-align:center">操作</th>
+                <th ref="prdTipOpsRef" class="col-action" style="text-align:center">操作</th>
               </tr>
             </thead>
             <tbody>
@@ -286,6 +288,29 @@
           </div>
         </div>
       </div>
+
+      <PrdTipMarker
+        :anchor-el="prdTipAnchorRef"
+        :tip-id="1"
+        :module-name="bundle.page.moduleName"
+        :markdown="bundle.page.md"
+      />
+      <PrdTipMarker
+        v-if="bundle.filter"
+        variant="filterCard"
+        :anchor-el="prdTipFilterRef"
+        :tip-id="2"
+        :module-name="bundle.filter.moduleName"
+        :markdown="bundle.filter.md"
+      />
+      <PrdTipMarker
+        v-if="bundle.ops"
+        variant="opsHeader"
+        :anchor-el="prdTipOpsRef"
+        :tip-id="opsTipId"
+        :module-name="bundle.ops.moduleName"
+        :markdown="bundle.ops.md"
+      />
     </div>
 
     <!-- 用户详情抽屉 -->
@@ -385,8 +410,12 @@
 </template>
 
 <script setup lang="ts">
+import PrdTipMarker from '@/components/prd/PrdTipMarker.vue'
+import { useAdminPrdTips } from '@/composables/useAdminPrdTips'
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+
+const { bundle, opsTipId, prdTipAnchorRef, prdTipFilterRef, prdTipOpsRef } = useAdminPrdTips()
 
 interface UserItem {
   userId: string; nickname: string; phone: string; identities: string[]

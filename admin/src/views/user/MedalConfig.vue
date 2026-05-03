@@ -11,7 +11,9 @@
     <div class="page-content">
       <div class="page-header">
         <div>
-          <h1 class="page-title">勋章配置</h1>
+          <div ref="prdTipAnchorRef" class="page-header-title-anchor">
+            <h1 class="page-title">勋章配置</h1>
+          </div>
           <p class="page-desc">管理勋章类型与勋章详情配置</p>
         </div>
       </div>
@@ -45,7 +47,7 @@
       <!-- ===== Tab 一：勋章类型 ===== -->
       <template v-if="activeTab==='type'">
         <!-- 筛选 -->
-        <div class="glass-card bl-filter">
+        <div ref="prdTipFilterRef" class="glass-card bl-filter">
           <div class="ul-filter-grid">
             <div class="ul-form-group"><label class="ul-label">类型名称</label><input v-model="tf.name" class="ul-input" placeholder="模糊搜索类型名称"></div>
             <div class="ul-form-group">
@@ -94,7 +96,7 @@
                 <tr>
                   <th>类型名称</th><th>类型描述</th><th style="text-align:right">类型排序</th>
                   <th style="text-align:right">关联勋章</th><th>状态</th><th>操作人</th><th>操作时间</th>
-                  <th class="col-action" style="text-align:center">操作</th>
+                  <th ref="prdTipOpsRef" class="col-action" style="text-align:center">操作</th>
                 </tr>
               </thead>
               <tbody>
@@ -148,7 +150,7 @@
       <!-- ===== Tab 二：勋章配置 ===== -->
       <template v-if="activeTab==='medal'">
         <!-- 筛选 -->
-        <div class="glass-card bl-filter">
+        <div ref="prdTipFilterRef" class="glass-card bl-filter">
           <div class="ul-filter-grid">
             <div class="ul-form-group"><label class="ul-label">勋章名称</label><input v-model="mf.name" class="ul-input" placeholder="模糊搜索勋章名称"></div>
             <div class="ul-form-group">
@@ -215,7 +217,7 @@
                 <tr>
                   <th>勋章名称</th><th>勋章图标</th><th>勋章类型</th><th>获得条件</th>
                   <th>状态</th><th style="text-align:right">获得人数</th>
-                  <th>操作人</th><th>操作时间</th><th class="col-action" style="text-align:center">操作</th>
+                  <th>操作人</th><th>操作时间</th><th ref="prdTipOpsRef" class="col-action" style="text-align:center">操作</th>
                 </tr>
               </thead>
               <tbody>
@@ -266,6 +268,29 @@
           </div>
         </div>
       </template>
+
+      <PrdTipMarker
+        :anchor-el="prdTipAnchorRef"
+        :tip-id="1"
+        :module-name="bundle.page.moduleName"
+        :markdown="bundle.page.md"
+      />
+      <PrdTipMarker
+        v-if="bundle.filter"
+        variant="filterCard"
+        :anchor-el="prdTipFilterRef"
+        :tip-id="2"
+        :module-name="bundle.filter.moduleName"
+        :markdown="bundle.filter.md"
+      />
+      <PrdTipMarker
+        v-if="bundle.ops"
+        variant="opsHeader"
+        :anchor-el="prdTipOpsRef"
+        :tip-id="opsTipId"
+        :module-name="bundle.ops.moduleName"
+        :markdown="bundle.ops.md"
+      />
     </div>
 
     <!-- 勋章类型 新增/编辑 弹窗 -->
@@ -386,7 +411,11 @@
 </template>
 
 <script setup lang="ts">
+import PrdTipMarker from '@/components/prd/PrdTipMarker.vue'
+import { useAdminPrdTips } from '@/composables/useAdminPrdTips'
 import { ref, computed, watch } from 'vue'
+
+const { bundle, opsTipId, prdTipAnchorRef, prdTipFilterRef, prdTipOpsRef } = useAdminPrdTips()
 
 interface MedalType { id:number; name:string; desc:string; sort:number; medalCount:number; status:string; operator:string; operateTime:string }
 interface Medal { id:number; name:string; color:string; medalType:string; condition:string; status:string; earnCount:number; operator:string; operateTime:string }

@@ -11,12 +11,14 @@
     <div class="page-content">
       <div class="page-header">
         <div>
-          <h1 class="page-title">权益配置</h1>
+          <div ref="prdTipAnchorRef" class="page-header-title-anchor">
+            <h1 class="page-title">权益配置</h1>
+          </div>
           <p class="page-desc">配置各身份对应的权益内容。</p>
         </div>
       </div>
 
-      <div class="glass-card bl-filter">
+      <div ref="prdTipFilterRef" class="glass-card bl-filter">
         <div class="ul-filter-grid" style="grid-template-columns: repeat(4, 1fr)">
           <div class="ul-form-group">
             <label class="ul-label">身份</label>
@@ -63,7 +65,7 @@
                 <th>状态</th>
                 <th>操作人</th>
                 <th>操作时间</th>
-                <th class="col-action" style="text-align: center">操作</th>
+                <th ref="prdTipOpsRef" class="col-action" style="text-align: center">操作</th>
               </tr>
             </thead>
             <tbody>
@@ -93,6 +95,29 @@
           </table>
         </div>
       </div>
+
+      <PrdTipMarker
+        :anchor-el="prdTipAnchorRef"
+        :tip-id="1"
+        :module-name="bundle.page.moduleName"
+        :markdown="bundle.page.md"
+      />
+      <PrdTipMarker
+        v-if="bundle.filter"
+        variant="filterCard"
+        :anchor-el="prdTipFilterRef"
+        :tip-id="2"
+        :module-name="bundle.filter.moduleName"
+        :markdown="bundle.filter.md"
+      />
+      <PrdTipMarker
+        v-if="bundle.ops"
+        variant="opsHeader"
+        :anchor-el="prdTipOpsRef"
+        :tip-id="opsTipId"
+        :module-name="bundle.ops.moduleName"
+        :markdown="bundle.ops.md"
+      />
     </div>
 
     <div class="ul-overlay" :class="{ show: editVisible }" @click.self="editVisible = false" />
@@ -147,7 +172,11 @@
 </template>
 
 <script setup lang="ts">
+import PrdTipMarker from '@/components/prd/PrdTipMarker.vue'
+import { useAdminPrdTips } from '@/composables/useAdminPrdTips'
 import { computed, ref } from 'vue'
+
+const { bundle, opsTipId, prdTipAnchorRef, prdTipFilterRef, prdTipOpsRef } = useAdminPrdTips()
 
 type IdentityKey = 'normal' | 'vip' | 'leader'
 

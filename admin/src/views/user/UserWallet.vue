@@ -11,13 +11,15 @@
     <div class="page-content">
       <div class="page-header">
         <div>
-          <h1 class="page-title">用户钱包</h1>
+          <div ref="prdTipAnchorRef" class="page-header-title-anchor">
+            <h1 class="page-title">用户钱包</h1>
+          </div>
           <p class="page-desc">查看用户各钱包余额汇总，支持管理员增减余额操作</p>
         </div>
       </div>
 
       <!-- 筛选 -->
-      <div class="glass-card bl-filter">
+      <div ref="prdTipFilterRef" class="glass-card bl-filter">
         <div class="ul-filter-grid">
           <div class="ul-form-group"><label class="ul-label">用户ID</label><input v-model="f.userId" class="ul-input" placeholder="请输入用户ID"></div>
           <div class="ul-form-group"><label class="ul-label">用户手机号</label><input v-model="f.mobile" class="ul-input" placeholder="请输入手机号"></div>
@@ -70,7 +72,7 @@
                 <th>分红钱包</th>
                 <th>奖励钱包</th>
                 <th>更新时间</th>
-                <th class="col-action" style="text-align:center">操作</th>
+                <th ref="prdTipOpsRef" class="col-action" style="text-align:center">操作</th>
               </tr>
             </thead>
             <tbody>
@@ -121,6 +123,29 @@
           </div>
         </div>
       </div>
+
+      <PrdTipMarker
+        :anchor-el="prdTipAnchorRef"
+        :tip-id="1"
+        :module-name="bundle.page.moduleName"
+        :markdown="bundle.page.md"
+      />
+      <PrdTipMarker
+        v-if="bundle.filter"
+        variant="filterCard"
+        :anchor-el="prdTipFilterRef"
+        :tip-id="2"
+        :module-name="bundle.filter.moduleName"
+        :markdown="bundle.filter.md"
+      />
+      <PrdTipMarker
+        v-if="bundle.ops"
+        variant="opsHeader"
+        :anchor-el="prdTipOpsRef"
+        :tip-id="opsTipId"
+        :module-name="bundle.ops.moduleName"
+        :markdown="bundle.ops.md"
+      />
     </div>
 
     <!-- 增减余额弹窗 -->
@@ -212,7 +237,11 @@
 </template>
 
 <script setup lang="ts">
+import PrdTipMarker from '@/components/prd/PrdTipMarker.vue'
+import { useAdminPrdTips } from '@/composables/useAdminPrdTips'
 import { ref, computed, onMounted } from 'vue'
+
+const { bundle, opsTipId, prdTipAnchorRef, prdTipFilterRef, prdTipOpsRef } = useAdminPrdTips()
 
 interface WalletItem {
   userId:string; nickname:string; mobile:string

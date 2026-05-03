@@ -11,7 +11,9 @@
     <div class="page-content">
       <div class="page-header">
         <div>
-          <h1 class="page-title">用户段位</h1>
+          <div ref="prdTipAnchorRef" class="page-header-title-anchor">
+            <h1 class="page-title">用户段位</h1>
+          </div>
           <p class="page-desc">配置用户段位体系及对应福利，通过子 Tab 切换「段位配置」与「段位福利」。</p>
         </div>
       </div>
@@ -44,7 +46,7 @@
     <!-- ===== Tab 一：段位配置 ===== -->
     <template v-if="activeTab === 'rank'">
       <!-- 筛选区 -->
-      <div class="glass-card filter-card" role="tabpanel" aria-labelledby="ur-tab-rank">
+      <div ref="prdTipFilterRef" class="glass-card filter-card" role="tabpanel" aria-labelledby="ur-tab-rank">
         <div class="filter-grid">
           <div class="form-group-filter">
             <label class="form-label-sm">段位名称</label>
@@ -102,7 +104,7 @@
             <thead>
               <tr>
                 <th>段位名称</th><th>段位图标</th><th>段位条件</th>
-                <th>该段位人数</th><th>状态</th><th>操作人</th><th>操作时间</th><th class="col-action">操作</th>
+                <th>该段位人数</th><th>状态</th><th>操作人</th><th>操作时间</th><th ref="prdTipOpsRef" class="col-action">操作</th>
               </tr>
             </thead>
             <tbody>
@@ -163,7 +165,7 @@
 
     <!-- ===== Tab 二：段位福利 ===== -->
     <template v-if="activeTab === 'benefit'">
-      <div class="glass-card filter-card" role="tabpanel" aria-labelledby="ur-tab-benefit">
+      <div ref="prdTipFilterRef" class="glass-card filter-card" role="tabpanel" aria-labelledby="ur-tab-benefit">
         <div class="filter-grid">
           <div class="form-group-filter">
             <label class="form-label-sm">福利名称</label>
@@ -236,7 +238,7 @@
             <thead>
               <tr>
                 <th>福利名称</th><th>福利图标</th><th>是否免费</th><th>价格</th>
-                <th>独立解锁段位</th><th>状态</th><th>操作人</th><th>操作时间</th><th class="col-action">操作</th>
+                <th>独立解锁段位</th><th>状态</th><th>操作人</th><th>操作时间</th><th ref="prdTipOpsRef" class="col-action">操作</th>
               </tr>
             </thead>
             <tbody>
@@ -299,6 +301,29 @@
         </div>
       </div>
     </template>
+
+      <PrdTipMarker
+        :anchor-el="prdTipAnchorRef"
+        :tip-id="1"
+        :module-name="bundle.page.moduleName"
+        :markdown="bundle.page.md"
+      />
+      <PrdTipMarker
+        v-if="bundle.filter"
+        variant="filterCard"
+        :anchor-el="prdTipFilterRef"
+        :tip-id="2"
+        :module-name="bundle.filter.moduleName"
+        :markdown="bundle.filter.md"
+      />
+      <PrdTipMarker
+        v-if="bundle.ops"
+        variant="opsHeader"
+        :anchor-el="prdTipOpsRef"
+        :tip-id="opsTipId"
+        :module-name="bundle.ops.moduleName"
+        :markdown="bundle.ops.md"
+      />
     </div>
     <!-- /page-content -->
 
@@ -413,7 +438,11 @@
 </template>
 
 <script setup lang="ts">
+import PrdTipMarker from '@/components/prd/PrdTipMarker.vue'
+import { useAdminPrdTips } from '@/composables/useAdminPrdTips'
 import { ref, computed, watch } from 'vue'
+
+const { bundle, opsTipId, prdTipAnchorRef, prdTipFilterRef, prdTipOpsRef } = useAdminPrdTips()
 
 interface Rank { id: number; name: string; color: string; threshold: number; count: number; status: string; op: string; time: string }
 interface Benefit { id: number; name: string; free: string; price: number; rankNames: string[]; status: string; op: string; time: string }

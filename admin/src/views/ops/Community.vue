@@ -13,11 +13,20 @@
     <div class="page-content">
       <div class="page-header">
         <div>
-          <h1 class="page-title">社区管理（分类）</h1>
+          <div ref="prdTipAnchorRef" class="page-header-title-anchor">
+            <h1 class="page-title">社区管理（分类）</h1>
+          </div>
           <p class="page-desc">社区大类；prd-admin §7.2.1（Mock，≥20 条，默认每页 10 条）。</p>
         </div>
         <button type="button" class="btn btn-primary btn-sm" @click="openModal()">新增分类</button>
       </div>
+
+      <PrdTipMarker
+        :anchor-el="prdTipAnchorRef"
+        :tip-id="1"
+        module-name="社区管理（页头汇总）"
+        :markdown="OPS_TIP_COMMUNITY"
+      />
 
       <div class="glass-card table-card">
         <div class="table-header">
@@ -38,7 +47,7 @@
                 <th>状态</th>
                 <th>创建人</th>
                 <th>创建时间</th>
-                <th class="col-action" style="text-align: center">操作</th>
+                <th ref="prdTipOpsRef" class="col-action" style="text-align: center">操作</th>
               </tr>
             </thead>
             <tbody>
@@ -110,6 +119,14 @@
           </div>
         </div>
       </div>
+
+      <PrdTipMarker
+        variant="opsHeader"
+        :anchor-el="prdTipOpsRef"
+        :tip-id="2"
+        module-name="社区管理（分类）· 操作列"
+        :markdown="OPS_TIP_COMMUNITY_OPS"
+      />
     </div>
 
     <div class="ul-overlay" :class="{ show: modal }" @click.self="modal = false" />
@@ -185,8 +202,10 @@
 </template>
 
 <script setup lang="ts">
+import PrdTipMarker from '@/components/prd/PrdTipMarker.vue'
 import { useEscCloseStack } from '@/composables/useEscCloseStack'
 import { useOpsListPagination } from '@/composables/useOpsListPagination'
+import { OPS_TIP_COMMUNITY, OPS_TIP_COMMUNITY_OPS } from '@/prd-tips/opsDomainTips'
 import { ref } from 'vue'
 import { useSimpleToast } from './useOpsToast'
 
@@ -219,6 +238,8 @@ function genRows(n: number): Row[] {
 }
 
 const { toasts, toast, removeToast } = useSimpleToast()
+const prdTipAnchorRef = ref<HTMLElement | null>(null)
+const prdTipOpsRef = ref<HTMLElement | null>(null)
 const rows = ref(genRows(22))
 const pageSize = ref(10)
 const listPg = useOpsListPagination(rows, pageSize, (msg) => toast(msg, 'error'))

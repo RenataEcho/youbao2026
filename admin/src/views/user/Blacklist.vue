@@ -11,7 +11,9 @@
     <div class="page-content">
       <div class="page-header">
         <div>
-          <h1 class="page-title">黑名单管理</h1>
+          <div ref="prdTipAnchorRef" class="page-header-title-anchor">
+            <h1 class="page-title">黑名单管理</h1>
+          </div>
           <p class="page-desc">管理平台封禁用户，支持多维度禁止类型配置与站内信通知</p>
         </div>
         <button class="btn btn-primary" @click="openAdd">
@@ -21,7 +23,7 @@
       </div>
 
       <!-- 筛选 -->
-      <div class="glass-card bl-filter">
+      <div ref="prdTipFilterRef" class="glass-card bl-filter">
         <div class="ul-filter-grid">
           <div class="ul-form-group">
             <label class="ul-label">用户ID</label>
@@ -84,7 +86,7 @@
                 <th style="min-width:120px">备注</th>
                 <th style="width:90px">操作人</th>
                 <th style="min-width:140px">创建时间</th>
-                <th class="col-action" style="width:88px;text-align:center">操作</th>
+                <th ref="prdTipOpsRef" class="col-action" style="width:88px;text-align:center">操作</th>
               </tr>
             </thead>
             <tbody>
@@ -142,6 +144,29 @@
           </div>
         </div>
       </div>
+
+      <PrdTipMarker
+        :anchor-el="prdTipAnchorRef"
+        :tip-id="1"
+        :module-name="bundle.page.moduleName"
+        :markdown="bundle.page.md"
+      />
+      <PrdTipMarker
+        v-if="bundle.filter"
+        variant="filterCard"
+        :anchor-el="prdTipFilterRef"
+        :tip-id="2"
+        :module-name="bundle.filter.moduleName"
+        :markdown="bundle.filter.md"
+      />
+      <PrdTipMarker
+        v-if="bundle.ops"
+        variant="opsHeader"
+        :anchor-el="prdTipOpsRef"
+        :tip-id="opsTipId"
+        :module-name="bundle.ops.moduleName"
+        :markdown="bundle.ops.md"
+      />
     </div>
 
     <!-- 新增/编辑弹窗 -->
@@ -234,7 +259,11 @@
 </template>
 
 <script setup lang="ts">
+import PrdTipMarker from '@/components/prd/PrdTipMarker.vue'
+import { useAdminPrdTips } from '@/composables/useAdminPrdTips'
 import { ref, computed, onMounted } from 'vue'
+
+const { bundle, opsTipId, prdTipAnchorRef, prdTipFilterRef, prdTipOpsRef } = useAdminPrdTips()
 
 interface BlackItem {
   id: number; userId: string; types: string[]; notify: boolean

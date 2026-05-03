@@ -9,8 +9,16 @@
     </div>
 
     <div class="page-content">
+      <div class="page-header">
+        <div>
+          <div ref="prdTipAnchorRef" class="page-header-title-anchor">
+            <h1 class="page-title">用户等级</h1>
+          </div>
+          <p class="page-desc">配置各等级条件、权益与审核策略；固定 10 个等级，不支持新增/删除。</p>
+        </div>
+      </div>
     <!-- 筛选区 -->
-    <div class="glass-card filter-card">
+    <div ref="prdTipFilterRef" class="glass-card filter-card">
       <div class="filter-grid">
         <div class="form-group-filter">
           <label class="form-label-sm">等级</label>
@@ -80,7 +88,7 @@
               <th>该等级人数</th>
               <th>状态</th>
               <th>操作人/创建时间</th>
-              <th class="col-action" style="text-align:center">操作</th>
+              <th ref="prdTipOpsRef" class="col-action" style="text-align:center">操作</th>
             </tr>
           </thead>
           <tbody>
@@ -126,6 +134,29 @@
         </table>
       </div>
     </div>
+
+      <PrdTipMarker
+        :anchor-el="prdTipAnchorRef"
+        :tip-id="1"
+        :module-name="bundle.page.moduleName"
+        :markdown="bundle.page.md"
+      />
+      <PrdTipMarker
+        v-if="bundle.filter"
+        variant="filterCard"
+        :anchor-el="prdTipFilterRef"
+        :tip-id="2"
+        :module-name="bundle.filter.moduleName"
+        :markdown="bundle.filter.md"
+      />
+      <PrdTipMarker
+        v-if="bundle.ops"
+        variant="opsHeader"
+        :anchor-el="prdTipOpsRef"
+        :tip-id="opsTipId"
+        :module-name="bundle.ops.moduleName"
+        :markdown="bundle.ops.md"
+      />
     </div>
     <!-- /page-content -->
 
@@ -220,7 +251,11 @@
 </template>
 
 <script setup lang="ts">
+import PrdTipMarker from '@/components/prd/PrdTipMarker.vue'
+import { useAdminPrdTips } from '@/composables/useAdminPrdTips'
 import { ref, computed } from 'vue'
+
+const { bundle, opsTipId, prdTipAnchorRef, prdTipFilterRef, prdTipOpsRef } = useAdminPrdTips()
 
 interface LevelRow {
   lv: string; lvNum: number; nick: string; audit: string; status: string

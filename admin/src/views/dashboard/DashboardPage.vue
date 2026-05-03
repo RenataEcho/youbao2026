@@ -44,7 +44,9 @@
       <!-- ===== 数据概览标题行 ===== -->
       <div class="page-header">
         <div>
-          <h1 class="page-title">数据概览</h1>
+          <div ref="prdTipAnchorRef" class="page-header-title-anchor">
+            <h1 class="page-title">数据概览</h1>
+          </div>
           <p class="page-desc">今天是 {{ dateStr }}</p>
         </div>
         <button class="btn btn-default btn-sm" @click="refreshData">
@@ -166,16 +168,26 @@
           </div>
         </div>
       </div>
+
+      <PrdTipMarker
+        :anchor-el="prdTipAnchorRef"
+        :tip-id="1"
+        :module-name="bundle.page.moduleName"
+        :markdown="bundle.page.md"
+      />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import PrdTipMarker from '@/components/prd/PrdTipMarker.vue'
+import { useAdminPrdTips } from '@/composables/useAdminPrdTips'
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAppStore } from '@/stores/app'
 import type { DomainKey } from '@/stores/app'
 
+const { bundle, prdTipAnchorRef } = useAdminPrdTips()
 const router = useRouter()
 const appStore = useAppStore()
 const loginUser = computed(() => localStorage.getItem('loginUser') || '管理员')

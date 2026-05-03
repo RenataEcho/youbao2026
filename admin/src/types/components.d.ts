@@ -31,6 +31,7 @@ declare module 'vue' {
     EmptyState: typeof import('./../components/common/EmptyState.vue')['default']
     FilterCard: typeof import('./../components/common/FilterCard.vue')['default']
     PageHeader: typeof import('./../components/common/PageHeader.vue')['default']
+    PrdTipMarker: typeof import('./../components/prd/PrdTipMarker.vue')['default']
     RichTextChrome: typeof import('./../components/project/RichTextChrome.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']

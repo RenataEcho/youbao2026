@@ -11,7 +11,9 @@
     <div class="page-content">
       <div class="page-header">
         <div>
-          <h1 class="page-title">关键词管理</h1>
+          <div ref="prdTipAnchorRef" class="page-header-title-anchor">
+            <h1 class="page-title">关键词管理</h1>
+          </div>
           <p class="page-desc">管理品牌项目下的推广关键词库</p>
         </div>
       </div>
@@ -37,7 +39,7 @@
       </div>
 
       <!-- 筛选 -->
-      <div class="glass-card kw-filter">
+      <div ref="prdTipFilterRef" class="glass-card kw-filter">
         <div class="ul-filter-grid">
           <div class="ul-form-group">
             <label class="ul-label">所属项目</label>
@@ -151,7 +153,7 @@
                 <th style="min-width:120px">审核状态</th>
                 <th style="min-width:130px">审核时间</th>
                 <th style="min-width:130px">创建时间</th>
-                <th style="width:88px;text-align:center" class="col-action">操作</th>
+                <th ref="prdTipOpsRef" style="width:88px;text-align:center" class="col-action">操作</th>
               </tr>
             </thead>
             <tbody>
@@ -212,7 +214,7 @@
                 <th style="min-width:140px">回收原因</th>
                 <th style="min-width:130px">审核时间</th>
                 <th style="min-width:130px">创建时间</th>
-                <th style="width:88px;text-align:center" class="col-action">操作</th>
+                <th ref="prdTipOpsRef" style="width:88px;text-align:center" class="col-action">操作</th>
               </tr>
             </thead>
             <tbody>
@@ -271,6 +273,29 @@
           </div>
         </div>
       </div>
+
+      <PrdTipMarker
+        :anchor-el="prdTipAnchorRef"
+        :tip-id="1"
+        :module-name="bundle.page.moduleName"
+        :markdown="bundle.page.md"
+      />
+      <PrdTipMarker
+        v-if="bundle.filter"
+        variant="filterCard"
+        :anchor-el="prdTipFilterRef"
+        :tip-id="2"
+        :module-name="bundle.filter.moduleName"
+        :markdown="bundle.filter.md"
+      />
+      <PrdTipMarker
+        v-if="bundle.ops"
+        variant="opsHeader"
+        :anchor-el="prdTipOpsRef"
+        :tip-id="opsTipId"
+        :module-name="bundle.ops.moduleName"
+        :markdown="bundle.ops.md"
+      />
     </div>
 
     <!-- 导入弹窗（仅正常词库使用） -->
@@ -340,7 +365,11 @@
 </template>
 
 <script setup lang="ts">
+import PrdTipMarker from '@/components/prd/PrdTipMarker.vue'
+import { useAdminPrdTips } from '@/composables/useAdminPrdTips'
 import { ref, computed, reactive, onMounted, watch } from 'vue'
+
+const { bundle, opsTipId, prdTipAnchorRef, prdTipFilterRef, prdTipOpsRef } = useAdminPrdTips()
 
 interface KeywordItem {
   id: number

@@ -11,7 +11,9 @@
     <div class="page-content">
       <div class="page-header">
         <div>
-          <h1 class="page-title">分红明细</h1>
+          <div ref="prdTipAnchorRef" class="page-header-title-anchor">
+            <h1 class="page-title">分红明细</h1>
+          </div>
           <p class="page-desc">查看用户分红收益逐条明细，包含来源订单、分红比例及打款状态</p>
         </div>
         <button class="btn btn-default btn-sm" @click="showToast('正在导出 Excel…','info')">
@@ -21,7 +23,7 @@
       </div>
 
       <!-- 筛选 -->
-      <div class="glass-card bl-filter">
+      <div ref="prdTipFilterRef" class="glass-card bl-filter">
         <div class="ul-filter-grid">
           <div class="ul-form-group"><label class="ul-label">用户ID</label><input v-model="f.userId" class="ul-input" placeholder="请输入用户ID"></div>
           <div class="ul-form-group"><label class="ul-label">来源订单用户ID</label><input v-model="f.sourceUserId" class="ul-input" placeholder="来源订单用户ID"></div>
@@ -172,6 +174,29 @@
           </div>
         </div>
       </div>
+
+      <PrdTipMarker
+        :anchor-el="prdTipAnchorRef"
+        :tip-id="1"
+        :module-name="bundle.page.moduleName"
+        :markdown="bundle.page.md"
+      />
+      <PrdTipMarker
+        v-if="bundle.filter"
+        variant="filterCard"
+        :anchor-el="prdTipFilterRef"
+        :tip-id="2"
+        :module-name="bundle.filter.moduleName"
+        :markdown="bundle.filter.md"
+      />
+      <PrdTipMarker
+        v-if="bundle.ops"
+        variant="opsHeader"
+        :anchor-el="prdTipOpsRef"
+        :tip-id="opsTipId"
+        :module-name="bundle.ops.moduleName"
+        :markdown="bundle.ops.md"
+      />
     </div>
 
     <div class="ul-toast-container">
@@ -184,7 +209,11 @@
 </template>
 
 <script setup lang="ts">
+import PrdTipMarker from '@/components/prd/PrdTipMarker.vue'
+import { useAdminPrdTips } from '@/composables/useAdminPrdTips'
 import { ref, computed, onMounted } from 'vue'
+
+const { bundle, opsTipId, prdTipAnchorRef, prdTipFilterRef, prdTipOpsRef } = useAdminPrdTips()
 
 interface DividendItem {
   orderId:string; userId:string; userLevels:string[]; sourceAmount:number; ratio:number

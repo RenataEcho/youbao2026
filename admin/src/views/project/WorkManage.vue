@@ -11,13 +11,15 @@
     <div class="page-content">
       <div class="page-header">
         <div>
-          <h1 class="page-title">作品管理</h1>
+          <div ref="prdTipAnchorRef" class="page-header-title-anchor">
+            <h1 class="page-title">作品管理</h1>
+          </div>
           <p class="page-desc">管理用户在平台提交的推广作品内容</p>
         </div>
       </div>
 
       <!-- 筛选 -->
-      <div class="glass-card wm-filter">
+      <div ref="prdTipFilterRef" class="glass-card wm-filter">
         <div class="ul-filter-grid">
           <div class="ul-form-group">
             <label class="ul-label">用户ID</label>
@@ -114,7 +116,7 @@
                 <th style="width:80px">点赞量</th>
                 <th style="width:90px">审核状态</th>
                 <th style="min-width:120px">提交时间</th>
-                <th class="col-action" style="width:120px;text-align:center">操作</th>
+                <th ref="prdTipOpsRef" class="col-action" style="width:120px;text-align:center">操作</th>
               </tr>
             </thead>
             <tbody>
@@ -188,6 +190,29 @@
           </div>
         </div>
       </div>
+
+      <PrdTipMarker
+        :anchor-el="prdTipAnchorRef"
+        :tip-id="1"
+        :module-name="bundle.page.moduleName"
+        :markdown="bundle.page.md"
+      />
+      <PrdTipMarker
+        v-if="bundle.filter"
+        variant="filterCard"
+        :anchor-el="prdTipFilterRef"
+        :tip-id="2"
+        :module-name="bundle.filter.moduleName"
+        :markdown="bundle.filter.md"
+      />
+      <PrdTipMarker
+        v-if="bundle.ops"
+        variant="opsHeader"
+        :anchor-el="prdTipOpsRef"
+        :tip-id="opsTipId"
+        :module-name="bundle.ops.moduleName"
+        :markdown="bundle.ops.md"
+      />
     </div>
 
     <!-- 单条驳回弹窗 -->
@@ -322,7 +347,11 @@
 </template>
 
 <script setup lang="ts">
+import PrdTipMarker from '@/components/prd/PrdTipMarker.vue'
+import { useAdminPrdTips } from '@/composables/useAdminPrdTips'
 import { ref, computed, onMounted, reactive } from 'vue'
+
+const { bundle, opsTipId, prdTipAnchorRef, prdTipFilterRef, prdTipOpsRef } = useAdminPrdTips()
 
 interface WorkItem {
   id: number

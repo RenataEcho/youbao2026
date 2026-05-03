@@ -13,7 +13,9 @@
       <!-- 页面标题 -->
       <div class="page-header">
         <div>
-          <h1 class="page-title">分销比例配置</h1>
+          <div ref="prdTipAnchorRef" class="page-header-title-anchor">
+            <h1 class="page-title">分销比例配置</h1>
+          </div>
           <p class="page-desc">配置各团长等级的分销分佣比例，支持按等级差异化设置收益分成规则。</p>
         </div>
         <div class="page-actions">
@@ -25,6 +27,7 @@
       </div>
 
       <!-- 筛选区 -->
+      <div ref="prdTipFilterRef">
       <FilterCard v-model="filters" :default-value="defaultFilters" @search="fetchList" @reset="fetchList">
         <el-form-item label="分佣等级">
           <el-select v-model="filters.level" placeholder="全部等级" clearable style="width:120px">
@@ -44,6 +47,7 @@
           <el-date-picker v-model="filters.updatedAt" type="date" placeholder="选择日期" value-format="YYYY-MM-DD" style="width:140px" />
         </el-form-item>
       </FilterCard>
+      </div>
 
       <!-- 数据表 -->
       <div class="glass-card table-card">
@@ -76,7 +80,7 @@
                 <th>操作人</th>
                 <th>创建时间</th>
                 <th>更新时间</th>
-                <th class="col-action cc-th-act">操作</th>
+                <th ref="prdTipOpsRef" class="col-action cc-th-act">操作</th>
               </tr>
             </thead>
             <tbody>
@@ -192,6 +196,29 @@
           </el-table>
         </div>
       </div>
+
+      <PrdTipMarker
+        :anchor-el="prdTipAnchorRef"
+        :tip-id="1"
+        :module-name="bundle.page.moduleName"
+        :markdown="bundle.page.md"
+      />
+      <PrdTipMarker
+        v-if="bundle.filter"
+        variant="filterCard"
+        :anchor-el="prdTipFilterRef"
+        :tip-id="2"
+        :module-name="bundle.filter.moduleName"
+        :markdown="bundle.filter.md"
+      />
+      <PrdTipMarker
+        v-if="bundle.ops"
+        variant="opsHeader"
+        :anchor-el="prdTipOpsRef"
+        :tip-id="opsTipId"
+        :module-name="bundle.ops.moduleName"
+        :markdown="bundle.ops.md"
+      />
     </div>
 
     <!-- 规则说明弹窗 -->
@@ -214,6 +241,8 @@
 </template>
 
 <script setup lang="ts">
+import PrdTipMarker from '@/components/prd/PrdTipMarker.vue'
+import { useAdminPrdTips } from '@/composables/useAdminPrdTips'
 import { ref, reactive, onMounted } from 'vue'
 import { InfoFilled, Setting } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
@@ -224,6 +253,8 @@ import CommissionRuleModal from './commission/CommissionRuleModal.vue'
 import CommissionEditModal from './commission/CommissionEditModal.vue'
 import CommissionLogDialog from './commission/CommissionLogDialog.vue'
 import { COMMISSION_LEVELS } from './commission/commissionUtils'
+
+const { bundle, opsTipId, prdTipAnchorRef, prdTipFilterRef, prdTipOpsRef } = useAdminPrdTips()
 
 const LEVELS = COMMISSION_LEVELS
 

@@ -11,7 +11,9 @@
     <div class="page-content">
       <div class="page-header">
         <div>
-          <h1 class="page-title">微信通知</h1>
+          <div ref="prdTipAnchorRef" class="page-header-title-anchor">
+            <h1 class="page-title">微信通知</h1>
+          </div>
           <p class="page-desc">记录向用户发送微信通知的日志</p>
         </div>
         <button class="btn btn-primary btn-sm" @click="openCreate">
@@ -21,7 +23,7 @@
       </div>
 
       <!-- 筛选 -->
-      <div class="glass-card bl-filter">
+      <div ref="prdTipFilterRef" class="glass-card bl-filter">
         <div class="ul-filter-grid">
           <div class="ul-form-group"><label class="ul-label">标题</label><input v-model="f.title" class="ul-input" placeholder="模糊搜索标题"></div>
           <div class="ul-form-group">
@@ -80,7 +82,7 @@
                 <th>通知用户</th>
                 <th>操作人</th>
                 <th>创建时间</th>
-                <th class="col-action" style="text-align:center">操作</th>
+                <th ref="prdTipOpsRef" class="col-action" style="text-align:center">操作</th>
               </tr>
             </thead>
             <tbody>
@@ -132,6 +134,29 @@
           </div>
         </div>
       </div>
+
+      <PrdTipMarker
+        :anchor-el="prdTipAnchorRef"
+        :tip-id="1"
+        :module-name="bundle.page.moduleName"
+        :markdown="bundle.page.md"
+      />
+      <PrdTipMarker
+        v-if="bundle.filter"
+        variant="filterCard"
+        :anchor-el="prdTipFilterRef"
+        :tip-id="2"
+        :module-name="bundle.filter.moduleName"
+        :markdown="bundle.filter.md"
+      />
+      <PrdTipMarker
+        v-if="bundle.ops"
+        variant="opsHeader"
+        :anchor-el="prdTipOpsRef"
+        :tip-id="opsTipId"
+        :module-name="bundle.ops.moduleName"
+        :markdown="bundle.ops.md"
+      />
     </div>
 
     <!-- 查看弹窗 -->
@@ -185,7 +210,11 @@
 </template>
 
 <script setup lang="ts">
+import PrdTipMarker from '@/components/prd/PrdTipMarker.vue'
+import { useAdminPrdTips } from '@/composables/useAdminPrdTips'
 import { ref, computed, onMounted } from 'vue'
+
+const { bundle, opsTipId, prdTipAnchorRef, prdTipFilterRef, prdTipOpsRef } = useAdminPrdTips()
 
 interface NotifyItem { id:number; title:string; notifyType:string; ownerType:string; ownerValue:string; operator:string; createTime:string }
 interface Toast { id:number; msg:string; type:string }

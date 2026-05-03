@@ -13,13 +13,22 @@
     <div class="page-content">
       <div class="page-header">
         <div>
-          <h1 class="page-title">兑换码管理</h1>
+          <div ref="prdTipAnchorRef" class="page-header-title-anchor">
+            <h1 class="page-title">兑换码管理</h1>
+          </div>
           <p class="page-desc">批次列表与单码明细；prd-admin §7.1.5（Mock，批次 ≥20 条，默认每页 10 条；抽屉内明细 ≥20 条）。</p>
         </div>
         <button type="button" class="btn btn-primary btn-sm" @click="createOpen = true">新增批次</button>
       </div>
 
-      <div class="glass-card ul-filter-card">
+      <PrdTipMarker
+        :anchor-el="prdTipAnchorRef"
+        :tip-id="1"
+        module-name="兑换码管理（页头汇总）"
+        :markdown="OPS_TIP_COUPON"
+      />
+
+      <div ref="prdTipFilterRef" class="glass-card ul-filter-card">
         <div class="ul-filter-grid">
           <div class="ul-form-group">
             <label class="ul-label">标题 / 备注</label>
@@ -60,7 +69,7 @@
                 <th>批次状态</th>
                 <th>创建人</th>
                 <th>创建时间</th>
-                <th class="col-action" style="text-align: center">操作</th>
+                <th ref="prdTipOpsRef" class="col-action" style="text-align: center">操作</th>
               </tr>
             </thead>
             <tbody>
@@ -132,6 +141,21 @@
           </div>
         </div>
       </div>
+
+      <PrdTipMarker
+        variant="filterCard"
+        :anchor-el="prdTipFilterRef"
+        :tip-id="2"
+        module-name="兑换码管理 · 筛选区"
+        :markdown="OPS_TIP_COUPON_FILTER"
+      />
+      <PrdTipMarker
+        variant="opsHeader"
+        :anchor-el="prdTipOpsRef"
+        :tip-id="3"
+        module-name="兑换码管理 · 操作列"
+        :markdown="OPS_TIP_COUPON_OPS"
+      />
     </div>
 
     <div class="ul-overlay" :class="{ show: createOpen }" @click.self="createOpen = false" />
@@ -274,8 +298,14 @@
 </template>
 
 <script setup lang="ts">
+import PrdTipMarker from '@/components/prd/PrdTipMarker.vue'
 import { useEscCloseStack } from '@/composables/useEscCloseStack'
 import { useOpsListPagination } from '@/composables/useOpsListPagination'
+import {
+  OPS_TIP_COUPON,
+  OPS_TIP_COUPON_FILTER,
+  OPS_TIP_COUPON_OPS,
+} from '@/prd-tips/opsDomainTips'
 import { computed, ref } from 'vue'
 import { useSimpleToast } from './useOpsToast'
 
@@ -307,6 +337,9 @@ function genBatches(n: number): Batch[] {
 }
 
 const { toasts, toast, removeToast } = useSimpleToast()
+const prdTipAnchorRef = ref<HTMLElement | null>(null)
+const prdTipFilterRef = ref<HTMLElement | null>(null)
+const prdTipOpsRef = ref<HTMLElement | null>(null)
 const f = ref({ kw: '', status: '' })
 const batches = ref(genBatches(22))
 

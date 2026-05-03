@@ -11,13 +11,15 @@
     <div class="page-content">
       <div class="page-header">
         <div>
-          <h1 class="page-title">提现账户</h1>
+          <div ref="prdTipAnchorRef" class="page-header-title-anchor">
+            <h1 class="page-title">提现账户</h1>
+          </div>
           <p class="page-desc">管理用户个人实名绑定的提现账户（银行卡 / 支付宝）</p>
         </div>
       </div>
 
       <!-- 筛选 -->
-      <div class="glass-card bl-filter">
+      <div ref="prdTipFilterRef" class="glass-card bl-filter">
         <div class="ul-filter-grid">
           <div class="ul-form-group">
             <label class="ul-label">用户ID</label>
@@ -118,7 +120,7 @@
                 <th>排序</th>
                 <th>是否本人</th>
                 <th>状态</th>
-                <th class="col-action" style="text-align:center">操作</th>
+                <th ref="prdTipOpsRef" class="col-action" style="text-align:center">操作</th>
               </tr>
             </thead>
             <tbody>
@@ -180,6 +182,29 @@
           </div>
         </div>
       </div>
+
+      <PrdTipMarker
+        :anchor-el="prdTipAnchorRef"
+        :tip-id="1"
+        :module-name="bundle.page.moduleName"
+        :markdown="bundle.page.md"
+      />
+      <PrdTipMarker
+        v-if="bundle.filter"
+        variant="filterCard"
+        :anchor-el="prdTipFilterRef"
+        :tip-id="2"
+        :module-name="bundle.filter.moduleName"
+        :markdown="bundle.filter.md"
+      />
+      <PrdTipMarker
+        v-if="bundle.ops"
+        variant="opsHeader"
+        :anchor-el="prdTipOpsRef"
+        :tip-id="opsTipId"
+        :module-name="bundle.ops.moduleName"
+        :markdown="bundle.ops.md"
+      />
     </div>
 
     <!-- 编辑弹窗 -->
@@ -257,7 +282,11 @@
 </template>
 
 <script setup lang="ts">
+import PrdTipMarker from '@/components/prd/PrdTipMarker.vue'
+import { useAdminPrdTips } from '@/composables/useAdminPrdTips'
 import { ref, computed, onMounted } from 'vue'
+
+const { bundle, opsTipId, prdTipAnchorRef, prdTipFilterRef, prdTipOpsRef } = useAdminPrdTips()
 
 interface WAccount {
   id:number; userId:string; type:string; cardNo:string; bankName:string

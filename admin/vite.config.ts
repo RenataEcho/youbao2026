@@ -6,10 +6,14 @@ import AutoImport from 'unplugin-auto-import/vite'
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 import path from 'node:path'
 import { fileURLToPath, URL } from 'node:url'
+import { prdTipSavePlugin } from './vite-plugins/prd-tip-save'
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 export default defineConfig({
   plugins: [
     vue(),
+    prdTipSavePlugin(__dirname),
     viteMockServe({
       mockPath: 'src/mock',
       enable: true,

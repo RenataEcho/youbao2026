@@ -13,12 +13,21 @@
     <div class="page-content">
       <div class="page-header">
         <div>
-          <h1 class="page-title">通用配置</h1>
+          <div ref="prdTipAnchorRef" class="page-header-title-anchor">
+            <h1 class="page-title">通用配置</h1>
+          </div>
           <p class="page-desc">
             一般为<strong>全局</strong>相关配置入口；下列子模块以 Tab 规划，当前为占位说明，详规与接口待后续补充。
           </p>
         </div>
       </div>
+
+      <PrdTipMarker
+        :anchor-el="prdTipAnchorRef"
+        :tip-id="1"
+        module-name="通用配置（页头汇总）"
+        :markdown="OPS_TIP_COMMON_CONFIG"
+      />
 
       <div class="glass-card" style="padding: 16px 20px">
         <p class="page-desc" style="margin: 0; line-height: 1.65">
@@ -63,6 +72,8 @@
 </template>
 
 <script setup lang="ts">
+import PrdTipMarker from '@/components/prd/PrdTipMarker.vue'
+import { OPS_TIP_COMMON_CONFIG } from '@/prd-tips/opsDomainTips'
 import { computed, ref } from 'vue'
 
 type TabKey =
@@ -73,6 +84,8 @@ type TabKey =
   | 'earning'
   | 'bank'
   | 'invite'
+
+const prdTipAnchorRef = ref<HTMLElement | null>(null)
 
 const tabs: { key: TabKey; label: string; hint: string }[] = [
   { key: 'copy', label: '说明文案', hint: '配置各前端页面使用的说明类文案；列表与编辑表单待 PRD 字段级补充。' },

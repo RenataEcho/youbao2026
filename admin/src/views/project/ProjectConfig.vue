@@ -11,7 +11,9 @@
     <div class="page-content">
       <div class="page-header">
         <div>
-          <h1 class="page-title">项目配置</h1>
+          <div ref="prdTipAnchorRef" class="page-header-title-anchor">
+            <h1 class="page-title">项目配置</h1>
+          </div>
           <p class="page-desc">
             对推广项目全生命周期配置管理：基础信息、状态开关、详情介绍（四大板块 + 项目介绍下五子模块），规则见 project.md
           </p>
@@ -21,7 +23,7 @@
         </router-link>
       </div>
 
-      <div class="glass-card pc-filter">
+      <div ref="prdTipFilterRef" class="glass-card pc-filter">
         <div class="ul-filter-grid pc-filter-grid">
           <div class="ul-form-group">
             <label class="ul-label">前台标题</label>
@@ -105,7 +107,7 @@
                 <th style="width:52px">新品</th>
                 <th style="width:56px">排序</th>
                 <th style="min-width:136px">更新时间</th>
-                <th class="col-action" style="min-width:280px;text-align:center">操作</th>
+                <th ref="prdTipOpsRef" class="col-action" style="min-width:280px;text-align:center">操作</th>
               </tr>
             </thead>
             <tbody>
@@ -179,16 +181,43 @@
           </div>
         </div>
       </div>
+
+      <PrdTipMarker
+        :anchor-el="prdTipAnchorRef"
+        :tip-id="1"
+        :module-name="bundle.page.moduleName"
+        :markdown="bundle.page.md"
+      />
+      <PrdTipMarker
+        v-if="bundle.filter"
+        variant="filterCard"
+        :anchor-el="prdTipFilterRef"
+        :tip-id="2"
+        :module-name="bundle.filter.moduleName"
+        :markdown="bundle.filter.md"
+      />
+      <PrdTipMarker
+        v-if="bundle.ops"
+        variant="opsHeader"
+        :anchor-el="prdTipOpsRef"
+        :tip-id="opsTipId"
+        :module-name="bundle.ops.moduleName"
+        :markdown="bundle.ops.md"
+      />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import PrdTipMarker from '@/components/prd/PrdTipMarker.vue'
+import { useAdminPrdTips } from '@/composables/useAdminPrdTips'
 import { ref, computed, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import type { ProjectCategory, ProjectRow, ShowHide, OnlineOffline } from '@/utils/projectManagement'
 import { useProjectConfigStore } from '@/stores/projectConfig'
 import { CATEGORIES, TRACK_OPTIONS, BIZ_OPTIONS } from './projectConfigConstants'
+
+const { bundle, opsTipId, prdTipAnchorRef, prdTipFilterRef, prdTipOpsRef } = useAdminPrdTips()
 
 const store = useProjectConfigStore()
 const { rows: allRows } = storeToRefs(store)

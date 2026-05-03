@@ -11,7 +11,9 @@
     <div class="page-content">
       <div class="page-header">
         <div>
-          <h1 class="page-title">业务类型</h1>
+          <div ref="prdTipAnchorRef" class="page-header-title-anchor">
+            <h1 class="page-title">业务类型</h1>
+          </div>
           <p class="page-desc">管理平台业务类型分类配置，用于项目归类</p>
         </div>
         <button class="btn btn-primary" @click="openAdd">
@@ -21,7 +23,7 @@
       </div>
 
       <!-- 筛选 -->
-      <div class="glass-card bt-filter">
+      <div ref="prdTipFilterRef" class="glass-card bt-filter">
         <div class="ul-filter-grid">
           <div class="ul-form-group">
             <label class="ul-label">业务名称</label>
@@ -66,7 +68,7 @@
                 <th style="width:80px">状态</th>
                 <th style="min-width:140px">创建时间</th>
                 <th style="min-width:140px">更新时间</th>
-                <th class="col-action" style="width:88px;text-align:center">操作</th>
+                <th ref="prdTipOpsRef" class="col-action" style="width:88px;text-align:center">操作</th>
               </tr>
             </thead>
             <tbody>
@@ -125,6 +127,29 @@
           </div>
         </div>
       </div>
+
+      <PrdTipMarker
+        :anchor-el="prdTipAnchorRef"
+        :tip-id="1"
+        :module-name="bundle.page.moduleName"
+        :markdown="bundle.page.md"
+      />
+      <PrdTipMarker
+        v-if="bundle.filter"
+        variant="filterCard"
+        :anchor-el="prdTipFilterRef"
+        :tip-id="2"
+        :module-name="bundle.filter.moduleName"
+        :markdown="bundle.filter.md"
+      />
+      <PrdTipMarker
+        v-if="bundle.ops"
+        variant="opsHeader"
+        :anchor-el="prdTipOpsRef"
+        :tip-id="opsTipId"
+        :module-name="bundle.ops.moduleName"
+        :markdown="bundle.ops.md"
+      />
     </div>
 
     <!-- 新增/编辑弹窗 -->
@@ -172,8 +197,12 @@
 </template>
 
 <script setup lang="ts">
+import PrdTipMarker from '@/components/prd/PrdTipMarker.vue'
+import { useAdminPrdTips } from '@/composables/useAdminPrdTips'
 import { ref, computed, onMounted } from 'vue'
 import { BIZ_TYPE_MOCK_SEED, type ProjectBizTypeRow } from '@/data/projectCategoryCatalog'
+
+const { bundle, opsTipId, prdTipAnchorRef, prdTipFilterRef, prdTipOpsRef } = useAdminPrdTips()
 
 type BizItem = ProjectBizTypeRow
 interface Toast { id: number; msg: string; type: 'success' | 'error' | 'info' }

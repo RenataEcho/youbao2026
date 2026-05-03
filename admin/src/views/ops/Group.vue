@@ -13,13 +13,22 @@
     <div class="page-content">
       <div class="page-header">
         <div>
-          <h1 class="page-title">社群管理</h1>
+          <div ref="prdTipAnchorRef" class="page-header-title-anchor">
+            <h1 class="page-title">社群管理</h1>
+          </div>
           <p class="page-desc">隶属社区分类下的社群；prd-admin §7.2.2（Mock，≥20 条，默认每页 10 条）。</p>
         </div>
         <button type="button" class="btn btn-primary btn-sm" @click="openDw()">新增社群</button>
       </div>
 
-      <div class="glass-card ul-filter-card">
+      <PrdTipMarker
+        :anchor-el="prdTipAnchorRef"
+        :tip-id="1"
+        module-name="社群管理（页头汇总）"
+        :markdown="OPS_TIP_GROUP"
+      />
+
+      <div ref="prdTipFilterRef" class="glass-card ul-filter-card">
         <div class="ul-filter-grid">
           <div class="ul-form-group">
             <label class="ul-label">所属分类</label>
@@ -81,7 +90,7 @@
                 <th>状态</th>
                 <th>创建人</th>
                 <th>创建时间</th>
-                <th class="col-action" style="text-align: center">操作</th>
+                <th ref="prdTipOpsRef" class="col-action" style="text-align: center">操作</th>
               </tr>
             </thead>
             <tbody>
@@ -150,6 +159,21 @@
           </div>
         </div>
       </div>
+
+      <PrdTipMarker
+        variant="filterCard"
+        :anchor-el="prdTipFilterRef"
+        :tip-id="2"
+        module-name="社群管理 · 筛选区"
+        :markdown="OPS_TIP_GROUP_FILTER"
+      />
+      <PrdTipMarker
+        variant="opsHeader"
+        :anchor-el="prdTipOpsRef"
+        :tip-id="3"
+        module-name="社群管理 · 操作列"
+        :markdown="OPS_TIP_GROUP_OPS"
+      />
     </div>
 
     <div class="ul-overlay" :class="{ show: dw }" @click.self="dw = false" />
@@ -258,7 +282,13 @@
 </template>
 
 <script setup lang="ts">
+import PrdTipMarker from '@/components/prd/PrdTipMarker.vue'
 import { useEscCloseStack } from '@/composables/useEscCloseStack'
+import {
+  OPS_TIP_GROUP,
+  OPS_TIP_GROUP_FILTER,
+  OPS_TIP_GROUP_OPS,
+} from '@/prd-tips/opsDomainTips'
 import { computed, ref, watch } from 'vue'
 import { useSimpleToast } from './useOpsToast'
 
@@ -308,6 +338,9 @@ function genGroups(n: number): G[] {
 }
 
 const { toasts, toast, removeToast } = useSimpleToast()
+const prdTipAnchorRef = ref<HTMLElement | null>(null)
+const prdTipFilterRef = ref<HTMLElement | null>(null)
+const prdTipOpsRef = ref<HTMLElement | null>(null)
 const all = ref(genGroups(22))
 const filters = ref({ catId: '', name: '' })
 

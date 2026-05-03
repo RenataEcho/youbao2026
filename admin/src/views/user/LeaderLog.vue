@@ -11,10 +11,12 @@
     <div class="page-content">
       <div class="page-header">
         <div>
+          <div ref="prdTipAnchorRef" class="page-header-title-anchor">
           <h1 class="page-title" style="display:flex;align-items:center;gap:10px">
             团长身份日志
             <span v-if="pendingCount>0" class="badge badge-danger" style="font-size:12px;padding:2px 10px">待审核 {{ pendingCount }}</span>
           </h1>
+          </div>
           <p class="page-desc">记录团长等级 LV1–LV5 的全部变更历史，涉及审核流程时在此完成审核</p>
         </div>
         <div style="display:flex;gap:8px">
@@ -28,7 +30,7 @@
       </div>
 
       <!-- 筛选 -->
-      <div class="glass-card bl-filter">
+      <div ref="prdTipFilterRef" class="glass-card bl-filter">
         <div class="ul-filter-grid">
           <div class="ul-form-group"><label class="ul-label">用户ID</label><input v-model="f.userId" class="ul-input" placeholder="精确输入用户ID"></div>
           <div class="ul-form-group">
@@ -104,7 +106,7 @@
                 <th>审核状态</th>
                 <th>审核信息</th>
                 <th>创建时间</th>
-                <th class="col-action" style="text-align:center">操作</th>
+                <th ref="prdTipOpsRef" class="col-action" style="text-align:center">操作</th>
               </tr>
             </thead>
             <tbody>
@@ -177,6 +179,29 @@
           </div>
         </div>
       </div>
+
+      <PrdTipMarker
+        :anchor-el="prdTipAnchorRef"
+        :tip-id="1"
+        :module-name="bundle.page.moduleName"
+        :markdown="bundle.page.md"
+      />
+      <PrdTipMarker
+        v-if="bundle.filter"
+        variant="filterCard"
+        :anchor-el="prdTipFilterRef"
+        :tip-id="2"
+        :module-name="bundle.filter.moduleName"
+        :markdown="bundle.filter.md"
+      />
+      <PrdTipMarker
+        v-if="bundle.ops"
+        variant="opsHeader"
+        :anchor-el="prdTipOpsRef"
+        :tip-id="opsTipId"
+        :module-name="bundle.ops.moduleName"
+        :markdown="bundle.ops.md"
+      />
     </div>
 
     <!-- 新增弹窗 -->
@@ -297,7 +322,11 @@
 </template>
 
 <script setup lang="ts">
+import PrdTipMarker from '@/components/prd/PrdTipMarker.vue'
+import { useAdminPrdTips } from '@/composables/useAdminPrdTips'
 import { ref, computed, onMounted } from 'vue'
+
+const { bundle, opsTipId, prdTipAnchorRef, prdTipFilterRef, prdTipOpsRef } = useAdminPrdTips()
 
 interface LogItem { id:string; userId:string; fromLevel:string; toLevel:string; changeType:string; auditStatus:string; auditor:string; auditTime:string; createdAt:string }
 interface Toast { id:number; msg:string; type:string }

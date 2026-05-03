@@ -13,10 +13,19 @@
     <div class="page-content">
       <div class="page-header">
         <div>
-          <h1 class="page-title">工具配置</h1>
+          <div ref="prdTipAnchorRef" class="page-header-title-anchor">
+            <h1 class="page-title">工具配置</h1>
+          </div>
           <p class="page-desc">分类与工具维护；prd-admin §7.1.3（Mock，各表 ≥20 条，默认每页 10 条）。</p>
         </div>
       </div>
+
+      <PrdTipMarker
+        :anchor-el="prdTipAnchorRef"
+        :tip-id="1"
+        module-name="工具配置（页头汇总）"
+        :markdown="OPS_TIP_TOOL_CONFIG"
+      />
 
       <div class="glass-card tab-nav-shell" role="tablist" aria-label="工具配置">
         <div class="tab-nav">
@@ -73,7 +82,7 @@
                 <th>状态</th>
                 <th>创建人</th>
                 <th>创建时间</th>
-                <th class="col-action" style="text-align: center">操作</th>
+                <th ref="prdTipCatOpsRef" class="col-action" style="text-align: center">操作</th>
               </tr>
             </thead>
             <tbody>
@@ -143,7 +152,7 @@
       </div>
 
       <template v-else>
-        <div class="glass-card ul-filter-card">
+        <div ref="prdTipToolFilterRef" class="glass-card ul-filter-card">
           <div class="ul-filter-grid">
             <div class="ul-form-group">
               <label class="ul-label">名称</label>
@@ -210,7 +219,7 @@
                   <th class="th-num">使用次数</th>
                   <th>来源</th>
                   <th>跳转/详情</th>
-                  <th class="col-action" style="text-align: center">操作</th>
+                  <th ref="prdTipToolOpsRef" class="col-action" style="text-align: center">操作</th>
                 </tr>
               </thead>
               <tbody>
@@ -284,6 +293,31 @@
           </div>
         </div>
       </template>
+
+      <PrdTipMarker
+        v-if="tab === 'tool'"
+        variant="filterCard"
+        :anchor-el="prdTipToolFilterRef"
+        :tip-id="2"
+        module-name="工具配置 · 工具筛选区"
+        :markdown="OPS_TIP_TOOL_FILTER"
+      />
+      <PrdTipMarker
+        v-if="tab === 'cat'"
+        variant="opsHeader"
+        :anchor-el="prdTipCatOpsRef"
+        :tip-id="3"
+        module-name="工具配置 · 分类表 · 操作列"
+        :markdown="OPS_TIP_TOOL_OPS_CAT"
+      />
+      <PrdTipMarker
+        v-if="tab === 'tool'"
+        variant="opsHeader"
+        :anchor-el="prdTipToolOpsRef"
+        :tip-id="4"
+        module-name="工具配置 · 工具表 · 操作列"
+        :markdown="OPS_TIP_TOOL_OPS_TOOL"
+      />
     </div>
 
     <div class="ul-overlay" :class="{ show: catModal }" @click.self="catModal = false" />
@@ -436,8 +470,15 @@
 </template>
 
 <script setup lang="ts">
+import PrdTipMarker from '@/components/prd/PrdTipMarker.vue'
 import { useEscCloseStack } from '@/composables/useEscCloseStack'
 import { useOpsListPagination } from '@/composables/useOpsListPagination'
+import {
+  OPS_TIP_TOOL_CONFIG,
+  OPS_TIP_TOOL_FILTER,
+  OPS_TIP_TOOL_OPS_CAT,
+  OPS_TIP_TOOL_OPS_TOOL,
+} from '@/prd-tips/opsDomainTips'
 import { computed, ref } from 'vue'
 import { useSimpleToast } from './useOpsToast'
 
@@ -493,6 +534,10 @@ function genTools(n: number, catIds: string[]): Tool[] {
 }
 
 const { toasts, toast, removeToast } = useSimpleToast()
+const prdTipAnchorRef = ref<HTMLElement | null>(null)
+const prdTipCatOpsRef = ref<HTMLElement | null>(null)
+const prdTipToolFilterRef = ref<HTMLElement | null>(null)
+const prdTipToolOpsRef = ref<HTMLElement | null>(null)
 const tab = ref<'cat' | 'tool'>('cat')
 
 const categories = ref(genCats(22))
